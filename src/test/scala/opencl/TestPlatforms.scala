@@ -66,7 +66,7 @@ class TestPlatforms {
 
             println("     Error correction support: " + d.errorCorrectionSupport)
             println("     Profiling timer resolution: " + d.profilingTimerResolution + " ns")
-            println("     Endian little: " + d.endianLittle)
+            println("     Endianness: " + d.endianness)
             println("     Available: " + d.available)
             println("     Compiler available: " + d.compilerAvailable)
 

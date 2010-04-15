@@ -2,7 +2,6 @@ import org.junit._
 import fr.hsyl20.auratune._
 import fr.hsyl20.opencl._
 import fr.hsyl20.auratune.Conversions._
-import java.nio.{ByteBuffer,ByteOrder}
 
 class TestLanguage {
    @Test def language {
@@ -42,18 +41,15 @@ class TestLanguage {
                val cq = new CommandQueue(ctx, dev, profiling = true)
                println(cq.properties)
 
-               val m0 = ByteBuffer.allocateDirect(1024*4)
-               
-               m0.order(ByteOrder.LITTLE_ENDIAN)
+               val b0 = ctx.bufferAlloc(1024*4)   
+               val fb0 = b0.byteBuffer.asFloatBuffer
 
-               val fb0 = m0.asFloatBuffer
                for (i <- 0 until 1024) {
                   fb0.put(i, 1.0f)
                }
                println()
                println()
                
-               val b0 = ctx.bufferUsing(m0)
 
                ker.setArg(0, b0)
                

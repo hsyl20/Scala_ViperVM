@@ -31,6 +31,11 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
    protected val releaseFunc = clReleaseContext
    protected val infoFunc = clGetContextInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
     
+   //Check that all devices have the same endianness
+   val endianness = devices.head.endianness
+   for (d <- devices.tail)
+      if (d.endianness != endianness) throw new Exception("Context cannot contain devices with different endianess")
+
    // Set properties (platform)
    val properties = new Memory(Pointer.SIZE * 3)
    if (Pointer.SIZE == 8) {
@@ -56,20 +61,9 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
    def referenceCount: Int = getIntInfo(CL_CONTEXT_REFERENCE_COUNT)
    //We already have device list and properties
 
-   def bufferUsing(bb:ByteBuffer, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = {
-      val flags = CL_MEM_USE_HOST_PTR | access.id
-      Buffer.fromByteBuffer(this, flags, bb)
-   }
-
-   def bufferAlloc(size:Long, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = {
-      val flags = CL_MEM_ALLOC_HOST_PTR | access.id
-      Buffer.allocate(this, flags, size)
-   }
-
-   def bufferCloning(bb:ByteBuffer, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = {
-      val flags = CL_MEM_COPY_HOST_PTR | access.id
-      Buffer.cloneByteBuffer(this, flags, bb)
-   }
+   def bufferUsing(bb:ByteBuffer, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.fromByteBuffer(this, bb, access)
+   
+   def bufferAlloc(size:Int, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.allocate(this, size, access)
 }
 
 object Context {

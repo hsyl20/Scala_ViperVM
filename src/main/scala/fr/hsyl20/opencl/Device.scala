@@ -19,6 +19,7 @@ import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
+import java.nio.ByteOrder
 
 /**
  * An OpenCL device
@@ -28,7 +29,6 @@ class Device(val platform: Platform, val peer: Pointer) extends Entity with Info
    import Device._
 
    override protected val infoFunc = clGetDeviceInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
-
 
    lazy val deviceType: BitSet = new BitSet.BitSet1(getLongInfo(CL_DEVICE_TYPE))
    lazy val vendorID: Int = getIntInfo(CL_DEVICE_VENDOR_ID)
@@ -79,7 +79,7 @@ class Device(val platform: Platform, val peer: Pointer) extends Entity with Info
    lazy val errorCorrectionSupport: Boolean = getBoolInfo(CL_DEVICE_ERROR_CORRECTION_SUPPORT)
    lazy val profilingTimerResolution: Long = getNativeSizeInfo(CL_DEVICE_PROFILING_TIMER_RESOLUTION)
 
-   lazy val endianLittle: Boolean = getBoolInfo(CL_DEVICE_ENDIAN_LITTLE)
+   lazy val endianness: ByteOrder = if(getBoolInfo(CL_DEVICE_ENDIAN_LITTLE)) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN
    def available: Boolean = getBoolInfo(CL_DEVICE_AVAILABLE)
    lazy val compilerAvailable: Boolean = getBoolInfo(CL_DEVICE_COMPILER_AVAILABLE)
 

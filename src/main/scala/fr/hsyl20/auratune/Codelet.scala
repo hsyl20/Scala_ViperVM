@@ -17,16 +17,9 @@ case class Argument(ctype:CType, area:Area = Global) {
    val id: String = Symbol.newId
 }
 
-class Codelet {
+class Codelet(arguments:Argument*) {
 
-   private var arguments: List[Argument] = Nil
    private var statements: List[Assign] = Nil
-
-   def addArgument(ctype:CType, area:Area = Global): Argument = {
-      val a = Argument(ctype, area)
-      arguments = a :: arguments
-      a
-   }
 
    def addStatement(s:Assign): Codelet = {
       statements = s :: statements

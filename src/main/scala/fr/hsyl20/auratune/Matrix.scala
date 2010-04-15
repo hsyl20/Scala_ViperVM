@@ -25,8 +25,8 @@ object Symbol {
 
 class FloatMatrix {
    def forAll(ef:ExprFun): Codelet = {
-      val c = new Codelet
-      val arg = c.addArgument(Float*)
+      val arg = new Argument(Float*)
+      val c = new Codelet(arg)
       val cell = Var(arg.id+"[get_global_id(0)]")
       val stat = Assign(cell, ef(cell))
       c.addStatement(stat)

@@ -18,7 +18,7 @@ class TestLanguage {
       println(fun(5))
 
       val fm = new FloatMatrix
-      val src = fm.forAll(fun, "pouet")
+      val src = fm.forAll(fun).cl("pouet")
       
       println(src)
    

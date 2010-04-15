@@ -33,7 +33,7 @@ case class ValFloat(f:Float) extends Expr {
    def replace(s:Expr, d:Expr): Expr = this
 }
 
-case class Var(s:String) extends Expr {
+case class Var(s:String = Symbol.newId) extends Expr {
    def :=(e:Expr) = Assign(this, e)
 
    def -->(e:Expr) = ExprFun(this, e)

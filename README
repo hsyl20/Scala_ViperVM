@@ -12,7 +12,14 @@
 **
 */
 
-This project uses Maven 2
+This project aims at providing an efficient binding between Scala and OpenCL.
 
-To compile, test and package:
-mvn package
+
+Build instructions:
+------------------
+
+This project uses Maven 2. Use "mvn package" to compile, test and package this software.
+
+Developers:
+----------
+Sylvain HENRY - hsyl20@yahoo.fr

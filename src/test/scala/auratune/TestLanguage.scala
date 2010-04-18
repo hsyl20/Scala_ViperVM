@@ -17,9 +17,9 @@ class TestLanguage {
       println(fun(5))
 
       val fm = new FloatMatrix
-      val src = fm.forAll(fun).cl("pouet")
+      val codelet = fm.map(fun)
       
-      println(src)
+      println(codelet.source)
    
       OpenCL.platforms match {
          case Nil => println("No OpenCL platform to test!")
@@ -27,14 +27,14 @@ class TestLanguage {
             case Nil => println("No device to test!")
             case devices => {
                val ctx = new Context(devices)
-               val prog = new Program(ctx, src)
+               val prog = new Program(ctx, codelet.source)
                val dev = devices.head
                prog.build(List(dev))
                
                val bldInfo = prog.buildInfo(dev)
                println("   Build status: " + bldInfo.status)
 
-               val ker = new Kernel(prog, "pouet")
+               val ker = new Kernel(prog, codelet.name)
                println("   Kernel num args: " + ker.numArgs)
                println("   Work group max size: " + ker.workGroupInfo(dev).size)
 

@@ -5,8 +5,8 @@
    <artifactId>auratune</artifactId>
    <packaging>jar</packaging>
    <version>0.1-SNAPSHOT</version>
-   <name>Auratune Language</name>
-   <url>http://runtime.bordeaux.inria.fr/shenry</url>
+   <name>Auratune</name>
+   <url>http://www.hsyl20.fr/auratune</url>
 
 
    <licenses>
@@ -23,8 +23,6 @@
          <name>Sylvain HENRY</name>
          <email>hsyl20@yahoo.fr</email>
          <url>http://www.hsyl20.fr</url>
-         <organization>INRIA</organization>
-         <organizationUrl>http://www.inria.fr</organizationUrl>
          <timezone>+1</timezone>
       </developer>
    </developers>

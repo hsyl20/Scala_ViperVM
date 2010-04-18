@@ -24,12 +24,13 @@ object Symbol {
 
 
 class FloatMatrix {
-   def forAll(ef:ExprFun): Codelet = {
+   def map(ef:ExprFun): Codelet = {
       val arg = new Argument(Float*)
-      val c = new Codelet(arg)
+      val c = new CodeletBuilder(arg)
       val cell = Var(arg.id+"[get_global_id(0)]")
       val stat = Assign(cell, ef(cell))
       c.addStatement(stat)
+      c.codelet()
    }
 }
 

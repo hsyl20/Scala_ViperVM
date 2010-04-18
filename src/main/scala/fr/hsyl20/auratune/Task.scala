@@ -14,5 +14,12 @@
 
 package fr.hsyl20.auratune
 
-class Language {
+import fr.hsyl20.opencl.Device
+
+/**
+ * A task ready to be executed. This class contains references to codelet arguments
+ * and various parameters (group size...)
+ */
+class Task {
+   def executableOn(d:Device): Boolean = true
 }

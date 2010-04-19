@@ -11,7 +11,7 @@ class TestMem {
             case l => {
                val c = new Context(l)
                val cq = new CommandQueue(c, p.devices().head)
-               val b0 = c.bufferAlloc(100000)
+               val b0 = c.allocBuffer(100000)
                println("Buffer info:")
                println("   Mem type: " + b0.memType)
                println("   Flags: " + b0.flags)

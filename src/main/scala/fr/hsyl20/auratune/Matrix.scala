@@ -12,8 +12,9 @@
 **
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.codelet
 
+import fr.hsyl20.auratune._
 import scala.collection.immutable._
 
 

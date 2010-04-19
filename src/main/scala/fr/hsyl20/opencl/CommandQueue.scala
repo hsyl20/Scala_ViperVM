@@ -58,33 +58,33 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
    def flush = checkError(clFlush(peer))
    def finish = checkError(clFinish(peer))
 
-   private def eventWaitList(events:List[Event]): Array[Pointer] = 
+   private def eventWaitList(events:Seq[Event]): Array[Pointer] = 
       if (events.size != 0) events.map(_.peer).toArray else null
 
-   def enqueueReadBuffer(buffer:Buffer, blocking:Boolean, offset:Long, size:Long, ptr:Pointer, events:List[Event]): Event = {
+   def enqueueReadBuffer(buffer:Buffer, blocking:Boolean, offset:Long, size:Long, ptr:Pointer, events:Seq[Event]): Event = {
       val b = if (blocking) CL_TRUE else CL_FALSE
       val ev = new PointerByReference
       checkError(clEnqueueReadBuffer(peer, buffer.peer, b, offset, size, ptr, events.size, eventWaitList(events), ev.getPointer))
       new Event(this, ev.getValue)
    }
 
-   def enqueueWriteBuffer(buffer:Buffer, blocking:Boolean, offset:Long, size:Long, ptr:Pointer, events:List[Event]): Event = {
+   def enqueueWriteBuffer(buffer:Buffer, blocking:Boolean, offset:Long, size:Long, ptr:Pointer, events:Seq[Event]): Event = {
       val b = if (blocking) CL_TRUE else CL_FALSE
       val ev = new PointerByReference
       checkError(clEnqueueWriteBuffer(peer, buffer.peer, b, offset, size, ptr, events.size, eventWaitList(events), ev.getPointer))
       new Event(this, ev.getValue)
    }
 
-   def enqueueWriteBuffer(buffer:Buffer, blocking:Boolean, offset:Long, mem:Memory, events:List[Event]): Event =
+   def enqueueWriteBuffer(buffer:Buffer, blocking:Boolean, offset:Long, mem:Memory, events:Seq[Event]): Event =
       enqueueWriteBuffer(buffer, blocking, offset, mem.getSize, mem.getPointer(0), events)
 
-   def enqueueCopyBuffer(src:Buffer, dst:Buffer, srcOffset:Long, dstOffset:Long, size:Long, events:List[Event]): Event = {
+   def enqueueCopyBuffer(src:Buffer, dst:Buffer, srcOffset:Long, dstOffset:Long, size:Long, events:Seq[Event]): Event = {
       val ev = new PointerByReference
       checkError(clEnqueueCopyBuffer(peer, src.peer, dst.peer, srcOffset, dstOffset, size, events.size, eventWaitList(events), ev.getPointer))
       new Event(this, ev.getValue)
    }
 
-   def enqueueMapBuffer(buffer:Buffer, blocking:Boolean, flags:Long, offset:Long, size:Long, events:List[Event]): (Pointer,Event) = {
+   def enqueueMapBuffer(buffer:Buffer, blocking:Boolean, flags:Long, offset:Long, size:Long, events:Seq[Event]): (Pointer,Event) = {
       val ev = new PointerByReference
       val err = new IntByReference
       val b = if (blocking) CL_TRUE else CL_FALSE
@@ -93,13 +93,13 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
       (map, new Event(this, ev.getValue))
    }
 
-   def enqueueUnmap(mem:Mem, ptr:Pointer, events:List[Event]): Event = {
+   def enqueueUnmap(mem:Mem, ptr:Pointer, events:Seq[Event]): Event = {
       val ev = new PointerByReference
       checkError(clEnqueueUnmapMemObject(peer, mem.peer, ptr, events.size, eventWaitList(events), ev.getPointer))
       new Event(this, ev.getValue)
    }
 
-   def enqueueKernel(kernel:Kernel, globalWorkSize:Seq[Long], localWorkSize:Option[Seq[Long]], events:List[Event]): Event = {
+   def enqueueKernel(kernel:Kernel, globalWorkSize:Seq[Long], localWorkSize:Option[Seq[Long]], events:Seq[Event]): Event = {
       val ev = new PointerByReference
       val gws = globalWorkSize.map(new NativeSize(_)).toArray
       val lws = localWorkSize match {
@@ -110,13 +110,13 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
       new Event(this, ev.getValue)
    }
 
-   def enqueueTask(kernel:Kernel, events:List[Event]): Event = {
+   def enqueueTask(kernel:Kernel, events:Seq[Event]): Event = {
       val ev = new PointerByReference
       checkError(clEnqueueTask(peer, kernel.peer, events.size, eventWaitList(events), ev.getPointer))
       new Event(this, ev.getValue)
    }
 
-   def enqueueWaitForEvents(events:List[Event]): Unit = {
+   def enqueueWaitForEvents(events:Seq[Event]): Unit = {
       checkError(clEnqueueWaitForEvents(peer, events.size, eventWaitList(events)))
    }
 

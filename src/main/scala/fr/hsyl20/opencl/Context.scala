@@ -27,6 +27,8 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
    import OpenCL.checkError
    import Mem._
 
+   def this(device: Device) = this(List(device))
+
    protected val retainFunc = clRetainContext
    protected val releaseFunc = clReleaseContext
    protected val infoFunc = clGetContextInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
@@ -61,9 +63,12 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
    def referenceCount: Int = getIntInfo(CL_CONTEXT_REFERENCE_COUNT)
    //We already have device list and properties
 
-   def bufferUsing(bb:ByteBuffer, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.fromByteBuffer(this, bb, access)
+   def createBuffer(size:Int, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.create(this, size, access)
+
+   def useBuffer(bb:ByteBuffer, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.fromByteBuffer(this, bb, access)
    
-   def bufferAlloc(size:Int, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.allocate(this, size, access)
+   def allocBuffer(size:Int, access:AccessMode.AccessMode = AccessMode.ReadWrite): Buffer = Buffer.allocate(this, size, access)
+
 }
 
 object Context {

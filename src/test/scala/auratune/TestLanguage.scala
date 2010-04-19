@@ -1,7 +1,8 @@
 import org.junit._
 import fr.hsyl20.auratune._
 import fr.hsyl20.opencl._
-import fr.hsyl20.auratune.Conversions._
+import fr.hsyl20.auratune.codelet.Conversions._
+import fr.hsyl20.auratune.codelet._
 
 class TestLanguage {
    @Test def language {
@@ -41,8 +42,8 @@ class TestLanguage {
                val cq = new CommandQueue(ctx, dev, profiling = true)
                println(cq.properties)
 
-               val b0 = ctx.bufferAlloc(1024*4)   
-               val fb0 = b0.byteBuffer.asFloatBuffer
+               val b0 = ctx.allocBuffer(1024*4)   
+               val fb0 = b0.hostByteBuffer.asFloatBuffer
 
                for (i <- 0 until 1024) {
                   fb0.put(i, 1.0f)

@@ -12,7 +12,9 @@
 **
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.codelet
+
+import fr.hsyl20.auratune.Codelet
 
 sealed abstract class Area
 case object Global extends Area

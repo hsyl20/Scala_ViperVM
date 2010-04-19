@@ -19,6 +19,7 @@ import com.sun.jna.ptr.{IntByReference, PointerByReference, LongByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
+import java.nio.ByteBuffer
 
 trait Mem extends Entity with Retainable with Info {
    import Wrapper._
@@ -32,6 +33,7 @@ trait Mem extends Entity with Retainable with Info {
    lazy val flags: BitSet = getBitSetInfo(CL_MEM_FLAGS)
    lazy val size: Long = getNativeSizeInfo(CL_MEM_SIZE)
    lazy val hostPtr: Pointer = getPointerInfo(CL_MEM_HOST_PTR)
+   def hostByteBuffer: ByteBuffer = hostPtr.getByteBuffer(0,size)
    def mapCount: Int = getIntInfo(CL_MEM_MAP_COUNT)
    def referenceCount: Int = getIntInfo(CL_MEM_REFERENCE_COUNT)
    val context: Context

@@ -59,9 +59,9 @@ class TestMatrix {
                println()
                println()
                
-               val b0 = ctx.bufferUsing(m0)
-               val b1 = ctx.bufferUsing(m1)
-               val b2 = ctx.bufferUsing(m2)
+               val b0 = ctx.useBuffer(m0)
+               val b1 = ctx.useBuffer(m1)
+               val b2 = ctx.useBuffer(m2)
 
                ker.setArg(0, b0)
                ker.setArg(1, b1)

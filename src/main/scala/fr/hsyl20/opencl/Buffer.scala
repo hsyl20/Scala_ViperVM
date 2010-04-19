@@ -22,13 +22,21 @@ import scala.collection.immutable._
 import scala.collection.immutable.BitSet.BitSet1
 import java.nio.ByteBuffer
 
-class Buffer(val context:Context, val peer:Pointer, val byteBuffer:ByteBuffer) extends Mem
+class Buffer(val context:Context, val peer:Pointer) extends Mem
 
 object Buffer {
    import Wrapper._
    import OpenCL.checkError
    import Mem._
    import Mem.AccessMode._
+
+   def create(context:Context, size:Int, access:AccessMode = ReadWrite): Buffer = {
+      val err = new IntByReference
+      val flags = access.id
+      val peer = clCreateBuffer(context.peer, flags, size, null, err.getPointer)
+      checkError(err.getValue)
+      new Buffer(context, peer)
+   }
 
    def fromByteBuffer(context:Context, bb:ByteBuffer, access:AccessMode = ReadWrite): Buffer = {
       if (context.endianness != bb.order)
@@ -37,7 +45,7 @@ object Buffer {
       val flags = CL_MEM_USE_HOST_PTR | access.id
       val peer = clCreateBuffer(context.peer, flags, bb.capacity, bb, err.getPointer)
       checkError(err.getValue)
-      new Buffer(context, peer, bb)
+      new Buffer(context, peer)
    }
 
    def allocate(context:Context, size:Int, access:AccessMode = ReadWrite): Buffer = {
@@ -45,4 +53,5 @@ object Buffer {
       bb.order(context.endianness)
       fromByteBuffer(context, bb, access)
    }
+
 }

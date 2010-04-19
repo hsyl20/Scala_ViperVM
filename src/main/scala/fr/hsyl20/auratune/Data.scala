@@ -9,16 +9,20 @@
 **      OpenCL binding (and more) for Scala
 **
 **         http://www.hsyl20.fr/auratune
-**
+**                     GPLv3
 */
 
 package fr.hsyl20.auratune
 
-import fr.hsyl20.{opencl => cl}
+import scala.actors._
+import java.nio.ByteBuffer
 
-class Codelet(val name:String, val source:String) {
+case class CopyToDevice(d:Device)
 
-   def program(context:cl.Context) = new cl.Program(context, source)
+case class CopiedToDevice(d:Device)
 
-   def kernel(context:cl.Context) = new cl.Kernel(program(context), name)
+class Data(val hostBuffer:ByteBuffer) {
+   var buffers: Map[Device, Buffer] = Map.empty
+
+   val size = hostBuffer.capacity
 }

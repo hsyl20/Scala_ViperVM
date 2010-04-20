@@ -17,7 +17,7 @@ class TestLanguage {
 
       println(fun(5))
 
-      val fm = new FloatMatrix
+      val fm = new Matrix[Float]()
       val codelet = fm.map(fun)
       
       println(codelet.source)

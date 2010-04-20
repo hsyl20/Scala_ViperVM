@@ -75,7 +75,7 @@ case class ExprFun(v:Var, e:Expr) {
 }
 
 
-package object Conversions {
+object Conversions {
    var symbolMap: Map[Symbol, Var] = Map.empty
 
    implicit def sym2var(s:Symbol): Var = symbolMap.get(s) match {

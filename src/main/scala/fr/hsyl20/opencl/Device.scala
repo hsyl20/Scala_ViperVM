@@ -19,6 +19,7 @@ import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
+import scala.collection.immutable.BitSet.BitSet1
 import java.nio.ByteOrder
 
 /**
@@ -83,8 +84,11 @@ class Device(val platform: Platform, val peer: Pointer) extends Entity with Info
    def available: Boolean = getBoolInfo(CL_DEVICE_AVAILABLE)
    lazy val compilerAvailable: Boolean = getBoolInfo(CL_DEVICE_COMPILER_AVAILABLE)
 
-   lazy val executionCapabilities: BitSet = new BitSet.BitSet1(getLongInfo(CL_DEVICE_EXECUTION_CAPABILITIES))
-   lazy val queueProperties: BitSet = new BitSet.BitSet1(getLongInfo(CL_DEVICE_QUEUE_PROPERTIES))
+   lazy val executionCapabilities: BitSet1 = new BitSet.BitSet1(getLongInfo(CL_DEVICE_EXECUTION_CAPABILITIES))
+   lazy val queueProperties: BitSet1 = new BitSet.BitSet1(getLongInfo(CL_DEVICE_QUEUE_PROPERTIES))
+
+   def queueProfilingSupport  = (queueProperties.elems & CommandQueue.CL_QUEUE_PROFILING_ENABLE) != 0
+   def queueOutOfOrderSupport = (queueProperties.elems & CommandQueue.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) != 0
 
    //platform field is already available
    lazy val name: String   = getStringInfo(CL_DEVICE_NAME)

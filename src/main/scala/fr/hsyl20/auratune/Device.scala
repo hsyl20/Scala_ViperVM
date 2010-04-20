@@ -23,9 +23,12 @@ class Device(val peer: cl.Device) {
 
    val context = new cl.Context(peer)
 
-   //TODO: enable profiling only if necessary
-   //TODO: enable outOfOrder only if supported
-   private val cq = new cl.CommandQueue(context, peer, outOfOrder=true, profiling=true)
+   private val cq = {
+      val ooo = peer.queueOutOfOrderSupport
+      //TODO: enable profiling only if necessary
+      val prof = peer.queueProfilingSupport
+      new cl.CommandQueue(context, peer, outOfOrder=ooo, profiling=prof)
+   }
 
    def execute(t:Task, after:Seq[Event]): Event = 
       new Event(cq.enqueueKernel(t.codelet.kernel(context), t.globalWorkSize, t.localWorkSize, after.map(_.peer)))

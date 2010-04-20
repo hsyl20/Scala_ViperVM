@@ -17,12 +17,15 @@ package fr.hsyl20.auratune
 import scala.actors._
 import java.nio.ByteBuffer
 
-class Data(val hostBuffer:ByteBuffer) {
-   var buffers: Map[Device, Buffer] = Map.empty
+abstract class Data {
 
-   val size = hostBuffer.capacity
+   type BufferType <: Buffer
+   var buffers: Map[Device, BufferType] = Map.empty
 
-   def synchronize(buffer:Buffer, access:Argument.AccessMode): Event = {
+   /** 
+    * Synchronize data on a given device for the given access mode (maybe it shouldn't be there)
+    */
+   def synchronize(buffer:BufferType, access:Argument.AccessMode): Event = {
       import Buffer.State._
       import Argument.AccessMode._
       //TODO
@@ -32,4 +35,6 @@ class Data(val hostBuffer:ByteBuffer) {
 
       new Event(null)
    }
+
+   def createBuffer(device:Device): BufferType
 }

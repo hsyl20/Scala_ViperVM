@@ -17,12 +17,19 @@ package fr.hsyl20.auratune
 import scala.actors._
 import java.nio.ByteBuffer
 
-case class CopyToDevice(d:Device)
-
-case class CopiedToDevice(d:Device)
-
 class Data(val hostBuffer:ByteBuffer) {
    var buffers: Map[Device, Buffer] = Map.empty
 
    val size = hostBuffer.capacity
+
+   def synchronize(buffer:Buffer, access:Argument.AccessMode): Event = {
+      import Buffer.State._
+      import Argument.AccessMode._
+      //TODO
+      (buffer.state,access) match {
+         case (Invalid, In) => //perform copy ()
+      }
+
+      new Event(null)
+   }
 }

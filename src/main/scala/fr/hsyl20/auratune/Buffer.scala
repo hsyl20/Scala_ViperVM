@@ -16,7 +16,6 @@ package fr.hsyl20.auratune
 
 import fr.hsyl20.{opencl => cl}
 
-
 class Buffer(data:Data, device:Device) {
    import Buffer._
 
@@ -24,16 +23,7 @@ class Buffer(data:Data, device:Device) {
 
    var state:State = State.Invalid
 
-   def synchronize(access:Argument.AccessMode): Event = {
-      import Buffer.State._
-      import Argument.AccessMode._
-      //TODO
-      (state,access) match {
-         case (Invalid, In) => //perform copy ()
-      }
-
-      new Event(null)
-   }
+   def synchronize(access:Argument.AccessMode): Event = data.synchronize(this, access)
 }
 
 object Buffer {

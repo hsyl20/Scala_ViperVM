@@ -9,7 +9,7 @@
 **      OpenCL binding (and more) for Scala
 **
 **         http://www.hsyl20.fr/auratune
-**
+**                     GPLv3
 */
 
 package fr.hsyl20.auratune.codelet
@@ -17,6 +17,7 @@ package fr.hsyl20.auratune.codelet
 
 sealed abstract class Expr {
    def +(e:Expr) = Add(this, e)
+   def -(e:Expr) = Sub(this, e)
 
    def toCL: String
    def replace(s:Expr,d:Expr): Expr
@@ -50,6 +51,17 @@ case class Add(e1:Expr, e2:Expr) extends Expr {
    }
 
    def toCL: String = "(" + e1.toCL + " + " + e2.toCL + ")"
+
+}
+
+case class Sub(e1:Expr, e2:Expr) extends Expr {
+   def replace(s:Expr, d:Expr): Expr = {
+      val e1b = if (e1 == s) d else e1
+      val e2b = if (e2 == s) d else e2
+      Sub(e1b,e2b)
+   }
+
+   def toCL: String = "(" + e1.toCL + " - " + e2.toCL + ")"
 
 }
 

@@ -17,16 +17,21 @@ package fr.hsyl20.auratune.codelet
 import fr.hsyl20.auratune._
 import scala.collection.immutable._
 
-object Symbol {
-   private var id = 0
-   def newId: String = { id += 1 ; "v"+id }
-}
-
-class Matrix[A <: AnyVal](val width:Int, val height:Int, val depth:Int)(implicit m: CLMatrix[A]) {
+class Matrix[A <: AnyVal](val width:Int, val height:Int, val depth:Int)(implicit m: CLMatrix[A]) extends Data {
 
    def this(width:Int, height:Int)(implicit m: CLMatrix[A]) = this(width, height, 1)(m)
    def this(width:Int)(implicit m: CLMatrix[A]) = this(width, 1, 1)(m)
    def this()(implicit m: CLMatrix[A]) = this(1, 1, 1)(m)
+
+   type BufferType = MatrixBuffer
+
+   val size = width * height * depth * m.elementSize
+
+   def createBuffer(device:Device): MatrixBuffer = {
+      val b = new MatrixBuffer(device, size, 0)
+      buffers += (device -> b)
+      b
+   }
 
    def map(ef:ExprFun): Codelet = {
       val arg = new Argument(m.ctype)
@@ -38,17 +43,22 @@ class Matrix[A <: AnyVal](val width:Int, val height:Int, val depth:Int)(implicit
    }
 }
 
+
+
 abstract class CLMatrix[A] {
-   def ctype: CType
+   val ctype: CType
+   val elementSize: Int
 }
 
 object CLMatrix {
    implicit object FloatMatrix extends CLMatrix[Float] {
-      def ctype = Float*
+      val ctype = Float*
+      val elementSize = 4
    }
 
    implicit object DoubleMatrix extends CLMatrix[Double] {
-      def ctype = Double*
+      val ctype = Double*
+      val elementSize = 8
    }
 }
 

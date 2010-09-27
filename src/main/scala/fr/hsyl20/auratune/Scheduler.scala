@@ -26,12 +26,12 @@ class Scheduler {
          //Try to find existing Buffer for this data in device memory
          val buffer = data.buffers.get(device).getOrElse {
             // Create it if it doesn't exist
-            val buf = new Buffer(data, device)
+            val buf = data.createBuffer(device)
             data.buffers += (device -> buf)
             buf
          }
          // Synchronize buffer (copy data from host or from elsewhere if necessary)
-         buffer.synchronize(access)
+         data.synchronize(buffer, access)
       }
 
       // Launch task

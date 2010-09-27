@@ -16,14 +16,12 @@ package fr.hsyl20.auratune
 
 import fr.hsyl20.{opencl => cl}
 
-class Buffer(data:Data, device:Device) {
+abstract class Buffer(device:Device, size:Int) {
    import Buffer._
 
-   val peer = device.context.createBuffer(data.size)
+   val peer = device.context.createBuffer(size)
 
    var state:State = State.Invalid
-
-   def synchronize(access:Argument.AccessMode): Event = data.synchronize(this, access)
 }
 
 object Buffer {

@@ -14,12 +14,10 @@
 
 package fr.hsyl20.auratune
 
-import scala.collection.immutable._
 import fr.hsyl20.{opencl => cl}
 
 class Device(val peer: cl.Device) {
-   var inactiveBuffers: List[Buffer] = Nil
-   var activeBuffers: List[Buffer] = Nil
+   var buffers: List[Buffer] = Nil
 
    val context = new cl.Context(peer)
 
@@ -30,8 +28,31 @@ class Device(val peer: cl.Device) {
       new cl.CommandQueue(context, peer, outOfOrder=ooo, profiling=prof)
    }
 
-   def execute(t:Task, after:Seq[Event]): Event = 
-      new Event(cq.enqueueKernel(t.codelet.kernel(context), t.globalWorkSize, t.localWorkSize, after.map(_.peer)))
+   /* Execute a task, assuming all data are present in device memory */
+   def execute(t:Task): Event = {
+
+      /* Lock data in memory */
+      for ((s,d) <- t.inputs) {
+         if (!d.lockInDevice(this))
+            throw new Exception("Task input data not present in device memory")
+      }
+      for ((s,d) <- t.outputs) {
+         if (!d.lockInDevice(this))
+            throw new Exception("Task input data not present in device memory")
+      }
+
+      /* Set kernel args and execute kernel  */
+      val argPos: Map[Symbol,Int] = t.codelet.args.zipWithIndex.map{ case ((s,a),i) => (s -> i)}
+      val k = t.codelet.kernel(context)
+
+      k.synchronized { /* Kernel is not thread safe */
+         for ((s,d) <- t.inputs)
+            k.setArg(argPos(s), d.getBuffer(this).get.peer)
+         for ((s,d) <- t.outputs)
+            k.setArg(argPos(s), d.getBuffer(this).get.peer)
+         new OpenCLEvent(cq.enqueueKernel(k, t.globalWorkSize, t.localWorkSize, null))
+      }
+   }
 }
 
 object Device {

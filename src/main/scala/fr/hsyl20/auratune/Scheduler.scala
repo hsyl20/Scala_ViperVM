@@ -14,29 +14,14 @@
 
 package fr.hsyl20.auratune
 
-class Scheduler {
+import scala.collection.immutable._
 
-   def schedule(task:Task): Event = {
-      //Find a device
-      //Dumb: we take the first one
-      val device = Device.list.head
+trait Scheduler {
+   def schedule(task:Task): Event
+}
 
-      //Dumb: We transfer data to device memory if necessary without checking memory availability
-      val syncs = for (Argument(data,access) <- task.args) yield {
-         //Try to find existing Buffer for this data in device memory
-         val buffer = data.buffers.get(device).getOrElse {
-            // Create it if it doesn't exist
-            val buf = new Buffer(data, device)
-            data.buffers += (device -> buf)
-            buf
-         }
-         // Synchronize buffer (copy data from host or from elsewhere if necessary)
-         buffer.synchronize(access)
-      }
+object Scheduler {
+   private var scheduler: Scheduler = new DumbScheduler
 
-      // Launch task
-      val event = device.execute(task, after=syncs)
-
-      event
-   }
+   def schedule(t:Task): Event = scheduler.schedule(t)
 }

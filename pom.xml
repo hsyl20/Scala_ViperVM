@@ -31,7 +31,12 @@
    <repositories>
       <repository>
          <id>scala-tools.org</id>
-         <name>Scala-tools Maven2 Repository</name>
+         <name>Scala-tools Maven2 Snapshots Repository</name>
+         <url>http://scala-tools.org/repo-snapshots</url>
+      </repository>
+      <repository>
+         <id>scala-tools.org</id>
+         <name>Scala-tools Maven2 Releases Repository</name>
          <url>http://scala-tools.org/repo-releases</url>
       </repository>
       <repository>
@@ -40,6 +45,21 @@
          <url>http://download.java.net/maven/2/</url>
       </repository>
    </repositories>
+
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>scala-tools.org</id>
+         <name>Scala-tools Maven2 Repository</name>
+         <url>http://scala-tools.org/repo-snapshots</url>
+      </pluginRepository>
+      <pluginRepository>
+         <id>scala-tools.org</id>
+         <name>Scala-tools Maven2 Repository</name>
+         <url>http://scala-tools.org/repo-releases</url>
+      </pluginRepository>
+   </pluginRepositories>
+
 
    <dependencies>
       <dependency>
@@ -73,7 +93,7 @@
             <plugin>
                <groupId>org.scala-tools</groupId>
                <artifactId>maven-scala-plugin</artifactId>
-               <version>2.12</version>
+               <version>2.14.2-SNAPSHOT</version>
             </plugin>
          </plugins>
       </pluginManagement>
@@ -82,7 +102,7 @@
          <plugin>
             <groupId>org.scala-tools</groupId>
             <artifactId>maven-scala-plugin</artifactId>
-            <version>2.12</version>
+            <version>2.14.2-SNAPSHOT</version>
             <executions> 
                <execution>
                   <id>scala-compile-first</id>
@@ -134,7 +154,7 @@
          <plugin>
             <groupId>org.scala-tools</groupId>
             <artifactId>maven-scala-plugin</artifactId>
-            <version>2.12</version>
+            <version>2.14.2-SNAPSHOT</version>
          </plugin>
       </plugins>
    </reporting>

@@ -16,20 +16,20 @@ package fr.hsyl20.auratune
 
 import fr.hsyl20.{opencl => cl}
 
-class Buffer(data:Data, device:Device) {
-   import Buffer._
-
+class Buffer(val data:Data, val device:Device) {
    val peer = device.context.createBuffer(data.size)
 
-   var state:State = State.Invalid
+   var ready = false
+   var refcount = 0
 
-   def synchronize(access:Argument.AccessMode): Event = data.synchronize(this, access)
-}
+   /**
+    * Try to detach this buffer from its original Data.
+    * Attach it to a new data and mark it as not ready.
+    *
+    * Detached buffers can be used as ReadWrite kernel arguments
+    */
+   def detach: Data = Data.fromBuffer(this)
 
-object Buffer {
-   type State = State.Value
-
-   object State extends Enumeration {
-      val Modified, Exclusive, Share, Invalid = Value
-   }
+   def retain: Unit  = { refcount = refcount + 1 }
+   def release: Unit = { refcount = refcount - 1 }
 }

@@ -29,7 +29,7 @@ class Matrix[A <: AnyVal](val width:Int, val height:Int, val depth:Int)(implicit
    def this()(implicit m: CLMatrix[A]) = this(1, 1, 1)(m)
 
    def map(ef:ExprFun): Codelet = {
-      val arg = new Argument(m.ctype)
+      val arg = new Argument(m.ctype, Size(m.ctype.size * width * height * depth))
       val c = new CodeletBuilder(arg)
       val cell = Var(arg.id+"[get_global_id(0)]")
       val stat = Assign(cell, ef(cell))

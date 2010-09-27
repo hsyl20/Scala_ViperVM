@@ -15,21 +15,20 @@
 package fr.hsyl20.auratune.codelet
 
 import fr.hsyl20.auratune.Codelet
+import fr.hsyl20.auratune.{ArgSize, Arg}
+import fr.hsyl20.auratune.{Mode,ReadWrite,ReadOnly,WriteOnly}
 
-sealed abstract class Area
-case object Global extends Area
-case object Local extends Area
-case object Constant extends Area
 
 sealed abstract class CType {
    def * : CType = Pointer(this)
+   def size: Int
 }
-case object Float extends CType
-case object Double extends CType
-case object Int extends CType
-case class Pointer(t:CType) extends CType
+case object Float extends CType { def size = 4 }
+case object Double extends CType { def size = 8 }
+case object Int extends CType {def size = 4 }
+case class Pointer(t:CType) extends CType { def size = 8 }
 
-case class Argument(ctype:CType, area:Area = Global) {
+case class Argument(ctype:CType, size:ArgSize, mode:Mode = ReadWrite, area:Area = Global) {
    val id: String = Symbol.newId
 }
 
@@ -47,7 +46,7 @@ class CodeletBuilder(arguments:Argument*) {
          "(" + arguments.map(clArg).mkString(", ") + ") { \n" + 
             statements.map(clStatement).mkString("\n") +
          "\n}"
-      new Codelet(name, src)
+      new Codelet(name, src, arguments.map(a => scala.Symbol(a.id) -> new Arg(a.size, a.mode)).toMap)
    }
    private def clArg(a:Argument): String = a.ctype match {
       case Pointer(_) => clArea(a.area) + " " + clType(a.ctype) + " " + a.id

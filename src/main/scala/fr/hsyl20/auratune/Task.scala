@@ -16,20 +16,8 @@ package fr.hsyl20.auratune
 
 import scala.collection.immutable._
 
-object Argument {
-   type AccessMode = AccessMode.Value
-
-   object AccessMode extends Enumeration {
-      val In, Out, InOut = Value
-   }
-}
-
-case class Argument(data:Data, access:Argument.AccessMode)
-
 /**
  * A task ready to be executed. This class contains references to codelet arguments
  * and various parameters (group size...)
  */
-class Task(val codelet:Codelet, val globalWorkSize:Seq[Long], val localWorkSize:Option[Seq[Long]]) {
-   var args: List[Argument] = Nil
-}
+class Task(val kernel:Kernel, val inputs:Map[Symbol,Data], val outputs:Map[Symbol,Data], val globalWorkSize:Seq[Long], val localWorkSize:Option[Seq[Long]])

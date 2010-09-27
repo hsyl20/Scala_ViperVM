@@ -18,8 +18,8 @@ import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference, LongByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
 import com.sun.jna.Pointer.NULL
-import scala.collection.immutable._
 import scala.collection.immutable.BitSet.BitSet1
+import scala.collection.immutable.BitSet
 
 class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extends Entity with Retainable with Info {
    import Wrapper._

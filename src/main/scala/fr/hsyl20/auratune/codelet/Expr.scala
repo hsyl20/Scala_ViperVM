@@ -12,6 +12,7 @@
 **                     GPLv3
 */
 
+/*
 package fr.hsyl20.auratune.codelet
 
 
@@ -90,3 +91,4 @@ object Conversions {
    implicit def int2val(i:Int): ValInt = ValInt(i)
    implicit def float2val(f:Float): ValFloat = ValFloat(f)
 }
+*/

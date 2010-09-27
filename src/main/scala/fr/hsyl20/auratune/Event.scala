@@ -16,4 +16,6 @@ package fr.hsyl20.auratune
 
 import fr.hsyl20.{opencl => cl}
 
-class Event(val peer:cl.Event)
+trait Event
+
+class OpenCLEvent(val peer:cl.Event) extends Event

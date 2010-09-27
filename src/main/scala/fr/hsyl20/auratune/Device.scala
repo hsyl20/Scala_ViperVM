@@ -14,24 +14,35 @@
 
 package fr.hsyl20.auratune
 
-import scala.collection.immutable._
 import fr.hsyl20.{opencl => cl}
 
 class Device(val peer: cl.Device) {
-   var inactiveBuffers: List[Buffer] = Nil
-   var activeBuffers: List[Buffer] = Nil
+   var buffers: List[Buffer] = Nil
 
    val context = new cl.Context(peer)
 
-   private val cq = {
+   val cq = {
       val ooo = peer.queueOutOfOrderSupport
       //TODO: enable profiling only if necessary
       val prof = peer.queueProfilingSupport
       new cl.CommandQueue(context, peer, outOfOrder=ooo, profiling=prof)
    }
 
-   def execute(t:Task, after:Seq[Event]): Event = 
-      new Event(cq.enqueueKernel(t.codelet.kernel(context), t.globalWorkSize, t.localWorkSize, after.map(_.peer)))
+   /* Execute a task, assuming all data are present in device memory */
+   def execute(t:Task): Event = {
+
+      /* Lock data in memory */
+      for ((s,d) <- t.inputs) {
+         if (!d.lockInDevice(this))
+            throw new Exception("Task input data not present in device memory")
+      }
+      for ((s,d) <- t.outputs) {
+         if (!d.lockInDevice(this))
+            throw new Exception("Task input data not present in device memory")
+      }
+
+      t.enqueue(this)
+   }
 }
 
 object Device {

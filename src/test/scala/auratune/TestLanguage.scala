@@ -1,8 +1,6 @@
-import org.junit._
+/*import org.junit._
 import fr.hsyl20.auratune._
 import fr.hsyl20.opencl._
-import fr.hsyl20.auratune.codelet.Conversions._
-import fr.hsyl20.auratune.codelet._
 
 class TestLanguage {
    @Test def language {
@@ -74,3 +72,4 @@ class TestLanguage {
       }
    }  
 }
+*/

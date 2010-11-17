@@ -4,7 +4,7 @@ class IndexedVar(val base:Variable, val index:Variable) extends Variable(base.ty
    override val id = "%s[%s]".format(base.id, index.id)
 }
 
-class Variable(val typ:CType, val space:Option[String]) extends Expr {
+class Variable(val typ:CType, val space:AddressSpace) extends Expr {
    val id = "v" + Variable.getId
 
    def apply(v:Variable): IndexedVar = new IndexedVar(this, v)
@@ -17,7 +17,14 @@ object Variable {
       idc
    }
 
-   def apply(typ:CType, space:String = ""): Variable = {
-      new Variable(typ, if (space.isEmpty) None else Some(space))
+   def apply(typ:CType, space:AddressSpace = DefaultSpace): Variable = {
+      new Variable(typ, space)
    }
+}
+
+class AddressSpace(val name:String)
+object DefaultSpace extends AddressSpace("")
+
+object AddressSpace {
+   def apply(s:String) = new AddressSpace(s)
 }

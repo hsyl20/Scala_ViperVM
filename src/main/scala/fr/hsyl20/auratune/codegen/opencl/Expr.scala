@@ -1,6 +1,5 @@
 package fr.hsyl20.auratune.codegen.opencl
 
-
 trait Expr {
    val typ: CType
    def +(v:Expr) = new OpAdd(this, v)

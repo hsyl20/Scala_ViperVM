@@ -12,12 +12,12 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 import scala.collection.mutable.Queue
 import scala.collection.mutable
 import java.nio.ByteBuffer
-import fr.hsyl20.auratune.datatype.DataType
+import fr.hsyl20.auratune.opencl.datatype.DataType
 
 
 class Data(val size:Int) {
@@ -90,7 +90,6 @@ object Data {
       case SizeValue(b,dims@_*) => new Data((b /: dims)(_*_))
    }
 
-   def createBuffer(device:Device): BufferType
 }
 
 sealed abstract class Request extends Event

@@ -1,10 +1,13 @@
 package fr.hsyl20.auratune.codegen.opencl
 
+import scala.collection.breakOut
+
 class CLCode extends CCode 
    with Block
    with Scope
    with CLAddressSpaces
-   with If {
+   with If
+   with CLBuiltIn {
 
    implicit def sym2var(s:Symbol): Variable = {
       getSymbol(s.name) match {
@@ -12,6 +15,20 @@ class CLCode extends CCode
          case _ => error("Invalid symbol %s".format(s.name))
       }
    }
+
+   implicit def int2var(i:Int): Variable = {
+      declareInitRaw(Variable(CInt), i.toString)
+   }
+
+   implicit def double2var(i:Double): Variable = {
+      declareInitRaw(Variable(CDouble), i.toString)
+   }
+
+   implicit def float2var(i:Float): Variable = {
+      declareInitRaw(Variable(CFloat), i.toString)
+   }
+
+   implicit def typ2vt(t:CType): VarType = new VarType(t, DefaultSpace)
 
    implicit def symex(s:Symbol) = new {
       def := (e:Expr): Unit = {
@@ -90,7 +107,7 @@ class CLCode extends CCode
       append("%s %s(%s) {\n".format(f.returnType.id, f.id, argss))
       indent {
          vars.foreach(v => addSymbol(v.id, v))
-         val r = compute(f(vars))
+         val r = compute(f(vars :_*))
          if (r.typ != f.returnType)
             throw new Exception("Invalid return type")
          append("return %s;\n".format(r.id))
@@ -98,8 +115,9 @@ class CLCode extends CCode
       append("}\n")
    }
 
-   def kernel(name:String, args:Variable*)(body: =>Unit): Unit = {
-      val as = args.map(v =>
+   def kernel(name:String, args:VarType*)(body: PartialFunction[Seq[Variable],Unit]): Unit = {
+      val vars: List[Variable] = args.map(v => new Variable(v.typ, v.space))(breakOut)
+      val as = vars.map(v =>
          if (v.space == DefaultSpace)
             "%s %s".format(v.typ.id, v.id)
          else
@@ -107,8 +125,10 @@ class CLCode extends CCode
          ).mkString(", ")
       append("__kernel void %s(%s) {\n".format(name, as))
       indent {
-         args.foreach(v => addSymbol(v.id, v))
-         body
+         vars.foreach(v => addSymbol(v.id, v))
+         if (!body.isDefinedAt(vars))
+            throw new Exception("Invalid kernel arguments")
+         body(vars)
       }
       append("}\n")
    }

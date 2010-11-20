@@ -9,10 +9,9 @@
 **      OpenCL binding (and more) for Scala
 **
 **         http://www.hsyl20.fr/auratune
-**
+**                     GPLv3
 */
 
 package fr.hsyl20.auratune.opencl
 
-class Language {
-}
+import fr.hsyl20.{auratune => generic}

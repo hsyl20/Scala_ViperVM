@@ -22,7 +22,10 @@ object Variable {
    }
 }
 
-class AddressSpace(val name:String)
+class AddressSpace(val name:String) {
+   def __ (t:CType) = new VarType(t, this)
+}
+
 object DefaultSpace extends AddressSpace("")
 
 object AddressSpace {

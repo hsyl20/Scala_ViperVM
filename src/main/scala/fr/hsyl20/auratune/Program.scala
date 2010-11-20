@@ -12,7 +12,7 @@
 **
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 import fr.hsyl20.{opencl => cl}
 

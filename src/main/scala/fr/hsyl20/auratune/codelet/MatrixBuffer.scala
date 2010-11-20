@@ -17,4 +17,4 @@ package fr.hsyl20.auratune.codelet
 import fr.hsyl20.auratune._
 import scala.collection.immutable._
 
-class MatrixBuffer(device:Device, size:Int, val padding:Int) extends Buffer(device,size)
+//class MatrixBuffer(device:Device, size:Int, val padding:Int) extends Buffer(device,size)

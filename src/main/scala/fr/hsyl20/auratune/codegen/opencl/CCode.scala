@@ -1,9 +1,18 @@
 package fr.hsyl20.auratune.codegen.opencl
 
 
-class VarType(val typ:CType, val space:AddressSpace)
+class VarType(val typ:CType, val space:AddressSpace) {
+   def * = new VarType(typ*,space)
+}
+
+object VarType {
+   def apply(typ:CType, space:AddressSpace = DefaultSpace) = new VarType(typ, space)
+
+}
+
 
 trait CCode extends Block with Scope {
+
    def declare(v:Variable): Variable = {
       if (v.space == DefaultSpace)
          append("%s %s;\n".format(v.typ.id, v.id))

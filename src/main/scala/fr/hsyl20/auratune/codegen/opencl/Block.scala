@@ -1,7 +1,7 @@
 package fr.hsyl20.auratune.codegen.opencl
 
 trait Block {
-   private var code: String = ""
+   protected var code: String = ""
    private var indentv: Int = 0
 
    def scopeIn: Unit = {}

@@ -12,8 +12,9 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
+import fr.hsyl20.{auratune => generic}
 import fr.hsyl20.{opencl => cl}
 
 class Buffer(val data:Data, val device:Device) {

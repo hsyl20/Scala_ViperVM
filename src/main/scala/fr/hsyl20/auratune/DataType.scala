@@ -1,4 +1,4 @@
-package fr.hsyl20.auratune.datatype
+package fr.hsyl20.auratune.opencl.datatype
 
 trait DataType
 

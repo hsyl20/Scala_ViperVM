@@ -1,26 +1,33 @@
 package fr.hsyl20.auratune.codegen.opencl
 
 
-class CMap(f:CFunction, n:Expr, src:Variable, dest:Variable) {
+class CMap(f:CFunction, src:Variable, dest:Variable, size:Int) {
 
    if (f.arity != 1)
       throw new Exception("Function of arity 1 expected for map")
 
+   val threadsCount = 512
+
+   val mod = size % threadsCount
+
    val code = new CLCode {
-      val nvar = compute(n)
-      val ggid = declareInitRaw(Variable(CInt), "get_global_id(0)")
-      cif(nvar < ggid) {
-         val args = List(src(ggid))
-         val t = compute(f(args))
-         assign(dest(ggid), t)
+      kernel("mymap", Global __ CFloat*, Global __ CFloat*, CInt) {
+         case List(src, dest, size) =>
+            'ggid := getGlobalId(0)
+            cif('ggid < size) {
+               val t = compute(f(src('ggid)))
+               assign(dest('ggid), t)
+            }
       }
    }
+
+   override def toString = code.toString
 }
 
 
 object CMap {
-   def apply(f:CFunction,n:Expr,src:Variable,dest:Variable): CMap = {
-      new CMap(f, n, src, dest)
+   def apply(f:CFunction,src:Variable,dest:Variable,size:Int): CMap = {
+      new CMap(f, src, dest,size)
    }
 }
 

@@ -23,7 +23,7 @@ trait Scope extends Block {
       val ret = getSymbol(s)
       
       if (ret == None)
-         throw new Exception("Symbol \"%s\" not declared".format(s))
+         throw new Exception("Symbol \"%s\" not declared in:\n%s".format(s, code))
       
       ret
    }

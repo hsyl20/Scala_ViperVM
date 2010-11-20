@@ -9,6 +9,6 @@ trait If extends CCode with Block with Scope {
 
       append("if (%s) {\n".format(v.id))
       indent(body)
-      append("}")
+      append("}\n")
    }
 }

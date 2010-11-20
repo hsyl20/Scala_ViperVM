@@ -16,9 +16,11 @@ class CFunction(val returnType:CType, val args:List[Variable], body:PartialFunct
    val id = CFunction.getId
    val arity = args.size
 
-   def apply(args:List[Variable]): Expr = {
-      if (!body.isDefinedAt(args))
+   def apply(args:Variable*): Expr = {
+      val as = args.toList
+
+      if (!body.isDefinedAt(as))
          throw new Exception("Invalid function body (check argument count)")
-      body(args)
+      body(as)
    }
 }

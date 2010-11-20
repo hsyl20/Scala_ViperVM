@@ -1,11 +1,11 @@
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 class DumbScheduler extends Scheduler {
 
    def schedule(task:Task): Event = {
       //Find a device
       //Dumb: we take the first one
-      val device = Device.list.head
+      val device = Platform.devices.head
 
       //Dumb: We transfer data to device memory if necessary without checking memory availability
       /* Transfer inputs */

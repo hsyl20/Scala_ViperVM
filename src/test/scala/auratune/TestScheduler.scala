@@ -1,6 +1,5 @@
 import org.junit._
 import fr.hsyl20.auratune._
-import fr.hsyl20.auratune.{datatype => dt}
 
 /*class TestScheduler {
    @Test def scheduler {

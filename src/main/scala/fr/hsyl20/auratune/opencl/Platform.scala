@@ -12,11 +12,12 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 import fr.hsyl20.{opencl => cl}
 
 class Device(val peer: cl.Device) {
+
    var buffers: List[Buffer] = Nil
 
    val context = new cl.Context(peer)
@@ -45,6 +46,8 @@ class Device(val peer: cl.Device) {
    }
 }
 
-object Device {
-   lazy val list = for (p <- cl.OpenCL.platforms ; d <- p.devices()) yield new Device(d)
+object Platform {
+   private lazy val deviceList = for (p <- cl.OpenCL.platforms ; d <- p.devices()) yield new Device(d)
+
+   def devices:Seq[Device] = deviceList
 }

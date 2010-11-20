@@ -12,7 +12,7 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 import scala.collection.immutable._
 

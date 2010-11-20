@@ -12,10 +12,10 @@
 **
 */
 
-package fr.hsyl20.auratune
+package fr.hsyl20.auratune.opencl
 
 import fr.hsyl20.{opencl => cl}
-import fr.hsyl20.auratune.datatype._
+import fr.hsyl20.auratune.opencl.datatype._
 import scala.collection.mutable.ArrayBuffer
 
 sealed abstract class Area

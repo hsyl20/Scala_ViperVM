@@ -15,8 +15,8 @@ class CMap(f:CFunction, src:Variable, dest:Variable, size:Int) {
          case List(src, dest, size) =>
             'ggid := getGlobalId(0)
             cif('ggid < size) {
-               val t = compute(f(src('ggid)))
-               assign(dest('ggid), t)
+               val e = f(src('ggid))
+               assign(dest('ggid), e)
             }
       }
    }

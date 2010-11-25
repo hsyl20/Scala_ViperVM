@@ -32,16 +32,11 @@ class ExprSpec extends FlatSpec with ShouldMatchers {
 
   "A variable" should "be assignable" in {
       val code = new CLCode {
-         val a = Variable(CFloat)
-         val b = Variable(CFloat)
-         val c = Variable(CFloat)
+         'a :- CFloat
+         'b :- CFloat
+         'c :- CFloat
 
-         declare(a)
-         declare(b)
-         declare(c)
-         val e = (a + b) * a
-
-         c := compute(e)
+         'c := ('a + 'b) * 'a
       }
       println(code)
   }
@@ -49,12 +44,9 @@ class ExprSpec extends FlatSpec with ShouldMatchers {
   "A variable" should "support address spaces in declaration" in {
 
       val code = new CLCode {
-         val a = Variable(CFloat, Global)
-         val b = Variable(CFloat, Private)
-         val c = Variable(CFloat, Local)
-         declare(a)
-         declareInit(b,a)
-         declareInitRaw(c, "raw init")
+         'a :- Global @@ CFloat
+         'b :- Private @@ CFloat := 'a
+         'c :- Local @@ CFloat := "raw init"
       }
       println(code)
   }

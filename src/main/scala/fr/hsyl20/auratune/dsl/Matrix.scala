@@ -12,7 +12,8 @@
 **
 */
 
-package fr.hsyl20.auratune.opencl
+package fr.hsyl20.auratune.dsl
 
-class Language {
+class Matrix2D(typ:Typ, width:Int, height:Int) extends Data {
+   def map(f:Expr => Expr) = new Map(this,f)
 }

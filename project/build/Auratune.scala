@@ -11,5 +11,8 @@ class AuratuneProject(info: ProjectInfo) extends DefaultProject(info) {
    /* Test libs */
    val scalatest = "org.scalatest" % "scalatest" % "1.2"
    val junit = "junit" % "junit" % "4.8.2"
+
+   /* Runs */
+   val demo_codegen = runTask(Some("demos.codegen.Main"), testClasspath) dependsOn(testCompile) describedAs "C code generation demo"
 }
 

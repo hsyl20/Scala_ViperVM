@@ -1,5 +1,7 @@
 package fr.hsyl20.auratune.codegen.opencl
 
+import fr.hsyl20.auratune.codegen._
+
 class IndexedVar(val base:Variable, val index:Variable) extends Variable(base.typ^,base.space) {
    override val id = "%s[%s]".format(base.id, index.id)
 }

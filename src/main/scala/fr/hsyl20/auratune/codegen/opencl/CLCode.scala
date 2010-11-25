@@ -32,21 +32,27 @@ class CLCode extends CCode
 
    implicit def symex(s:Symbol) = new {
       def := (e:Expr): Unit = {
-         val v = compute(e)
          getSymbol(s.name) match {
             case None => {
-               val vv = Variable(v.typ)
-               declareInit(vv, v)
-               addSymbol(s.name,vv)
+               val v = Variable(e.typ)
+               declareInit(v, e)
+               addSymbol(s.name,v)
             }
-            case Some(vv:Variable) => assign(vv,v)
+            case Some(v:Variable) => assign(v,e)
+            case _ => throw new Exception("Invalid symbol")
+         }
+      }
+
+      def := (raw:String): Unit = {
+         getSymbol(s.name) match {
+            case Some(v:Variable) => assignRaw(v,raw)
             case _ => throw new Exception("Invalid symbol")
          }
       }
 
       def :- (t:CType): Variable = {
          getSymbol(s.name) match {
-            case Some(v:Variable) => if (v.typ != t) error("Invalid ascription") else v
+            case Some(v:Variable) => if (v.typ != t) error("Invalid type ascription") else v
             case None => {
                val v = Variable(t)
                declare(v)
@@ -73,6 +79,7 @@ class CLCode extends CCode
 
    implicit def addex(a:AddressSpace) = new {
       def @@ (t:CType): VarType = new VarType(t,a)
+      def apply (t:CType): VarType = new VarType(t,a)
    }
 
    private def checkVarSymbol(v:Variable): Any = v match {
@@ -85,14 +92,7 @@ class CLCode extends CCode
 
    implicit def var2assign(v:Variable) = new {
       def := (e:Expr) = assign(v,e)
-   }
-
-   def assign(v:Variable,e:Expr): Unit = {
-      checkVarSymbol(v)
-      val rv = compute(e)
-      if (rv.typ != v.typ)
-         throw new Exception("Invalid types in assignment (%s and %s)".format(v.typ, rv.typ))
-      append("%s = %s;\n".format(v.id,rv.id))
+      def := (s:String) = assignRaw(v,s)
    }
 
    def declareFun(f:CFunction): Unit = {
@@ -107,10 +107,8 @@ class CLCode extends CCode
       append("%s %s(%s) {\n".format(f.returnType.id, f.id, argss))
       indent {
          vars.foreach(v => addSymbol(v.id, v))
-         val r = compute(f(vars :_*))
-         if (r.typ != f.returnType)
-            throw new Exception("Invalid return type")
-         append("return %s;\n".format(r.id))
+         val e = f(vars :_*)
+         append("return %s;\n".format(expr(e)))
       }
       append("}\n")
    }
@@ -134,9 +132,8 @@ class CLCode extends CCode
    }
 
    def call(f:CFunction, args:Array[Expr]): Variable = {
-      val args2 = args.map(compute(_))
       val v = Variable(f.returnType)
-      val as = args2.map(_.id).mkString(", ")
+      val as = args.map(expr(_)).mkString(", ")
       val s = "%s(%s)".format(f.id, as)
       declareInitRaw(v, s)
       v

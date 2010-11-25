@@ -23,16 +23,18 @@ trait CCode extends Block with Scope {
    }
 
    def declareInit(v:Variable, e:Expr): Variable = {
-      val rv = compute(e)
-      if (rv.typ != v.typ)
-         throw new Exception("Invalid type")
       if (v.space == DefaultSpace)
-         append("%s %s = %s;\n".format(v.typ.id, v.id, rv.id))
+         append("%s %s = %s;\n".format(v.typ.id, v.id, expr(e)))
       else
-         append("__%s %s %s = %s;\n".format(v.space.name, v.typ.id, v.id, rv.id))
+         append("__%s %s %s = %s;\n".format(v.space.name, v.typ.id, v.id, expr(e)))
       addSymbol(v.id, v)
       v
    }
+
+   def assign(v:Variable,e:Expr): Unit = {
+      append("%s = %s;\n".format(v.id,expr(e)))
+   }
+
 
    def declareInitRaw(v:Variable, s:String): Variable = {
       if (v.space == DefaultSpace)
@@ -43,16 +45,13 @@ trait CCode extends Block with Scope {
       v
    }
 
-   def compute(e:Expr): Variable = e match {
-      case v: Variable => v
-      case op: Op => {
-         val (a,b) = (op.a, op.b)
-         val a_var = compute(a)
-         val b_var = compute(b)
-         val op_var = Variable(op.typ)
-         declareInitRaw(op_var, "%s %s %s".format(a_var.id, op.csym, b_var.id))
-         op_var
-      }
+   def assignRaw(v:Variable, s:String): Unit = {
+      append("%s = %s;\n".format(v.id, s))
+   }
+
+   def expr(e:Expr): String = e match {
+      case v: Variable => v.id
+      case op: Op => "(%s %s %s)".format(expr(op.a), op.csym, expr(op.b))
    }
 
 }

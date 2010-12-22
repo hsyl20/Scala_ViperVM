@@ -12,16 +12,21 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.opencl
+package fr.hsyl20.auratune.runtime
 
-import scala.collection.immutable._
-
-trait Scheduler {
-   def schedule(task:Task): Event
-}
-
-object Scheduler {
-   private var scheduler: Scheduler = new DumbScheduler
-
-   def schedule(t:Task): Event = scheduler.schedule(t)
+/**
+ * Task scheduler
+ *
+ * Schedulers have the responsability of ensuring progression
+ * of the computation, load-balancing, etc.
+ */
+abstract class Scheduler {
+  
+  /**
+   * Give a task for the scheduler to schedule after every
+   * dependency has completed
+   *
+   * @return An event indicating task completion
+   */
+  def schedule(t:Task, dependencies:List[Event] = Nil): Event 
 }

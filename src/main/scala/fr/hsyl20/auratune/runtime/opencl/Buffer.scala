@@ -12,13 +12,16 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.runtime
+package fr.hsyl20.auratune.runtime.opencl
+
+import fr.hsyl20.auratune.runtime.Buffer
+import fr.hsyl20.{opencl => cl}
 
 /**
- * A buffer in a memory node
+ * OpenCL buffer
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+abstract class OpenCLBuffer extends Buffer {
+   type MemoryNodeType <: OpenCLMemoryNode
 
-  val memoryNode:MemoryNodeType
+   val peer: cl.Buffer
 }

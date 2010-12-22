@@ -12,13 +12,9 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.runtime
+package fr.hsyl20.auratune.runtime.jvm
 
-/**
- * A buffer in a memory node
- */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+import fr.hsyl20.auratune.runtime.Device
 
-  val memoryNode:MemoryNodeType
+class JVMDevice extends Device {
 }

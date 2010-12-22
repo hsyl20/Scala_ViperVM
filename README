@@ -23,3 +23,13 @@ This project uses SBT (simple build tool).
 Developers:
 ----------
 Sylvain HENRY - sylvain.henry@inria.fr
+
+
+Packages:
+--------
+
+fr.hsyl20.opencl - OpenCL binding (using SNA and JNA)
+fr.hsyl20.auratune.runtime - Runtime system
+fr.hsyl20.auratune.runtime.schedulers - Available schedulers for the runtime system
+fr.hsyl20.auratune.runtime.opencl - OpenCL backend for the runtime system
+

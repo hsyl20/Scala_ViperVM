@@ -12,13 +12,9 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.runtime
+package fr.hsyl20.auratune.runtime.opencl
 
-/**
- * A buffer in a memory node
- */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+import fr.hsyl20.auratune.runtime.Event
+import fr.hsyl20.{opencl => cl}
 
-  val memoryNode:MemoryNodeType
-}
+class OpenCLEvent(val peer:cl.Event) extends Event

@@ -14,11 +14,9 @@
 
 package fr.hsyl20.auratune.runtime
 
-/**
- * A buffer in a memory node
- */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+import fr.hsyl20.auratune.runtime.AccessMode.AccessMode
 
-  val memoryNode:MemoryNodeType
-}
+/**
+ * This class describes a kernel parameter
+ */
+case class KernelParameterDecl(datatype:KernelParameterType, mode:AccessMode, name:String = "")

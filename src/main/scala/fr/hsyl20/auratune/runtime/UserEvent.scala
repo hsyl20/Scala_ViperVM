@@ -15,10 +15,22 @@
 package fr.hsyl20.auratune.runtime
 
 /**
- * A buffer in a memory node
+ * Event that can be triggered by user code.
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+class UserEvent extends Event {
+  
+  /**
+   * Trigger the event
+   */
+  def trigger: Unit = complete
 
-  val memoryNode:MemoryNodeType
+
+  /**
+   * Link this user event with the given one
+   *
+   * When "event" completes, trigger is called
+   */
+  def chainWith(event:Event): Unit = {
+    event.addCallback(_ => trigger)
+  }
 }

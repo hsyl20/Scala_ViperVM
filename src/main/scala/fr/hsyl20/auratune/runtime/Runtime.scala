@@ -15,10 +15,15 @@
 package fr.hsyl20.auratune.runtime
 
 /**
- * A buffer in a memory node
+ * A runtime system
+ *
+ * A runtime system is made of
+ *  - a platform
+ *  - a task scheduler
+ *  - a data scheduler
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
-
-  val memoryNode:MemoryNodeType
+class Runtime {
+  val platform:Platform
+  val taskScheduler:Scheduler
+  val dataScheduler:DataScheduler
 }

@@ -12,85 +12,84 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.opencl
+package fr.hsyl20.auratune.runtime
 
-import scala.collection.mutable.Queue
-import scala.collection.mutable
-import java.nio.ByteBuffer
-import fr.hsyl20.auratune.opencl.datatype.DataType
+import fr.hsyl20.auratune.runtime.AccessMode._
+import scala.collection._
+
+/** This represents a data. That is, a set of buffers
+ * in different memories
+ */
+abstract class Data {
+  import Data._
+
+  /* Buffers on different memory nodes */
+  protected var buffers: mutable.Map[MemoryNode,Buffer] = mutable.Map.empty
+
+  /* Buffer status */
+  protected var status: mutable.Map[Buffer,State] = mutable.Map.empty
+
+  /**
+   * Return the buffer associated to this data on the given memory node
+   */
+  def getBuffer(memoryNode:MemoryNode): Option[Buffer] = buffers.get(memoryNode)
+
+  /**
+   * Return the status of this data on the given node
+   */
+  def status(memoryNode:MemoryNode): Option[State] = getBuffer(memoryNode).flatMap(status.get _)
 
 
-class Data(val size:Int) {
-   /* Data instances on different devices */
-   private var buffers: mutable.Map[Device, Buffer] = mutable.Map.empty
-   
-   /* Host-side buffer */
-   var hostBuffer: Option[ByteBuffer] = None
-   var hostValid: Boolean = false 
+  /**
+   * Allocate a buffer for this data on some memory node
+   */
+  def allocate(memoryNode:MemoryNode): Event
 
-   /* Queue of requests for this data */
-   val activeRequest: List[Request] = List.empty
-   val pendingRequests: Queue[Request] = new Queue[Request]
+  /**
+   * Update the buffer on memoryNode if it is invalid
+   */
+  def sync(memoryNode:MemoryNode): Event
 
-   var computed: Boolean = false
+  /**
+   * Add a buffer to this data on a different memory node.
+   *
+   * If a buffer for this data is already present on the memory node, an
+   * exception is thrown
+   */
+  def addBuffer(buffer:Buffer): Unit = {
+    getBuffer(buffer.memoryNode) match {
+      case Some(_) => throw new Exception("A buffer for this data is already present on the same memory node")
+      case None => buffers += (buffer.memoryNode -> buffer)
+    }
+  }
 
-   /**
-    * Indicates that this data is required by a device with the
-    * specified access mode
-    *
-    * When the buffer is ready on the device, returned event is triggered
-    */
-   def postTransferRequest(device:Device): TransferRequest = {
-      val req = TransferRequest(device)
-      pendingRequests += req
+  /**
+   * Remove a reference to a buffer supporting this data
+   *
+   * Return the removed buffer
+   */
+  def removeBuffer(buffer:Buffer): Option[Buffer] = buffers.remove(buffer.memoryNode)
 
-      req
-   }
 
-   def allocate(device:Device): Unit = {
-      //TODO
-   }
+  /**
+   * This method is called before an access is to be made
+   * on buffer associated to this data
+   */
+  def notifyBeforeAccess(buffer:Buffer, mode:AccessMode): Unit = {}
 
-   def lockInDevice(device:Device): Boolean = buffers.get(device).map(_.retain).isDefined
-
-   def unlockInDevice(device:Device): Boolean = buffers.get(device).map(_.release).isDefined
-
-   def getBuffer(device:Device): Option[Buffer] = buffers.get(device)
+  /**
+   * This method is called after an access is to be made
+   * on buffer associated to this data
+   */
+  def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {}
 }
+
+
 
 object Data {
-   def map(buffer:ByteBuffer): Data = new Data(buffer.capacity) {
-      hostBuffer = Some(buffer)
-      hostValid = true
-   }
-
-   /* Create a new Data from the specified Buffer.
-    * Remove buffer from the origin Data */
-   def fromBuffer(buffer:Buffer): Data = {
-      val d = Data.fromData(buffer.data)
-      
-      val b = new Buffer(d, buffer.device) {
-         override val peer = buffer.peer
-      }
-
-      d.buffers += (buffer.device -> b)
-      buffer.data.buffers -= buffer.device
-      d
-   }
-
-   /* Create a new Data with no active buffer
-    * f with the same size as "data" argument
-    */
-   def fromData(data:Data): Data = {
-      new Data(data.size)
-   }
-
-   def apply(datatype:DataType, size:Size): Data = size match {
-      case NoSize => throw new Exception("Cannot create data with undefined size")
-      case SizeValue(b,dims@_*) => new Data((b /: dims)(_*_))
-   }
-
+  sealed abstract class State
+  case object Ready extends State
+  case class Shared(readerCount:Int) extends State /* Shared in Read-Only mode */
+  case object Invalid extends State
+  case object Exclusive extends State
 }
-
-sealed abstract class Request extends Event
-case class TransferRequest(device:Device) extends Request

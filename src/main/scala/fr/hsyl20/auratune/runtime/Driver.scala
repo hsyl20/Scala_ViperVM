@@ -12,6 +12,16 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.opencl
+package fr.hsyl20.auratune.runtime
 
-import fr.hsyl20.{auratune => generic}
+/** Drivers give access to some devices (CUDA, OpenCL, CELL...)
+ *
+ * They are to be registered into a platform to be used
+ */
+abstract class Driver {
+
+   /* Devices managed by this driver */
+   def devices:Seq[Device]
+
+}
+

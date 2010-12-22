@@ -12,33 +12,20 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.opencl
+package fr.hsyl20.auratune.runtime
 
-import fr.hsyl20.{opencl => cl}
+import fr.hsyl20.auratune.runtime.AccessMode._
 
 /**
- * A task ready to be executed. This class contains references to codelet arguments
- * and various parameters (group size...)
+ * A task ready to be scheduled.
  */
-case class Task(kernel:Kernel, inputs:Map[Parameter,Data], outputs:Map[Parameter,Data],
-   globalWorkSize:Seq[Long], localWorkSize:Option[Seq[Long]]) {
-
-   def enqueue(device:Device): Event = {
-      val k = kernel.get(device)
-      val argPos = kernel.params.zipWithIndex
-
-      k.synchronized { /* Kernel is not thread safe */
-
-         /* Set kernel args and execute kernel  */
-         for ((arg,idx) <- argPos) {
-            arg.mode match {
-               case ReadOnly  => k.setArg(idx, inputs(arg).getBuffer(device).get.peer)
-               case ReadWrite => k.setArg(idx, inputs(arg).getBuffer(device).get.peer)
-               case WriteOnly => k.setArg(idx, outputs(arg).getBuffer(device).get.peer)
-            }
-         }
-         new OpenCLEvent(device.cq.enqueueKernel(k, globalWorkSize, localWorkSize, null))
-      }
-   }
-
+case class Task(kernels:KernelSet, args:List[(TaskParameter,AccessMode)]) {
+  
+  /**
+   * Return Data parameters
+   */
+  def data: List[(Data,AccessMode)] = args.flatMap(a => a._1 match {
+    case DataTaskParameter(d) => Some((d,a._2))
+    case _ => None
+  })
 }

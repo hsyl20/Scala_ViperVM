@@ -15,10 +15,10 @@
 package fr.hsyl20.auratune.runtime
 
 /**
- * A buffer in a memory node
+ * Types supported for kernel parameters
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
-
-  val memoryNode:MemoryNodeType
-}
+sealed abstract class KernelParameterType
+case object BufferParameterType extends KernelParameterType
+case object IntParameterType  extends KernelParameterType
+case object DoubleParameterType extends KernelParameterType
+case object FloatParameterType  extends KernelParameterType

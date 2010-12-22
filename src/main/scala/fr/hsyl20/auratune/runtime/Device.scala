@@ -14,11 +14,9 @@
 
 package fr.hsyl20.auratune.runtime
 
-/**
- * A buffer in a memory node
+/** Device represents a GPU or a CPU+memory
+ *
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
-
-  val memoryNode:MemoryNodeType
+abstract class Device {
+  val memoryNodes: Seq[MemoryNode]
 }

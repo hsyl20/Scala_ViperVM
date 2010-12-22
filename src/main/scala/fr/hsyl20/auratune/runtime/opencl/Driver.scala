@@ -12,13 +12,16 @@
 **                     GPLv3
 */
 
-package fr.hsyl20.auratune.runtime
+package fr.hsyl20.auratune.runtime.opencl
 
-/**
- * A buffer in a memory node
+import fr.hsyl20.auratune.runtime.{Driver,Device}
+import fr.hsyl20.{opencl => cl}
+
+/** OpenCL Driver
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
+class OpenCLDriver extends Driver {
+   
+   def devices:Seq[Device] = for (p <- cl.OpenCL.platforms ; peer <- p.devices())
+      yield new OpenCLDevice(peer)
 
-  val memoryNode:MemoryNodeType
 }

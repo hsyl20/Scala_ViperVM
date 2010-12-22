@@ -15,10 +15,13 @@
 package fr.hsyl20.auratune.runtime
 
 /**
- * A buffer in a memory node
+ * Manage data transfers between memory nodes
  */
-abstract class Buffer {
-  type MemoryNodeType <: MemoryNode
-
-  val memoryNode:MemoryNodeType
+abstract class DataScheduler {
+  
+  /**
+   * Transfer data in order to have the given Data on the same device
+   * with the given access modes
+   */
+  def makeState(state:DataState): DataStateEvent
 }

@@ -20,8 +20,4 @@ import fr.hsyl20.{opencl => cl}
 /**
  * OpenCL buffer
  */
-abstract class OpenCLBuffer extends Buffer {
-   type MemoryNodeType <: OpenCLMemoryNode
-
-   val peer: cl.Buffer
-}
+class OpenCLBuffer(val peer: cl.Buffer, val memoryNode:OpenCLMemoryNode) extends Buffer

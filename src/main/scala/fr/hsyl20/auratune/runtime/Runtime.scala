@@ -22,7 +22,7 @@ package fr.hsyl20.auratune.runtime
  *  - a task scheduler
  *  - a data scheduler
  */
-class Runtime {
+abstract class Runtime {
   val platform:Platform
   val taskScheduler:Scheduler
   val dataScheduler:DataScheduler

@@ -14,33 +14,33 @@
 
 package fr.hsyl20.auratune.runtime
 
+import fr.hsyl20.auratune.runtime.AccessMode._
+
 /**
- * A DataState represents a configuration of Data
+ * Group of Data to access with the specified access mode.
+ *
+ * Support device constraints (include, exclude) and piorities
+ *
+ * @param data Data and their associated access modes
  */
-class DataState {
+class DataState(val data:List[(Data,AccessMode)]) extends AbstractDataState {
 
-  val releaseEvent: UserEvent = new UserEvent
-
-  /**
-   * Release data state on event completion
-   */
-  def releaseOn(event:Event): Unit = {
-    event.addCallback(_ => release)
-  }
+  def this(data:(Data,AccessMode)*) = this(data.toList)
 
   /**
-   * Release the Data State
-   *
-   * Indicate that Data in this data state can be released, that
-   * buffers can be moved or released, etc.
+   * if "includedDevices" is not Nil, the DataState must only be
+   * configured on a device contained in it. Otherwise any device
+   * on the platform can be used.
    */
-  final def release: Unit = {
-    if (!releaseEvent.test) {
-      releaseEvent.trigger
-    }
-  }
+  val includedDevices:List[Device] = Nil
 
-  def addReleaseCallback(f:this.type=>Unit): Unit = {
-    releaseEvent.addCallback(_ => f(this))
-  }
+  /**
+   * Devices that must not be used
+   */
+  val excludedDevices:List[Device] = Nil
+
+  /**
+   * Device priorities. 0 is default. Negative is lower priority and positive is higher priority
+   */
+  val priorities: Map[Device, Int] = Map.empty
 }

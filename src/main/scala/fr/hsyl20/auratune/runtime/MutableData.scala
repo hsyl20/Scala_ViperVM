@@ -20,7 +20,7 @@ import scala.collection._
 /** This represents a mutable data. That is, a data where
  * coherency between buffers needs to be managed.
  */
-class MutableData extends Data {
+abstract class MutableData extends Data {
   import Data._
 
    /**
@@ -32,7 +32,7 @@ class MutableData extends Data {
     * This method is called before an access is to be made
     * on buffer associated to this data
     */
-   def notifyBeforeAccess(buffer:Buffer, mode:AccessMode): Unit = {
+   override def notifyBeforeAccess(buffer:Buffer, mode:AccessMode): Unit = {
 
       val currentState = status(buffer)
 
@@ -53,7 +53,7 @@ class MutableData extends Data {
     * This method is called after an access is to be made
     * on buffer associated to this data
     */
-   def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {
+   override def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {
 
       val currentState = status(buffer)
 

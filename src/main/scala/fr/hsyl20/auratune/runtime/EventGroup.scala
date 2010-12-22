@@ -24,8 +24,6 @@ class EventGroup(val events:Seq[Event]) extends Event {
   private var remaining: Int = events.size
   private val lock = new Lock
   
-  def this(events:Event*) = this(events.toList)
-
   for (e <- events) {
     e.addCallback(_ => {
       val rem = lock.synchronized[Int] {

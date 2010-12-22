@@ -21,7 +21,7 @@ import scala.concurrent.Lock
 
 import fr.hsyl20.auratune.runtime._
 
-class SingleDeviceScheduler(device:Device, dataSched:DataScheduler) extends Scheduler {
+class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
   
   /* Enqueued tasks associated to remaining dependencies */
   private var queuedTasks:Map[Task, List[Event]] = HashMap.empty
@@ -70,7 +70,7 @@ class SingleDeviceScheduler(device:Device, dataSched:DataScheduler) extends Sche
     /* Remove completed event from task dependencies */
     val newEvents = queuedTasks.synchronized[List[Event]] {
       val oldEvents = queuedTasks(task)
-      val newEvents = oldEvents - event
+      val newEvents = oldEvents filterNot (_ == event)
       if (newEvents.isEmpty) queuedTasks.remove(task) else queuedTasks.update(task, newEvents)
       newEvents
     }
@@ -86,12 +86,12 @@ class SingleDeviceScheduler(device:Device, dataSched:DataScheduler) extends Sche
   protected def prepare(task:Task, event:UserEvent): Unit = {
 
     /* Create datastate with task Data on specified device */
-    val ds = new DefaultDataState(task.data) {
-      override val includeDevices = List(device)
+    val ds = new DataState(task.data) {
+      val includeDevices = List(device)
     }
 
     /* Schedule data configuration */
-    val dsEvent = dataSched.makeState(ds)
+    val dsEvent = runtime.dataScheduler.makeState(ds)
 
     /* Release data state on task event completion */
     ds.releaseOn(event)
@@ -139,6 +139,6 @@ class SingleDeviceScheduler(device:Device, dataSched:DataScheduler) extends Sche
     val ks = for (k <- task.kernels if k.canExecute(device, params)) yield k
     if (ks.isEmpty)
       error("No device can execute the given task!")
-    ks.first
+    ks.head
   }
 }

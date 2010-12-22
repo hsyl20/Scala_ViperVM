@@ -20,7 +20,7 @@ import fr.hsyl20.auratune.runtime.{Kernel,Device,Event,Buffer}
  * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
  */
 
-abstract class JVMKernel extends Kernel {
+/*abstract class JVMKernel extends Kernel {
   /* We use implicit conversions to cast from generic types
    * to backend types. We can do this because it is the
    * of the responsability of the scheduler to provide backends
@@ -31,4 +31,4 @@ abstract class JVMKernel extends Kernel {
 
   private implicit def buf2buf(b:Buffer): JVMBuffer =
     b.asInstanceOf[JVMBuffer]
-}
+}*/

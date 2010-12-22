@@ -14,7 +14,7 @@
 
 package fr.hsyl20.auratune.runtime
 
-import java.nio.ByteBuffer
+import com.sun.jna.Memory
 import scala.collection.immutable.NumericRange
 
 /**
@@ -64,14 +64,14 @@ abstract class MemoryNode {
   /**
    * Copy data from host
    */
-  def copyFromHost(src:ByteBuffer,dst:Buffer,size:Long,srcOffset:Long=0,dstOffset:Long=0): Event
+  def copyFromHost(src:Memory,dst:Buffer,size:Long,srcOffset:Long=0,dstOffset:Long=0): Event
 
   /**
    * Copy 2D data from host
    *
    * Default behavior is to launch a copy for each row
    */
-  def copyFromHost2D(src:ByteBuffer,dst:Buffer,elemSize:Int,width:Long,height:Long,
+  def copyFromHost2D(src:Memory,dst:Buffer,elemSize:Int,width:Long,height:Long,
     srcPadding:Long,
     dstPadding:Long = -1,
     srcOffset:Long = 0, dstOffset:Long = 0): Event = {
@@ -86,7 +86,7 @@ abstract class MemoryNode {
    *
    * Default behavior is to launch a 2D copy for each plane
    */
-  def copyFromHost3D(src:ByteBuffer,dst:Buffer,elemSize:Int,width:Long,height:Long,depth:Long,
+  def copyFromHost3D(src:Memory,dst:Buffer,elemSize:Int,width:Long,height:Long,depth:Long,
   srcRowPadding:Long, srcPlanePadding:Long, dstRowPadding:Long = -1, dstPlanePadding:Long = -1,
   srcOffset:Long = 0,dstOffset:Long = 0): Event = {
 
@@ -100,22 +100,36 @@ abstract class MemoryNode {
   /**
    * Copy data to host
    */
-  def copyToHost(src:Buffer,dst:ByteBuffer,size:Long,srcOffset:Long=0,dstOffset:Long=0): Event
+  def copyToHost(src:Buffer,dst:Memory,size:Long,srcOffset:Long=0,dstOffset:Long=0): Event
 
   /**
    * Copy 2D data to host
    *
    * Default behavior is to launch a copy for each row
    */
-  def copyToHost2D(src:Buffer,dst:ByteBuffer,elemSize:Int,width:Long,height:Long,
-    srcPadding:Long, dstPadding:Long = -1, srcOffset:Long = 0,dstOffset:Long = 0): Event = {
+  def copyToHost2D(src:Buffer,dst:Memory,elemSize:Int,width:Long,height:Long,
+    srcPadding:Long = -1, dstPadding:Long, srcOffset:Long = 0,dstOffset:Long = 0): Event = {
 
-    val _dstPadding = if (dstPadding == -1) padding2D(elemSize,width,height) else dstPadding
+    val _srcPadding = if (srcPadding == -1) padding2D(elemSize,width,height) else srcPadding
 
-    copyGeneric2D[Buffer,ByteBuffer](copyToHost _)(src,dst,elemSize,width,height,srcPadding,_dstPadding,srcOffset,dstOffset)
+    copyGeneric2D(copyToHost _)(src,dst,elemSize,width,height,_srcPadding,dstPadding,srcOffset,dstOffset)
   }
 
+  /**
+   * Copy 3D data to host
+   *
+   * Default behavior is to launch a 2D copy for each plane
+   */
+  def copyToHost3D(src:Buffer,dst:Memory,elemSize:Int,width:Long,height:Long,depth:Long,
+  srcRowPadding:Long = -1, srcPlanePadding:Long = -1, dstRowPadding:Long, dstPlanePadding:Long,
+  srcOffset:Long = 0,dstOffset:Long = 0): Event = {
 
+    val _srcRowPadding = if (srcRowPadding == -1) padding2D(elemSize,width,height) else srcRowPadding
+    val _srcPlanePadding = if (srcPlanePadding == -1) padding3D(elemSize,width,height,depth) else srcPlanePadding
+
+    copyGeneric3D(copyToHost2D _)(src,dst,elemSize,width,height,depth,_srcRowPadding,_srcPlanePadding,dstRowPadding,dstPlanePadding,srcOffset,dstOffset)
+
+  }
 
   /**
    * Generic 2D copy

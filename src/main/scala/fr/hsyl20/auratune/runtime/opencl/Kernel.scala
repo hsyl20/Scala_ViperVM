@@ -86,7 +86,7 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
    * Test if the kernel can be executed with the given parameters
    * Return a list of errors or Nil if none
    */
-  def canExecute(device:Device, args:Seq[KernelParameter]): List[Error]
+  def canExecute(device:Device, args:Seq[KernelParameter]): Boolean
   //TODO
 
   /**

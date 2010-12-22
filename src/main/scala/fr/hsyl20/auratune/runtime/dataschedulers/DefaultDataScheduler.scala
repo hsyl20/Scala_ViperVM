@@ -21,7 +21,7 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
 
   protected var pendingStates: Map[DataState, DataStateEvent] = HashMap.empty
 
-  def makeState(state:DefaultDataState): DataStateEvent = {
+  def makeState(state:DataState): DataStateEvent = {
 
     /* Available devices */
     val ds = if (state.includedDevices.isEmpty) runtime.platform.devices else state.includedDevices
@@ -56,11 +56,11 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
     dse
   }
 
-  protected def selectDevice(state:DefaultDataState, devices:Seq[Device]): (Device,MemoryNode) = {
-    (devices.first, devices.first.memoryNodes.first)
+  protected def selectDevice(state:DataState, devices:Seq[Device]): (Device,MemoryNode) = {
+    (devices.head, devices.head.memoryNodes.head)
   }
 
-  protected def releaseDataState(state:DefaultDataState): Unit = {
+  protected def releaseDataState(state:DataState): Unit = {
     for (d <- state.data) {
     }
   }

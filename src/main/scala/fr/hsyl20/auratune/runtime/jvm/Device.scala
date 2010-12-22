@@ -16,5 +16,5 @@ package fr.hsyl20.auratune.runtime.jvm
 
 import fr.hsyl20.auratune.runtime.Device
 
-class JVMDevice extends Device {
-}
+/*class JVMDevice extends Device {
+}*/

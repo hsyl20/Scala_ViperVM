@@ -16,7 +16,7 @@ package fr.hsyl20.opencl
 
 import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory,NativeLong}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 import java.nio.ByteBuffer

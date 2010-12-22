@@ -30,7 +30,7 @@ object Buffer {
    import Mem._
    import Mem.AccessMode._
 
-   def create(context:Context, size:Int, access:AccessMode = ReadWrite): Buffer = {
+   def create(context:Context, size:Long, access:AccessMode = ReadWrite): Buffer = {
       val err = new IntByReference
       val flags = access.id
       val peer = clCreateBuffer(context.peer, flags, size, null, err.getPointer)

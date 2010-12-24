@@ -14,9 +14,4 @@
 
 package fr.hsyl20.auratune.runtime
 
-/**
- * Abstract class for kernels.
- *
- * Backends provide concrete implementations
- */
-abstract class Kernel
+case class ConfiguredKernel(kernel:Kernel, args:Seq[KernelParameter])

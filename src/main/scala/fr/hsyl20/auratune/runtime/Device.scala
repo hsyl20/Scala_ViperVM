@@ -19,4 +19,15 @@ package fr.hsyl20.auratune.runtime
  */
 abstract class Device {
   val memoryNodes: Seq[MemoryNode]
+
+  /**
+   * Execute the kernel with the specified parameters
+   */
+  def execute(kernel:ConfiguredKernel): RunningKernel
+
+  /**
+   * Test if the kernel can be executed with the given parameters
+   * Return a list of errors or Nil if none
+   */
+  def canExecute(kernel:ConfiguredKernel): Boolean
 }

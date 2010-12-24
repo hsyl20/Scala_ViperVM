@@ -51,45 +51,6 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
   }
 
   /**
-   * Execute the kernel with the specified parameters
-   */
-  def execute(device:Device, args:Seq[KernelParameter]): Event = {
-    val k = get(device)
-
-    /* Get work sizes */
-    val global = computeGlobalWorkSize(device, args)
-    val local = computeLocalWorkSize(device, args)
-
-    /* Get parameter list */
-    val params = computeParameters(device, args)
-
-    /* We need to synchronize as OpenCL kernels are not thread safe */
-    k.synchronized {
-
-      /* Set parameters */
-      for ((a,idx) <- params.zipWithIndex) a match {
-        case BufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, b.peer.peer)
-        case IntKernelParameter(v) => k.setArg(idx, 4, new IntByReference(v).getPointer)
-        case DoubleKernelParameter(v) => k.setArg(idx, 8, new DoubleByReference(v).getPointer)
-        case FloatKernelParameter(v) => k.setArg(idx, 4, new FloatByReference(v).getPointer)
-      }
-
-      /* Enqueue kernel */
-      val e = device.commandQueue.enqueueKernel(k, global, local, null)
-
-      /* Return wrapped event */
-      new OpenCLEvent(e)
-    }
-  }
-
-  /**
-   * Test if the kernel can be executed with the given parameters
-   * Return a list of errors or Nil if none
-   */
-  def canExecute(device:Device, args:Seq[KernelParameter]): Boolean
-  //TODO
-
-  /**
    * Compute global work size. Concrete kernels must implement this
    */
   def computeGlobalWorkSize(device:OpenCLDevice, args:Seq[KernelParameter]):List[Long]

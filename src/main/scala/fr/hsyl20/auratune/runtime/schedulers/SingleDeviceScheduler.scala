@@ -96,15 +96,15 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
     /* Release data state on task event completion */
     ds.releaseOn(event)
 
-    /* Execute kernel on data state event completion */
+    /* Execute kernel when data configuration is ready */
     dsEvent.addCallback(dse => {
       /* Get kernel for selected device */
       val k = selectKernel(task, dse.device, dse.memoryNode)
 
       val st = new ScheduledTask(task, k, dse.device, dse.memoryNode)
 
-      /* Execute task */
-      val devEvent = st.execute
+      /* Execute kernel */
+      val runningKernel = st.execute
 
       /* Add scheduled task to the list of active tasks */
       activeLock.synchronized {
@@ -112,10 +112,10 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
       }
 
       /* Trigger task event on devEvent completion */
-      event.chainWith(devEvent)
+      event.chainWith(runningKernel.event)
 
       /* Remove from active task on completion */
-      devEvent.addCallback(_ => activeLock.synchronized {
+      runningKernel.event.addCallback(_ => activeLock.synchronized {
         _activeTasks = _activeTasks - task
       })
     })
@@ -136,7 +136,7 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
    */
   protected def selectKernel(task:Task, device:Device, memoryNode:MemoryNode): Kernel = {
     val params = task.args.map(_._1.toKernelParameter(memoryNode))
-    val ks = for (k <- task.kernels if k.canExecute(device, params)) yield k
+    val ks = for (k <- task.kernels ; confK = ConfiguredKernel(k,params) if device.canExecute(confK)) yield k
     if (ks.isEmpty)
       error("No device can execute the given task!")
     ks.head

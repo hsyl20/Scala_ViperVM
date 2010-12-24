@@ -15,8 +15,10 @@
 package fr.hsyl20.auratune.runtime
 
 /**
- * Abstract class for kernels.
+ * Kernel being executed on a device
  *
- * Backends provide concrete implementations
+ * @param kernel  Kernel and its parameters
+ * @param device  Device executing the kernel
+ * @param event   Event indicating kernel execution completion
  */
-abstract class Kernel
+case class RunningKernel(kernel:ConfiguredKernel,device:Device,event:Event)

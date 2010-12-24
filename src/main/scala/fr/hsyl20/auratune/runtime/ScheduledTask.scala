@@ -21,17 +21,19 @@ class ScheduledTask(val task:Task, val kernel:Kernel, val device:Device, memoryN
 
   private val kernelParameters = task.args.map( _._1.toKernelParameter(memoryNode))
 
+  val configuredKernel = ConfiguredKernel(kernel, kernelParameters)
+
   /**
    * Execute this task
    */
-  def execute: Event = {
-    kernel.execute(device, kernelParameters)
+  def execute: RunningKernel = {
+    device.execute(configuredKernel)
   }
 
   /**
    * Can be executed?
    */
   def canExecute: Boolean = {
-    kernel.canExecute(device, kernelParameters)
+    device.canExecute(configuredKernel)
   }
 }

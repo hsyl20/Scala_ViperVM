@@ -37,11 +37,16 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
     //else
     /* Put the state in the queue */
 
-    for ((d,mode) <- state.data) {
-      /* Check buffer status */
-      val s = d.status(memoryNode)
-      //TODO
-    }
+    /* List data invalid on the memory node */
+    val requiredData = (for ((d,mode) <- state.data) yield {
+      d.status(memoryNode) match {
+        case None => Some((d,mode))
+        case Some(Data.Shared(_)) if mode != AccessMode.ReadOnly => Some((d,mode))
+        case Some(Data.Invalid) => Some((d,mode))
+        case _ => None
+      }
+    }).flatten
+
     
 
     val dse = new DataStateEvent {

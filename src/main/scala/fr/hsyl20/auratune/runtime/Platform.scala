@@ -36,6 +36,11 @@ class Platform {
    * Available devices
    */
   def devices: Seq[Device] = drivers.flatMap(_.devices)
+
+  /**
+   * Memory nodes
+   */
+  def memoryNodes: Seq[MemoryNode] = devices.flatMap(_.memoryNodes).distinct
 }
 
 

@@ -86,8 +86,8 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
   protected def prepare(task:Task, event:UserEvent): Unit = {
 
     /* Create datastate with task Data on specified device */
-    val ds = new DataState(task.data) {
-      val includeDevices = List(device)
+    val ds = new DataConfig(task.data) {
+      override val included = device.memoryNodes
     }
 
     /* Schedule data configuration */

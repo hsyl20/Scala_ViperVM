@@ -23,7 +23,7 @@ import fr.hsyl20.auratune.runtime.AccessMode._
  *
  * @param data Data and their associated access modes
  */
-class DataState(val data:List[(Data,AccessMode)]) extends AbstractDataState {
+class DataConfig(val data:List[(Data,AccessMode)]) extends AbstractDataConfig {
 
   def this(data:(Data,AccessMode)*) = this(data.toList)
 
@@ -32,12 +32,12 @@ class DataState(val data:List[(Data,AccessMode)]) extends AbstractDataState {
    * configured on a memory node contained in it. Otherwise any
    * memory node in the platform can be used.
    */
-  val included:List[MemoryNode] = Nil
+  val included:Seq[MemoryNode] = Nil
 
   /**
    * Memory nodes that must not be used
    */
-  val excluded:List[MemoryNode] = Nil
+  val excluded:Seq[MemoryNode] = Nil
 
   /**
    * Memory node priorities. 0 is default. Negative is lower priority and positive is higher priority

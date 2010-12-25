@@ -17,19 +17,19 @@ package fr.hsyl20.auratune.runtime
 /**
  * Event triggered when a given data configuration is obtained
  *
- * You should release the associated DataState as soon as possible,
+ * You should release the associated DataConfig as soon as possible,
  * otherwise it will be released on Garbage Collection
  */
-abstract class DataStateEvent extends Event {
+abstract class DataConfigEvent extends Event {
 
   /** Return the associated DataState */
-  def dataState: DataState
+  def config: DataConfig
 
   /** Selected memory node */
   def memoryNode: MemoryNode
 
   override def finalize: Unit = {
-    dataState.release
+    config.release
     super.finalize
   }
 }

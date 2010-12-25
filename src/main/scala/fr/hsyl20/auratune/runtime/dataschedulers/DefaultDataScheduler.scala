@@ -19,13 +19,13 @@ import fr.hsyl20.auratune.runtime._
 
 class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
 
-  protected var pendingStates: Map[DataState, DataStateEvent] = HashMap.empty
+  protected var pendingStates: List[DataConfigEvent] = Nil
 
-  def makeState(state:DataState): DataStateEvent = {
+  def makeState(config:DataConfig): DataConfigEvent = {
 
     /* Memory nodes to choose from */
-    val ds = if (state.included.isEmpty) runtime.platform.memoryNodes else state.included
-    val nodes = ds.filterNot(state.excluded.contains _)
+    val ds = if (config.included.isEmpty) runtime.platform.memoryNodes else config.included
+    val nodes = ds.filterNot(config.excluded.contains _)
 
     /* Check if this state is compatible with the current ones */
     //TODO
@@ -37,16 +37,16 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
     /* Prepare the event that will be returned if everything
      * goes well
      */
-    val dse = new DataStateEvent {
+    val dse = new DataConfigEvent {
       def memoryNode = memoryNode
-      def dataState = state
+      def config = config
     }
 
     /* Select memory node */
-    val memoryNode = selectMemoryNode(state, nodes)
+    val node = selectMemoryNode(config, nodes)
 
     /* Allocate and transfer data */
-    val invalids = invalidData(state,memoryNode)
+    val invalids = invalidData(config,node)
     for (d <- invalids) {
       /* Allocate buffers */
       //TODO
@@ -74,7 +74,7 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
     /* Add a callback for the scheduler to be notified when
      * the active data configuration is released
      */
-    dse.dataState.addReleaseCallback(releaseDataState _)
+    dse.config.addReleaseCallback(releaseConfig _)
 
     /* Return data state event */
     dse
@@ -86,19 +86,19 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
    * This higher it is, the most likely the data configuration will
    * be set on the memory node
    */
-  protected def score(state:DataState, memoryNode:MemoryNode):Float = {
-    val invalid = invalidData(state,memoryNode)
+  protected def score(config:DataConfig, memoryNode:MemoryNode):Float = {
+    val invalid = invalidData(config,memoryNode)
     val sizeToTransfer = invalid.map(_.sizeOn(memoryNode)).sum
 
-    sizeToTransfer.toFloat * (-0.001f) + 10.0f * state.priorities.getOrElse(memoryNode, 0)
+    sizeToTransfer.toFloat * (-0.001f) + 10.0f * config.priorities.getOrElse(memoryNode, 0)
   }
 
   /**
    * Return the list of data from the data configuration that are not
    * in a valid state on the given memory node
    */
-  protected def invalidData(state:DataState, memoryNode:MemoryNode): Seq[Data] = {
-    state.data.map(_._1).flatMap(d => d.status(memoryNode) match {
+  protected def invalidData(config:DataConfig, memoryNode:MemoryNode): Seq[Data] = {
+    config.data.map(_._1).flatMap(d => d.status(memoryNode) match {
         case None 
           | Some(Data.Invalid) => Some(d)
         case _ => None
@@ -106,20 +106,20 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
   }
 
   /**
-   * Select the best memory node for the given state
+   * Select the best memory node for the given data configuration
    *
    * By default, memory node with best score is selected
    */
-  protected def selectMemoryNode(state:DataState, nodes:Seq[MemoryNode]): MemoryNode = {
-    (nodes zip nodes.map(m => score(state,m))).sortBy(_._2).last._1
+  protected def selectMemoryNode(config:DataConfig, nodes:Seq[MemoryNode]): MemoryNode = {
+    (nodes zip nodes.map(m => score(config,m))).sortBy(_._2).last._1
   }
 
   /**
    * Indicate that a data configuration is no longer required
    */
-  protected def releaseDataState(state:DataState): Unit = {
+  protected def releaseConfig(config:DataConfig): Unit = {
     /* Release access locks on data of the configuration*/
-    for (d <- state.data) {
+    for (d <- config.data) {
       //TODO
     }
     /* Check for pending configurations that can be enabled */

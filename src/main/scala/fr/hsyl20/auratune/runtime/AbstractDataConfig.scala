@@ -17,9 +17,9 @@ package fr.hsyl20.auratune.runtime
 /**
  * A DataState represents a configuration of Data
  */
-abstract class AbstractDataState {
+abstract class AbstractDataConfig {
 
-  val releaseEvent: UserEvent = new UserEvent
+  protected val releaseEvent: UserEvent = new UserEvent
 
   /**
    * Release data state on event completion
@@ -40,6 +40,9 @@ abstract class AbstractDataState {
     }
   }
 
+  /**
+   * Add a callback triggered on release of this data configuration
+   */
   def addReleaseCallback(f:this.type=>Unit): Unit = {
     releaseEvent.addCallback(_ => f(this))
   }

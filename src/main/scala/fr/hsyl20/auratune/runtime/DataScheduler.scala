@@ -23,5 +23,5 @@ abstract class DataScheduler {
    * Transfer data in order to have the given Data on the same device
    * with the given access modes
    */
-  def makeState(state:DataState): DataStateEvent
+  def makeState(config:DataConfig): DataConfigEvent
 }

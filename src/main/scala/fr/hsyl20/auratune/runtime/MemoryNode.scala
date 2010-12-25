@@ -27,11 +27,11 @@ abstract class MemoryNode {
   /**
    * Natural 2D padding
    */
-  def padding2D(elemSize:Int,width:Long,height:Long): Long = 0
+  def padding2D(elemSize:Int,width:Long,height:Long): Long = 4
   /**
    * Natural 3D padding
    */
-  def padding3D(elemSize:Int,width:Long,height:Long,depth:Long): Long = 0
+  def padding3D(elemSize:Int,width:Long,height:Long,depth:Long): Long = 4
 
 
   /** 
@@ -43,28 +43,4 @@ abstract class MemoryNode {
    * Allocate a buffer
    */
   def allocate(size:Long): Buffer
-
-  /**
-   * Allocate with natural 2D padding
-   *
-   * Default behavior is no padding
-   *
-   * @return (Buffer,padding)
-   */
-  def allocate2D(elemSize:Int,width:Long,height:Long): (Buffer,Long) = {
-    (allocate(elemSize*width*height), padding2D(elemSize,width,height))
-  }
-
-  /**
-   * Allocate with natural 3D padding
-   *
-   * Default behavior is no padding
-   *
-   * @return (Buffer,padding1,padding2)
-   */
-  def allocate3D(elemSize:Int,width:Long,height:Long,depth:Long): (Buffer,Long,Long) = {
-    val pad1 = padding2D(elemSize,width,height)
-    val pad2 = padding3D(elemSize,width,height,depth)
-    (allocate(elemSize*width*height*depth), pad1, pad2)
-  }
 }

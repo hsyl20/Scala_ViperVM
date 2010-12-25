@@ -46,6 +46,11 @@ abstract class Data {
   def allocate(memoryNode:MemoryNode): Event
 
   /**
+   * Required size of the buffer for this data on the given node
+   */
+  def sizeOn(memoryNode:MemoryNode): Long
+
+  /**
    * Update the buffer on memoryNode if it is invalid
    */
   def sync(memoryNode:MemoryNode): Event

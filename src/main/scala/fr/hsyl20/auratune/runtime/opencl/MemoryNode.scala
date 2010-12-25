@@ -22,6 +22,8 @@ import fr.hsyl20.{opencl => cl}
 /* OpenCL memory node */
 class OpenCLMemoryNode(val device:OpenCLDevice) extends MemoryNode {
 
+  val devices = List(device)
+
   implicit def buffer2buffer(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
 
   private var _availableMemory: Long = device.peer.globalMemSize

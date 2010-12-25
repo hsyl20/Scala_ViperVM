@@ -21,6 +21,9 @@ import com.sun.jna.Memory
  */
 abstract class MemoryNode {
 
+  /* Devices associated to this node */
+  val devices:Seq[Device]
+
   /**
    * Natural 2D padding
    */

@@ -25,9 +25,6 @@ abstract class DataStateEvent extends Event {
   /** Return the associated DataState */
   def dataState: DataState
 
-  /** Selected device */
-  def device: Device
-
   /** Selected memory node */
   def memoryNode: MemoryNode
 

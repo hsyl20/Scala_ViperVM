@@ -98,10 +98,12 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
 
     /* Execute kernel when data configuration is ready */
     dsEvent.addCallback(dse => {
-      /* Get kernel for selected device */
-      val k = selectKernel(task, dse.device, dse.memoryNode)
+      val device = dse.memoryNode.devices.head
 
-      val st = new ScheduledTask(task, k, dse.device, dse.memoryNode)
+      /* Get kernel for selected device */
+      val k = selectKernel(task, device, dse.memoryNode)
+
+      val st = new ScheduledTask(task, k, device, dse.memoryNode)
 
       /* Execute kernel */
       val runningKernel = st.execute

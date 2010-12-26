@@ -20,8 +20,7 @@ package fr.hsyl20.auratune.runtime
 abstract class DataScheduler {
   
   /**
-   * Transfer data in order to have the given Data on the same device
-   * with the given access modes
+   * Ask for the given data configuration to be set up
    */
-  def makeState(config:DataConfig): DataConfigEvent
+  def configure(config:DataConfig): DataConfigEvent
 }

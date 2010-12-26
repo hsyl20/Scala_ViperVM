@@ -21,11 +21,21 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
 
   protected var pendingStates: List[DataConfigEvent] = Nil
 
-  def makeState(config:DataConfig): DataConfigEvent = {
+  /**
+   * Return available memory nodes for the given configuration
+   */
+  protected def availableNodes(config:DataConfig):Seq[MemoryNode] = {
+    val included = if (config.included.isEmpty) runtime.platform.memoryNodes else config.included
+    included.filterNot(config.excluded.contains _)
+  }
+
+  /**
+   * Ask for a data configuration to be set up
+   */
+  def configure(config:DataConfig): DataConfigEvent = {
 
     /* Memory nodes to choose from */
-    val ds = if (config.included.isEmpty) runtime.platform.memoryNodes else config.included
-    val nodes = ds.filterNot(config.excluded.contains _)
+    val nodes = availableNodes(config)
 
     /* Check if this state is compatible with the current ones */
     //TODO

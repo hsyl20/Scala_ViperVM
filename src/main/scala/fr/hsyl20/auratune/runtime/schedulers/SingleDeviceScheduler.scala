@@ -86,24 +86,24 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
   protected def prepare(task:Task, event:UserEvent): Unit = {
 
     /* Create datastate with task Data on specified device */
-    val ds = new DataConfig(task.data) {
+    val config = new DataConfig(task.data) {
       override val included = device.memoryNodes
     }
 
     /* Schedule data configuration */
-    val dsEvent = runtime.dataScheduler.makeState(ds)
+    val dcEvent = runtime.dataScheduler.configure(config)
 
     /* Release data state on task event completion */
-    ds.releaseOn(event)
+    config.releaseOn(event)
 
     /* Execute kernel when data configuration is ready */
-    dsEvent.addCallback(dse => {
-      val device = dse.memoryNode.devices.head
+    dcEvent.addCallback(dce => {
+      val device = dce.memoryNode.devices.head
 
       /* Get kernel for selected device */
-      val k = selectKernel(task, device, dse.memoryNode)
+      val k = selectKernel(task, device, dce.memoryNode)
 
-      val st = new ScheduledTask(task, k, device, dse.memoryNode)
+      val st = new ScheduledTask(task, k, device, dce.memoryNode)
 
       /* Execute kernel */
       val runningKernel = st.execute

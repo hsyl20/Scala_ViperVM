@@ -42,8 +42,10 @@ abstract class Data {
 
   /**
    * Allocate a buffer for this data on some memory node
+   *
+   * Return true on success, false otherwise
    */
-  def allocate(memoryNode:MemoryNode): Event
+  def allocate(memoryNode:MemoryNode): Boolean
 
   /**
    * Required size of the buffer for this data on the given node
@@ -51,9 +53,16 @@ abstract class Data {
   def sizeOn(memoryNode:MemoryNode): Long
 
   /**
-   * Update the buffer on memoryNode if it is invalid
+   * List memory nodes that can be used as sources to update
+   * buffer contained in given memoryNode
    */
-  def sync(memoryNode:MemoryNode): Event
+  def syncSources(memoryNode:MemoryNode): Seq[MemoryNode]
+
+  /**
+   * Update the buffer in dst memory node from the one in src
+   * memory node
+   */
+  def sync(dst:MemoryNode, src:MemoryNode): Event
 
   /**
    * Add a buffer to this data on a different memory node.

@@ -20,12 +20,14 @@ package fr.hsyl20.auratune.runtime
  * You should release the associated DataConfig as soon as possible,
  * otherwise it will be released on Garbage Collection
  */
-abstract class DataConfigEvent extends Event {
+trait DataConfigEvent extends Event {
 
   /** Return the associated DataState */
   def config: DataConfig
 
-  /** Selected memory node */
+  /**
+   * Selected memory node (only available after event completion)
+   */
   def memoryNode: MemoryNode
 
   override def finalize: Unit = {

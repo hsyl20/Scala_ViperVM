@@ -60,7 +60,7 @@ abstract class MutableData extends Data {
          case (Shared(n),ReadOnly) if n > 1 => status.update(buffer,Shared(n-1))
          case (Shared(n),ReadOnly)  => status.update(buffer,Ready)
          case (Exclusive,_) => status.update(buffer,Ready)
-         case _ => system.error("Buffer got an invalid state while being processed")
+         case _ => error("Buffer got an invalid state while being processed")
       }
    }
 

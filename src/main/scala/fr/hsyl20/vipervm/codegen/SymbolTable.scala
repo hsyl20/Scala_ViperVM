@@ -31,7 +31,7 @@ abstract class SymbolTable[A] {
       (this /: ss.items) { (st, entry) =>
          st.get(entry._1) match {
             case None => this + entry
-            case Some(desc2) => system.error("Conflicting symbols")
+            case Some(desc2) => error("Conflicting symbols")
          }
          st
       }

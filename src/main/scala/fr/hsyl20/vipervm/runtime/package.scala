@@ -11,5 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm
 
+package object runtime {
+}

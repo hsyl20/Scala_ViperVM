@@ -139,7 +139,7 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
     val params = task.args.map(_._1.toKernelParameter(memoryNode))
     val ks = for (k <- task.kernels ; confK = ConfiguredKernel(k,params) if device.canExecute(confK)) yield k
     if (ks.isEmpty)
-      system.error("No device can execute the given task!")
+      error("No device can execute the given task!")
     ks.head
   }
 }

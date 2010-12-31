@@ -17,6 +17,8 @@ import scala.concurrent.Lock
 
 /**
  * An event that completes when all events it contains have completed
+ *
+ * @param events Events in this group
  */
 class EventGroup[E <: Event](val events:Seq[E]) extends Event {
 

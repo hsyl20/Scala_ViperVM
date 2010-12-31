@@ -17,6 +17,7 @@ package fr.hsyl20.vipervm.runtime
  *
  */
 abstract class Device {
+  /** Memory nodes associated with this device */
   val memoryNodes: Seq[MemoryNode]
 
   /**

@@ -22,12 +22,10 @@ import fr.hsyl20.vipervm.runtime.AccessMode._
  *
  * @param data Data and their associated access modes
  */
-class DataConfig(val data:List[(Data,AccessMode)]) extends AbstractDataConfig {
-
-  def this(data:(Data,AccessMode)*) = this(data.toList)
+class DataConfig(val data:Seq[(Data,AccessMode)]) extends AbstractDataConfig {
 
   /**
-   * if "included" is not Nil, the DataState must only be
+   * if "included" is not Nil, the data configuration must only be
    * configured on a memory node contained in it. Otherwise any
    * memory node in the platform can be used.
    */

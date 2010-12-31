@@ -21,7 +21,7 @@ package fr.hsyl20.vipervm.runtime
  */
 trait DataConfigEvent extends Event {
 
-  /** Return the associated DataState */
+  /** Return the associated data configuration */
   def config: DataConfig
 
   /**

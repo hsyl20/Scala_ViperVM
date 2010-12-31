@@ -22,6 +22,7 @@ import scala.concurrent.Lock
  * A buffer in a memory node
  */
 abstract class Buffer {
+  /** Memory node containing this buffer */
   val memoryNode:MemoryNode
 
   private var _kernels:List[RunningKernel] = Nil
@@ -31,7 +32,7 @@ abstract class Buffer {
   private val transfersLock:Lock = new Lock
 
   /** Free this buffer */
-  def free: Unit
+  def free(): Unit
 
   /** Driver specific 1D copy implementation */
   protected def driverCopyFromHost(src:Memory,size:Long,srcOffset:Long,dstOffset:Long): Event
@@ -201,13 +202,17 @@ abstract class Buffer {
     }
   }
 
-  def srcTransfers: List[DataTransfer] =
+  /** Data transfers involving this buffer */
+  def transfers: List[DataTransfer] = _transfers
+
+  /** Data transfers involving this buffer as source */
+  def transfersAsSource: List[DataTransfer] =
     transfers.filter(_.direction == MemoryNodeToHost)
 
-  def dstTransfers: List[DataTransfer] =
+  /** Data transfers involving this buffer as destination */
+  def transfersAsDestination: List[DataTransfer] =
     transfers.filter(_.direction == HostToMemoryNode)
 
-  def transfers: List[DataTransfer] = _transfers
 
   protected def startTransfer(t:DataTransfer): Unit = transfersLock.synchronized {
     _transfers ::= t
@@ -217,14 +222,16 @@ abstract class Buffer {
     _transfers = _transfers.filterNot(_ == t)
   }
 
-
+  /** Kernels currently accessing this buffer */
   def kernels: List[RunningKernel] = _kernels
 
-  def startKernelAccess(k:RunningKernel) = kernelsLock.synchronized {
-    _kernels ::= k
+  /** Call this to indicate that this buffer is being accessed by a kernel */
+  def notifyKernelAccessStart(kernel:RunningKernel) = kernelsLock.synchronized {
+    _kernels ::= kernel
   }
 
-  def endKernelAccess(k:RunningKernel) = kernelsLock.synchronized {
-    _kernels = _kernels.filterNot(_ == k)
+  /** Call this to indicate that the given kernel doesn't access this buffer anymore */
+  def notifyKernelAccessEnd(kernel:RunningKernel) = kernelsLock.synchronized {
+    _kernels = _kernels.filterNot(_ == kernel)
   }
 }

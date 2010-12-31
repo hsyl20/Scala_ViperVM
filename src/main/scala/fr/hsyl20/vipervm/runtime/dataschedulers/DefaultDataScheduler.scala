@@ -215,7 +215,7 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
       case Shared(n) if n > 1 => dataStates.update(d, Shared(n-1))
       case Shared(_)
        |   Exclusive => dataStates.remove(d)
-      case _ => error("Invalid data state after data configuration release")
+      case _ => system.error("Invalid data state after data configuration release")
     }}
 
     /* Check for waiting configurations that may be enabled now */

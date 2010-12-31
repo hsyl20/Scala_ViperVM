@@ -70,7 +70,7 @@ trait CCode extends Block with Scope {
    implicit def sym2var(s:Symbol): Variable = {
       getSymbol(s.name) match {
          case Some(v:Variable) => v
-         case _ => error("Invalid symbol %s".format(s.name))
+         case _ => system.error("Invalid symbol %s".format(s.name))
       }
    }
 
@@ -110,27 +110,27 @@ trait CCode extends Block with Scope {
 
       def :- (t:CType): Variable = {
          getSymbol(s.name) match {
-            case Some(v:Variable) => if (v.typ != t) error("Invalid type ascription") else v
+            case Some(v:Variable) => if (v.typ != t) system.error("Invalid type ascription") else v
             case None => {
                val v = Variable(t)
                declare(v)
                addSymbol(s.name, v)
                v
             }
-            case _ => error("Invalid symbol")
+            case _ => system.error("Invalid symbol")
          }
       }
 
       def :- (vt:VarType): Variable = {
          getSymbol(s.name) match {
-            case Some(v:Variable) => if (v.typ != vt.typ || v.space != vt.space) error("Invalid ascription") else v
+            case Some(v:Variable) => if (v.typ != vt.typ || v.space != vt.space) system.error("Invalid ascription") else v
             case None => {
                val v = Variable(vt.typ,vt.space)
                declare(v)
                addSymbol(s.name, v)
                v
             }
-            case _ => error("Invalid symbol")
+            case _ => system.error("Invalid symbol")
          }
       }
    }

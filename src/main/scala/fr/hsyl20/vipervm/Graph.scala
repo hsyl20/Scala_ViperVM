@@ -34,7 +34,7 @@ object Graph {
          case Mul(d1,d2) => dfs (d1) (f) ::: dfs (d2) (f)
          case Div(d1,d2) => dfs (d1) (f) ::: dfs (d2) (f)
 
-         case _ => error("Unhandled data type %s".format(ds))
+         case _ => system.error("Unhandled data type %s".format(ds))
       }
 
       current ::: children

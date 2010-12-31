@@ -19,7 +19,7 @@ package fr.hsyl20.vipervm.runtime
  */
 abstract class Driver {
 
-   /* Devices managed by this driver */
+   /** Devices managed by this driver */
    def devices:Seq[Device]
 
 }

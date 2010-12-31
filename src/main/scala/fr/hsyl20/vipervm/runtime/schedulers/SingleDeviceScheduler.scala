@@ -33,7 +33,7 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
   private var _activeTasks:ImmMap[Task,ScheduledTask] = ImmMap.empty
 
 
-  def activeTasks = _activeTasks
+  def runningTasks = _activeTasks.keys.toSeq
 
   def schedule(task:Task, dependencies:List[Event] = Nil): Event = {
 
@@ -139,7 +139,7 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
     val params = task.args.map(_._1.toKernelParameter(memoryNode))
     val ks = for (k <- task.kernels ; confK = ConfiguredKernel(k,params) if device.canExecute(confK)) yield k
     if (ks.isEmpty)
-      error("No device can execute the given task!")
+      system.error("No device can execute the given task!")
     ks.head
   }
 }

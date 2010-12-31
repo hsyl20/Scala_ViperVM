@@ -28,4 +28,9 @@ abstract class Scheduler {
    * @return An event indicating task completion
    */
   def schedule(t:Task, dependencies:List[Event] = Nil): Event 
+
+  /**
+   * Running tasks
+   */
+  def runningTasks: Seq[Task]
 }

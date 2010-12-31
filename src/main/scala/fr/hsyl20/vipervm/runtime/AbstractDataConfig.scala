@@ -14,24 +14,26 @@
 package fr.hsyl20.vipervm.runtime
 
 /**
- * A DataState represents a configuration of Data
+ * A data configuration.
+ *
+ * Data configurations are requests for the data scheduler.
  */
 abstract class AbstractDataConfig {
 
   protected val releaseEvent: UserEvent = new UserEvent
 
   /**
-   * Release data state on event completion
+   * Release this data configuration on event completion
    */
   def releaseOn(event:Event): Unit = {
     event.addCallback(_ => release)
   }
 
   /**
-   * Release the Data State
+   * Release this data configuration
    *
-   * Indicate that Data in this data state can be released, that
-   * buffers can be moved or released, etc.
+   * The requester of this data configuration has to release it
+   * when it becomes useless.
    */
   final def release: Unit = {
     if (!releaseEvent.test) {

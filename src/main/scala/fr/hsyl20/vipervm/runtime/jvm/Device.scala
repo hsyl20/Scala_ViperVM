@@ -13,7 +13,5 @@
 
 package fr.hsyl20.vipervm.runtime.jvm
 
-import fr.hsyl20.vipervm.runtime.Device
-
 /*class JVMDevice extends Device {
 }*/

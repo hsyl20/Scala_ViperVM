@@ -13,69 +13,78 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import com.sun.jna.Memory
-
 /**
  * Data transfer for contiguous memory
  *
- * @param size Size of data to transfer in bytes
+ * @param link    Link handling the transfer
+ * @param source  Source buffer
+ * @param target  Target buffer
+ * @param size    Size to copy (in bytes)
+ * @param sourceOffset Offset in source buffer (in bytes)
+ * @param targetOffset Offset in target buffer (in bytes)
  */
-case class DataTransfer1D(direction:DataTransferDirection,
-  offset:Long, memory:Memory, memoryOffset:Long, event:Event,
-  size:Long) extends DataTransfer
+case class DataTransfer1D(link:Link,source:Buffer,target:Buffer,size:Long,
+  sourceOffset:Long,targetOffset:Long,
+  event:Event) extends DataTransfer
 
 /**
  * 2D data transfer
  *
- * @param elemSize Size of an element (in bytes)
- * @param width Number of elements in one row
- * @param height Number of rows
- * @param padding Padding bytes for each row (on memory node)
- * @param memoryPadding Padding bytes for each row (on host)
+ * @param link    Link handling the transfer
+ * @param source  Source buffer
+ * @param target  Target buffer
+ * @param elemSize Size of one element (in bytes)
+ * @param width   Row width
+ * @param height  Row count
+ * @param sourcePadding Row padding in source buffer (in bytes)
+ * @param targetPadding Row padding in target buffer (in bytes)
+ * @param sourceOffset Offset in source buffer (in bytes)
+ * @param targetOffset Offset in target buffer (in bytes)
  */
-case class DataTransfer2D(direction:DataTransferDirection,
-  offset:Long, memory:Memory, memoryOffset:Long, event:Event,
-  elemSize:Int, width:Long, height:Long,
-  padding:Long, memoryPadding:Long) extends DataTransfer
+case class DataTransfer2D(link:Link,source:Buffer,target:Buffer,
+  elemSize:Long,width:Long,height:Long,
+  sourcePadding:Long,targetPadding:Long,
+  sourceOffset:Long,targetOffset:Long,
+  event:Event) extends DataTransfer
 
 /**
  * 3D data transfer
  *
- * @param elemSize Size of an element (in bytes)
- * @param width Number of elements in one row
- * @param height Number of rows in a plane
- * @param depth Number of planes
- * @param rowPadding Padding bytes for each row (on memory node)
- * @param planePadding Padding bytes for each plane (on memory node)
- * @param memoryRowPadding Padding bytes for each row (on host)
- * @param memoryPlanePadding Padding bytes for each plane (on host)
+ * @param link    Link handling the transfer
+ * @param source  Source buffer
+ * @param target  Target buffer
+ * @param elemSize Size of one element (in bytes)
+ * @param width   Row width
+ * @param height  Row count
+ * @param depth   Plane count
+ * @param sourceRowPadding Row padding in source buffer (in bytes)
+ * @param targetRowPadding Row padding in target buffer (in bytes)
+ * @param sourcePlanePadding Row padding in source buffer (in bytes)
+ * @param targetPlanePadding Row padding in target buffer (in bytes)
+ * @param sourceOffset Offset in source buffer (in bytes)
+ * @param targetOffset Offset in target buffer (in bytes)
  */
-case class DataTransfer3D(direction:DataTransferDirection,
-  offset:Long, memory:Memory, memoryOffset:Long, event:Event,
-  elemSize:Int, width:Long, height:Long, depth:Long,
-  rowPadding:Long, planePadding:Long,
-  memoryRowPadding:Long, memoryPlanePadding:Long) extends DataTransfer
+case class DataTransfer3D(link:Link,source:Buffer,target:Buffer,
+  elemSize:Long,width:Long,height:Long,
+  sourceRowPadding:Long,targetRowPadding:Long,
+  sourcePlanePadding:Long,targetPlanePadding:Long,
+  sourceOffset:Long,targetOffset:Long,
+  event:Event) extends DataTransfer
 
 /**
- * Event associated to a data transfer
+ * Data transfer
  */
 abstract class DataTransfer {
-  /** Direction (Host to memory node or vice-versa) */
-  val direction:DataTransferDirection
-  /** Offset in memory node buffer */
-  val offset:Long
-  /** Host data */
-  val memory:Memory
-  /** Offset for host data */
-  val memoryOffset:Long
+  /** Link handling the data transfer */
+  val link:Link
+  /** Source of the data transfer */
+  val source:Buffer
+  /** Destination of the data transfer */
+  val target:Buffer
+  /** Offset in the source buffer */
+  val sourceOffset:Long
+  /** Offset in the destination buffer */
+  val targetOffset:Long
   /** Event indicating data transfer completion  */
   val event:Event
 }
-
-
-/** Direction of a data transfer  */
-sealed abstract class DataTransferDirection
-/** Direction: from host to memory node  */
-case object HostToMemoryNode extends DataTransferDirection
-/** Direction: from memory node to host */
-case object MemoryNodeToHost extends DataTransferDirection

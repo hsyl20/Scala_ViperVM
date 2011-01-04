@@ -13,14 +13,20 @@
 
 package fr.hsyl20.vipervm.runtime
 
+import com.sun.jna.Memory
+
 /**
- * A buffer in a memory node
+ * Default host buffer implementation
  */
-abstract class Buffer {
+class DefaultHostBuffer(val peer:Memory, val memoryNode:HostMemoryNode) extends HostBuffer {
 
-  /** Memory node containing this buffer */
-  val memoryNode:MemoryNode
+  def this(size:Long,memoryNode:HostMemoryNode) = this(new Memory(size), memoryNode)
 
-  /** Free this buffer */
-  def free(): Unit
+  /**
+   * Free the buffer in memory node
+   *
+   * Current implementation free host buffer on GC.
+   * TODO: force instant call of free
+   */
+  def free():Unit = {}
 }

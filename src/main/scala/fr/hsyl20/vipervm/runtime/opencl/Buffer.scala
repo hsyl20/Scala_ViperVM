@@ -28,21 +28,4 @@ class OpenCLBuffer(val peer: cl.Buffer, val memoryNode:OpenCLMemoryNode) extends
 
   def free(): Unit = peer.release
 
-  /**
-   * Copy data from host to buffer
-   */
-  protected def driverCopyFromHost(src:Memory,size:Long,srcOffset:Long,dstOffset:Long): OpenCLEvent = {
-    val ptr = src.getPointer(srcOffset)
-    val clEvent = device.commandQueue.enqueueWriteBuffer(peer, false, dstOffset, size, ptr, Nil)
-    new OpenCLEvent(clEvent)
-  }
-
-  /**
-   * Copy data from buffer to host
-   */
-  protected def driverCopyToHost(dst:Memory,size:Long,srcOffset:Long,dstOffset:Long): OpenCLEvent = {
-    val ptr = dst.getPointer(dstOffset)
-    val clEvent = device.commandQueue.enqueueReadBuffer(peer, false, srcOffset, size, ptr, Nil)
-    new OpenCLEvent(clEvent)
-  }
 }

@@ -55,13 +55,12 @@ abstract class Data {
    * List memory nodes that can be used as sources to update
    * buffer contained in given memoryNode
    */
-  def syncSources(memoryNode:MemoryNode): Seq[MemoryNode]
-
-  /**
-   * Update the buffer in dst memory node from the one in src
-   * memory node
-   */
-  def sync(dst:MemoryNode, src:MemoryNode): Event
+  def syncSources(memoryNode:MemoryNode): Seq[MemoryNode] =
+    buffers.keys.filter(status(_) match {
+      case Some(Ready) 
+        |  Some(Shared(_)) => true
+      case _ => false
+    }).toSeq
 
   /**
    * Add a buffer to this data on a different memory node.

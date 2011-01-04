@@ -19,8 +19,12 @@ package fr.hsyl20.vipervm.runtime
  */
 abstract class Driver {
 
-   /** Devices managed by this driver */
-   def devices:Seq[Device]
+  /** Memory nodes */
+  def memoryNodes:Seq[MemoryNode]
 
+  /** Networks */
+  def networks:Seq[Network]
+
+  /** Processors */
+  def processors:Seq[Processor]
 }
-

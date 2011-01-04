@@ -11,20 +11,22 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.apps
+package fr.hsyl20.vipervm.apps.profiler
 
 import scala.swing._
 
 object Profiler {
+
   def main(args:Array[String]): Unit = {
     val frame = new ProfilerFrame
     frame.visible = true
   }
 }
 
-class ProfilerFrame extends Frame {
+private[profiler] class ProfilerFrame extends Frame {
   title = "Scala demo"
   contents = new Button {
     text = "Pouche mi!"
   }
 }
+

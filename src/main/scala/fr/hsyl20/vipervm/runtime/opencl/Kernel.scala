@@ -29,7 +29,7 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
    * of the responsability of the scheduler to provide backends
    * with appropriate device and buffer types.
    */
-  private implicit def dev2dev(d:Device): OpenCLDevice =
+  private implicit def dev2dev(d:Processor): OpenCLDevice =
     d.asInstanceOf[OpenCLDevice]
 
   private implicit def buf2buf(b:Buffer): OpenCLBuffer =

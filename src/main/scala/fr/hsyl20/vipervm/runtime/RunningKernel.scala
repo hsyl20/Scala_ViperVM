@@ -20,4 +20,4 @@ package fr.hsyl20.vipervm.runtime
  * @param device  Device executing the kernel
  * @param event   Event indicating kernel execution completion
  */
-case class RunningKernel(kernel:ConfiguredKernel,device:Device,event:Event)
+case class RunningKernel(kernel:ConfiguredKernel,proc:Processor,event:Event)

@@ -14,13 +14,22 @@
 package fr.hsyl20.vipervm.runtime
 
 /**
- * A buffer in a memory node
+ * A processor can execute programs to transform data that are stored in some memories
  */
-abstract class Buffer {
+abstract class Processor {
+  /**
+   * Memories in which the processor can work
+   */
+  def memories:Seq[MemoryNode]
 
-  /** Memory node containing this buffer */
-  val memoryNode:MemoryNode
+  /**
+   * Execute the kernel with the specified parameters
+   */
+  def execute(kernel:ConfiguredKernel): RunningKernel
 
-  /** Free this buffer */
-  def free(): Unit
+  /**
+   * Test if the kernel can be executed with the given parameters
+   * Return a list of errors or Nil if none
+   */
+  def canExecute(kernel:ConfiguredKernel): Boolean
 }

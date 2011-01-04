@@ -13,25 +13,16 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import com.sun.jna.Memory
+import scala.collection.immutable.{NumericRange,HashSet}
 
 /**
  * A memory node
  */
 abstract class MemoryNode {
 
-  /* Devices associated to this node */
-  val devices:Seq[Device]
+  type BufferType <: Buffer
 
-  /**
-   * Natural 2D padding
-   */
-  def padding2D(elemSize:Int,width:Long,height:Long): Long = 4
-  /**
-   * Natural 3D padding
-   */
-  def padding3D(elemSize:Int,width:Long,height:Long,depth:Long): Long = 4
-
+  protected var buffers:HashSet[Buffer] = HashSet.empty
 
   /** 
    * Estimated available memory
@@ -41,5 +32,15 @@ abstract class MemoryNode {
   /**
    * Allocate a buffer
    */
-  def allocate(size:Long): Buffer
+  def allocate(size:Long): BufferType
+
+  /**
+   * Returns the buffer with its real type if this memory node contains it.
+   * Otherwise, an exception is thrown.
+   */
+  def get(buffer:Buffer): BufferType = {
+    if (!buffers.contains(buffer))
+      throw new Exception("This buffer doesn't belong to this memory node")
+    buffer.asInstanceOf[BufferType]
+  }
 }

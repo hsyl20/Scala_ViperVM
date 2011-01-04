@@ -20,7 +20,7 @@ package fr.hsyl20.vipervm.runtime
  * Added kernels must support kernel set prototype (i.e. kernel parameters)
  * @param prototype Prototype for every kernel in this set
  */
-abstract class KernelSet(prototype:KernelParameter*) {
+abstract class KernelSet(prototype:KernelParameterDecl*) {
 
   var kernels: List[Kernel] = Nil
 

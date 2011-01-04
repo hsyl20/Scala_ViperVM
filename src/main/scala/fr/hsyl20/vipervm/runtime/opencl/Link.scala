@@ -11,16 +11,16 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.runtime.opencl
 
-/**
- * A buffer in a memory node
- */
-abstract class Buffer {
+import fr.hsyl20.vipervm.runtime.{HostMemoryNode,Link}
 
-  /** Memory node containing this buffer */
-  val memoryNode:MemoryNode
+case class OpenCLSourceLink(
+  network:OpenCLNetwork,
+  source:OpenCLMemoryNode,
+  target:HostMemoryNode) extends Link
 
-  /** Free this buffer */
-  def free(): Unit
-}
+case class OpenCLTargetLink(
+  network:OpenCLNetwork,
+  source:HostMemoryNode,
+  target:OpenCLMemoryNode) extends Link

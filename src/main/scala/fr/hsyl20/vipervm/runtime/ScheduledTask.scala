@@ -16,7 +16,7 @@ package fr.hsyl20.vipervm.runtime
 /**
  * A task scheduled on a device.
  */
-class ScheduledTask(val task:Task, val kernel:Kernel, val device:Device, memoryNode:MemoryNode) {
+class ScheduledTask(val task:Task, val kernel:Kernel, val proc:Processor, memoryNode:MemoryNode) {
 
   private val kernelParameters = task.args.map( _._1.toKernelParameter(memoryNode))
 
@@ -26,13 +26,13 @@ class ScheduledTask(val task:Task, val kernel:Kernel, val device:Device, memoryN
    * Execute this task
    */
   def execute: RunningKernel = {
-    device.execute(configuredKernel)
+    proc.execute(configuredKernel)
   }
 
   /**
    * Can be executed?
    */
   def canExecute: Boolean = {
-    device.canExecute(configuredKernel)
+    proc.canExecute(configuredKernel)
   }
 }

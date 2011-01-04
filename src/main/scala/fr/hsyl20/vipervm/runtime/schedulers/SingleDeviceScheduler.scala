@@ -20,7 +20,7 @@ import scala.concurrent.Lock
 
 import fr.hsyl20.vipervm.runtime._
 
-class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
+class SingleDeviceScheduler(proc:Processor, runtime:Runtime) extends Scheduler {
   
   /* Enqueued tasks associated to remaining dependencies */
   private var queuedTasks:Map[Task, List[Event]] = HashMap.empty
@@ -84,9 +84,12 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
    */
   protected def prepare(task:Task, event:UserEvent): Unit = {
 
-    /* Create datastate with task Data on specified device */
+    /* Create data configuration where
+     *  - data are task parameters
+     *  - memory node to choose from are those associated with proc
+     */
     val config = new DataConfig(task.data) {
-      override val included = device.memoryNodes
+      override val included = proc.memories
     }
 
     /* Schedule data configuration */
@@ -97,12 +100,12 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
 
     /* Execute kernel when data configuration is ready */
     dcEvent.addCallback(dce => {
-      val device = dce.memoryNode.devices.head
+      val proc = runtime.platform.processorsFor(dce.memoryNode).head
 
-      /* Get kernel for selected device */
-      val k = selectKernel(task, device, dce.memoryNode)
+      /* Get kernel for selected processor */
+      val k = selectKernel(task, proc, dce.memoryNode)
 
-      val st = new ScheduledTask(task, k, device, dce.memoryNode)
+      val st = new ScheduledTask(task, k, proc, dce.memoryNode)
 
       /* Execute kernel */
       val runningKernel = st.execute
@@ -131,13 +134,13 @@ class SingleDeviceScheduler(device:Device, runtime:Runtime) extends Scheduler {
   }
 
   /**
-   * Select a kernel from the task's kernel set to execute on the given device
+   * Select a kernel from the task's kernel set to be executed by the given processor
    *
-   * Default behavior is to choose the first one compatible with the device
+   * Default behavior is to choose the first one compatible with the processor
    */
-  protected def selectKernel(task:Task, device:Device, memoryNode:MemoryNode): Kernel = {
+  protected def selectKernel(task:Task, proc:Processor, memoryNode:MemoryNode): Kernel = {
     val params = task.args.map(_._1.toKernelParameter(memoryNode))
-    val ks = for (k <- task.kernels ; confK = ConfiguredKernel(k,params) if device.canExecute(confK)) yield k
+    val ks = for (k <- task.kernels ; confK = ConfiguredKernel(k,params) if proc.canExecute(confK)) yield k
     if (ks.isEmpty)
       error("No device can execute the given task!")
     ks.head

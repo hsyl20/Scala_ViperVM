@@ -14,13 +14,10 @@
 package fr.hsyl20.vipervm.runtime
 
 /**
- * A buffer in a memory node
+ * Host memory node
+ *
+ * An implementation of this class is required by the runtime
  */
-abstract class Buffer {
-
-  /** Memory node containing this buffer */
-  val memoryNode:MemoryNode
-
-  /** Free this buffer */
-  def free(): Unit
+abstract class HostMemoryNode extends MemoryNode {
+  type BufferType <: HostBuffer
 }

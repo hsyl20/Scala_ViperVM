@@ -25,4 +25,22 @@ abstract class Runtime {
   val platform:Platform
   val taskScheduler:Scheduler
   val dataScheduler:DataScheduler
+
+  /** Memory node for the host */
+  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+
+  /**
+   * Allocate a data somewhere
+   *
+   * Default behavior is to allocate in host memory node
+   */
+  def allocate(data:Data):Unit = {
+    data.status(hostMemoryNode) match {
+      case None =>
+        val size = data.sizeOn(hostMemoryNode)
+        val buf = hostMemoryNode.allocate(size)
+        data.addBuffer(buf)
+      case _ => ()
+    }
+  }
 }

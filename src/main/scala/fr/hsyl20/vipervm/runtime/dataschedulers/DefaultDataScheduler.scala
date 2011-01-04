@@ -106,7 +106,9 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
 
     /* Update buffers */
     val invalids = invalidData(config,node)
-    val syncEvents = for (d <- invalids) yield {
+
+    //TODO: fix this to make the data scheduler work
+    /*val syncTransfers = invalids.flatMap(d => {
       /* Get synchronization sources */
       val srcs = d.syncSources(node)
 
@@ -114,15 +116,16 @@ class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
       val src = selectSyncSource(d, node, srcs)
 
       /* Start data copy */
-      d.sync(node, src)
-    }
+      //TODO
+      //d.sync(node, src)
+    })
 
     /* Set callback to trigger the data configuration event once
      * every data transfer event has completed
      */
-    val group = syncEvents.group
+    val group = syncTransfers.map(_.event).group
     group.addCallback(_ => triggerDataConfigEvent(configEvent))
-
+    */
 
     /* Add the data configuration to the list of active configuration */
     //TODO

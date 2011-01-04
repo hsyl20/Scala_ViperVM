@@ -32,14 +32,19 @@ class Platform {
   }
 
   /**
-   * Available devices
-   */
-  def devices: Seq[Device] = drivers.flatMap(_.devices)
-
-  /**
    * Memory nodes
    */
-  def memoryNodes: Seq[MemoryNode] = devices.flatMap(_.memoryNodes).distinct
+  def memoryNodes: Seq[MemoryNode] = drivers.flatMap(_.memoryNodes)
+
+  /**
+   * Networks
+   */
+  def networks: Seq[Network] = drivers.flatMap(_.networks)
+
+  /**
+   * Retrieve processors that can work in given memory
+   */
+  def processorsFor(mem:MemoryNode):Seq[Processor] = drivers.flatMap(_.processors)
 }
 
 

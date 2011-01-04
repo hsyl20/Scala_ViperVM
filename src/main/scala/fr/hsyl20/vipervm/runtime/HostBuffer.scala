@@ -13,21 +13,15 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/** Device represents a GPU or a CPU+memory
- *
+import com.sun.jna.Memory
+
+/**
+ * A buffer in host memory
  */
-abstract class Device {
-  /** Memory nodes associated with this device */
-  val memoryNodes: Seq[MemoryNode]
+abstract class HostBuffer extends Buffer {
+  /** JNA Memory (C pointer) */
+  val peer:Memory
 
-  /**
-   * Execute the kernel with the specified parameters
-   */
-  def execute(kernel:ConfiguredKernel): RunningKernel
-
-  /**
-   * Test if the kernel can be executed with the given parameters
-   * Return a list of errors or Nil if none
-   */
-  def canExecute(kernel:ConfiguredKernel): Boolean
+  /** Associated memory node */
+  val memoryNode:HostMemoryNode
 }

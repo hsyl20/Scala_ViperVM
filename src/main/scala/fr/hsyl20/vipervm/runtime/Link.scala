@@ -14,13 +14,15 @@
 package fr.hsyl20.vipervm.runtime
 
 /**
- * A buffer in a memory node
+ * A link between two memory nodes
  */
-abstract class Buffer {
+abstract class Link {
+  /** Network this link is part of */
+  val network:Network
 
-  /** Memory node containing this buffer */
-  val memoryNode:MemoryNode
+  /** Source of the link */
+  val source:MemoryNode
 
-  /** Free this buffer */
-  def free(): Unit
+  /** Target of the link */
+  val target:MemoryNode
 }

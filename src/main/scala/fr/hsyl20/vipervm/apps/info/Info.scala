@@ -11,20 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime.scheduling
-/*
-import fr.hsyl20.vipervm.runtime._
+package fr.hsyl20.vipervm.apps
 
-case class ScheduleTask(task:Task,dependencies:Seq[Event])
+import fr.hsyl20.vipervm.runtime.Platform
+import fr.hsyl20.vipervm.runtime.opencl.OpenCLDriver
 
+object Info {
 
-class DefaultScheduler extends ActorScheduler with DefaultDataScheduler {
+  def main(args:Array[String]): Unit = {
+    val p = new Platform(new OpenCLDriver)
 
-  def run = react {
-    case ScheduleTask(task,deps) => remote ! scheduleTask(task,deps)
-  }
-
-  protected def scheduleTask(task:Task,deps:Seq[Event]):Event = {
+    println("Processors:")
+    p.processors.foreach(a => println(" - %s".format(a)))
   }
 }
-*/

@@ -12,7 +12,7 @@
 \*                                                  */
 
 package fr.hsyl20.vipervm.dsl.linearalgebra
-
+/*
 import fr.hsyl20.vipervm.data._
 import fr.hsyl20.vipervm.dsl._
 
@@ -63,7 +63,7 @@ case class MatrixMultiplication[A<:PrimitiveType](m:Matrix[A],n:Matrix[A]) exten
 
 case class MatrixFilled[A<:PrimitiveType](value:A, val width:Long, val height:Long) extends Matrix[A]
 
-class MatrixLoadFromStream[A<:PrimitiveType](stream:InputStream) extends Matrix[A] {
+class MatrixFile[A<:PrimitiveType](stream:InputStream) extends Matrix[A] {
   private val s = new DataInputStream(stream)
 
   /* Check header */
@@ -79,8 +79,9 @@ class MatrixLoadFromStream[A<:PrimitiveType](stream:InputStream) extends Matrix[
 
 object Matrix {
   /** Load a matrix from a file */
-  def loadFromStream[A<:PrimitiveType](stream:InputStream) = new MatrixLoadFromStream[A](stream)
+  def loadFromStream[A<:PrimitiveType](stream:InputStream) = new MatrixFile[A](stream)
 
   /** Create a new matrix filled with a value */
   def filled[A<:PrimitiveType](value:A,width:Long,height:Long) = MatrixFilled[A](value,width,height)
 }
+*/

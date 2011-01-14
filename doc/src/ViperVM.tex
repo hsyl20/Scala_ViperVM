@@ -1,0 +1,100 @@
+\documentclass[twoside]{book}
+
+\usepackage[cm]{fullpage}
+\usepackage[english]{babel}
+\usepackage[colorlinks,hyperindex,bookmarks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} 
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{amssymb}
+%\usepackage{fancybox}
+\usepackage{fancyhdr}
+\usepackage[boxed]{algorithm2e}
+%\usepackage{alltt}
+%\usepackage{cmbright,textcomp}
+\usepackage{graphicx}
+%\usepackage{wrapfig}
+%\usepackage{epsf}
+%\usepackage[toc]{appendix} 
+\usepackage{multirow}
+\usepackage{framed}
+\usepackage{listings}
+\usepackage{subfig}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{amsmath, amsthm, amssymb}
+
+
+%two column float page must be 90% full
+\renewcommand\dblfloatpagefraction{.90}
+%two column top float can cover up to 80% of page
+\renewcommand\dbltopfraction{.80}
+%float page must be 90% full
+\renewcommand\floatpagefraction{.90}
+%top float can cover up to 80% of page
+\renewcommand\topfraction{.80}
+%bottom float can cover up to 80% of page
+\renewcommand\bottomfraction{.80}
+%at least 10% of a normal page must contain text
+\renewcommand\textfraction{.1}
+
+
+\definecolor{codeboxcolor}{rgb}{0.8,0.8,1}
+
+\newcommand{\infobox}[1]{
+   \definecolor{shadecolor}{rgb}{0.9,0.9,0.9} 
+   \begin{shaded}#1\end{shaded}
+}
+
+\newcommand{\warning}[1]{
+   \definecolor{shadecolor}{rgb}{0.4,0.4,1} 
+   \begin{shaded}
+      \textbf{Warning! }
+      #1
+   \end{shaded}
+}
+
+\newcommand{\todo}[1]{%
+   \definecolor{shadecolor}{rgb}{1,0.2,0.2}
+   \begin{shaded}
+      \textbf{TODO: }
+      #1
+   \end{shaded}
+}
+
+\newcommand{\opencl}[1]{%
+   \definecolor{shadecolor}{rgb}{0.9,0.9,0.7}
+   \begin{shaded}
+      \textbf{OpenCL }
+      #1
+   \end{shaded}
+}
+
+\setlength{\columnsep}{4em}
+
+\lstset{language=C,
+        breaklines, breakatwhitespace,
+        frame=shadowbox, rulesepcolor=\color{codeboxcolor},
+        captionpos=b, basicstyle=\scriptsize}
+
+\newtheorem{mydef}{Definition}
+
+\title{ViperVM}
+\author{Sylvain HENRY\\\url{sylvain.henry@labri.fr}}
+\date{February 2011}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{layers}
+\input{runtime}
+\input{choices}
+\input{dsl}
+\input{codegen}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}

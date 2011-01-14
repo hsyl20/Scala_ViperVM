@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="modules.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="232.74164"
+     inkscape:cy="66.659707"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1032"
+     inkscape:window-x="0"
+     inkscape:window-y="26"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3896">
+      <rect
+         y="904.67041"
+         x="110.90733"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3755"
+         y="921.26959"
+         x="139.33632"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="921.26959"
+           x="139.33632"
+           id="tspan3757"
+           sodipodi:role="line">OpenCL</tspan><tspan
+           id="tspan3759"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="936.26959"
+           x="139.33632"
+           sodipodi:role="line">kernel</tspan><tspan
+           id="tspan3761"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="951.26959"
+           x="139.33632"
+           sodipodi:role="line">code</tspan></text>
+    </g>
+    <g
+       id="g3889">
+      <rect
+         y="842.29352"
+         x="111.16953"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-1"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3755-8"
+         y="858.8927"
+         x="139.59851"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="858.8927"
+           x="139.59851"
+           id="tspan3757-7"
+           sodipodi:role="line">OpenCL</tspan><tspan
+           id="tspan3759-9"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="873.8927"
+           x="139.59851"
+           sodipodi:role="line">kernel</tspan><tspan
+           id="tspan3761-2"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="888.8927"
+           x="139.59851"
+           sodipodi:role="line">DSL</tspan></text>
+    </g>
+    <g
+       id="g3903"
+       transform="translate(0,0.37878418)">
+      <rect
+         y="904.29163"
+         x="29.216068"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-0"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3755-2"
+         y="920.89081"
+         x="57.645054"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="920.89081"
+           x="57.645054"
+           id="tspan3757-3"
+           sodipodi:role="line">PTX</tspan><tspan
+           id="tspan3759-7"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="935.89081"
+           x="57.645054"
+           sodipodi:role="line">kernel</tspan><tspan
+           id="tspan3761-5"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="950.89081"
+           x="57.645054"
+           sodipodi:role="line">code</tspan></text>
+    </g>
+    <g
+       id="g3882"
+       transform="translate(0,0.37878418)">
+      <rect
+         y="841.91473"
+         x="29.478268"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-1-9"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3755-8-2"
+         y="858.51392"
+         x="57.907246"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="858.51392"
+           x="57.907246"
+           id="tspan3757-7-2"
+           sodipodi:role="line">PTX</tspan><tspan
+           id="tspan3759-9-8"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="873.51392"
+           x="57.907246"
+           sodipodi:role="line">kernel</tspan><tspan
+           id="tspan3761-2-9"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="888.51392"
+           x="57.907246"
+           sodipodi:role="line">DSL</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="88.893417"
+       y="870.76477"
+       id="text3857"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3859"
+         x="88.893417"
+         y="870.76477"
+         style="font-size:20px">...</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="88.893417"
+       y="933.14166"
+       id="text3857-7"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3859-3"
+         x="88.893417"
+         y="933.14166"
+         style="font-size:20px">...</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="45.137169"
+       y="818.28687"
+       id="text3910"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3912"
+         x="45.137169"
+         y="818.28687"
+         style="font-size:12px">Kernel generators</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.99599999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.99199998,1.99199998;stroke-dashoffset:0"
+       id="rect3914"
+       width="139.23433"
+       height="46.467018"
+       x="29.367659"
+       y="791.7428" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="129.35492"
+       y="764.63342"
+       id="text3916"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3918"
+         x="129.35492"
+         y="764.63342"
+         style="font-size:16px">Functional language</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.99599999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect3920"
+       width="362.85715"
+       height="52.857143"
+       x="29.285715"
+       y="733.79077" />
+    <g
+       id="g4084"
+       transform="translate(-5.5491028,30.019531)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text3922-6-2"
+         y="835.31555"
+         x="220.17522"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="835.31555"
+           x="220.17522"
+           id="tspan3924-1-9"
+           sodipodi:role="line">Platform</tspan><tspan
+           id="tspan3968"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="850.31555"
+           x="220.17522"
+           sodipodi:role="line">manager</tspan></text>
+      <rect
+         y="812.27399"
+         x="191.97768"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-1-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g4090"
+       transform="translate(-15.357147,-8.5519409)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text3922-6-2-3"
+         y="873.70245"
+         x="304.46094"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="873.70245"
+           x="304.46094"
+           id="tspan3924-1-9-1"
+           sodipodi:role="line">Data</tspan><tspan
+           id="tspan3968-9"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="888.70245"
+           x="304.46094"
+           sodipodi:role="line">manager</tspan></text>
+      <rect
+         y="850.84546"
+         x="276.2634"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-1-5-0"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g4096"
+       transform="translate(-18.736603,-0.69476318)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text3922-6-2-4"
+         y="851.02985"
+         x="382.31808"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="851.02985"
+           x="382.31808"
+           id="tspan3924-1-9-7"
+           sodipodi:role="line" /><tspan
+           id="tspan3968-8"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="866.02985"
+           x="382.31808"
+           sodipodi:role="line">Task</tspan><tspan
+           id="tspan4005"
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="881.02985"
+           x="382.31808"
+           sodipodi:role="line">manager</tspan></text>
+      <rect
+         y="842.98828"
+         x="354.12054"
+         height="54.46207"
+         width="57.473206"
+         id="rect2985-1-5-6"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g4123"
+       transform="translate(-0.71428572,-3.2297192)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text3922"
+         y="953.88702"
+         x="245.40988"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px"
+           y="953.88702"
+           x="245.40988"
+           id="tspan3924"
+           sodipodi:role="line">OpenCL library</tspan></text>
+      <rect
+         y="938.79077"
+         x="187.14285"
+         height="23.571428"
+         width="206.42857"
+         id="rect4103"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       id="g4128"
+       transform="translate(-54.642859,-2.3346558)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text3922-6"
+         y="922.10132"
+         x="275.52887"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px"
+           y="922.10132"
+           x="275.52887"
+           id="tspan3924-1"
+           sodipodi:role="line">Scala OpenCL wrapper</tspan></text>
+      <rect
+         y="907.00507"
+         x="241.07143"
+         height="23.571428"
+         width="206.42857"
+         id="rect4103-0"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+  </g>
+</svg>

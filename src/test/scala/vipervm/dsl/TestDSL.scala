@@ -10,7 +10,7 @@
 **         http://www.hsyl20.fr/vipervm             **
 **                     GPLv3                        **
 \*                                                  */
-
+/*
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
@@ -34,4 +34,4 @@ class DSLSpec extends FlatSpec with ShouldMatchers {
       c.saveToFile("matrix_res.dat")
   }
 }
-
+*/

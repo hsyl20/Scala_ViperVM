@@ -1,0 +1,40 @@
+\chapter{Runtime System}
+
+\section{Drivers}
+Drivers manage computing devices, memory nodes and networks.
+
+
+\section{Memory node}
+A memory node contains data.
+It may also contain compiled programs as some device require explicit management of those (CELL).
+
+\begin{description}
+  \item[allocate(size): Buffer] Allocate a buffer on this node
+  \item[buffers] List of buffers on this memory node
+\end{description}
+
+
+\section{Buffer}
+A contiguous memory space in a memory node
+
+\begin{description}
+  \item[free] Free this buffer
+  \item[memoryNode] Associated memory node
+\end{description}
+
+
+\section{Network}
+A network links different memory nodes together.
+Some networks are in fact DMA controllers + bus, other use a computing unit to transfer data (NUMA), other are really NIC+network. 
+Some networks can perform different transfers (up to a certain number) at the same time. Some can't.
+
+
+\section{Link}
+A link is a virtual one-way channel between two memory nodes. Each link is associated to a single network.
+
+
+\section{Computing device}
+A computing device can execute programs. These programs may need to be stored in some specific memory (CELL, GPU kernels (hidden to programmer)).
+Programs work on data. These data are stored in buffers on specific memory.
+
+

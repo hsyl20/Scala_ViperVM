@@ -1,0 +1,53 @@
+\chapter{Code Generation}
+
+\paragraph{Source kernel}
+
+\begin{lstlisting}
+__kernel void (__global float *src, __global float *dest, int a) {
+   int id = get_global_id(0);
+
+   if (id < a) {
+      dest[id] = src[id];
+   }
+}
+\end{lstlisting}
+
+\paragraph{Object version}
+
+\begin{lstlisting}
+kernel {
+   val src  = arg(0, global, float*, name = "src")
+   val dest = arg(1, global, float*, name = "dest")
+   val a    = arg(2, default, int, name = "a")
+
+   val id = variable(default, int, name = "id")
+   assign(id, funcall("get_global_id", 0))
+
+   val e = lt(id, a)
+
+   val destid = index(dest, id)
+   val srcid = index(src, id)
+
+   val ass = assign(destid, srcid)
+
+   cif (e, ass)
+}
+
+\end{lstlisting}
+
+
+\paragraph{DSL version}
+
+\begin{lstlisting}
+kernel {
+   'src  := setarg(0, global, float*)
+   'dest := setarg(1, global, float*)
+   'a    := setarg(2, default, int)
+
+   'id :- Global CInt := getGlobalId(0)
+   
+   cif ('id < 'a) {
+      'dest('id) := 'src('id)
+   }
+}
+\end{lstlisting}

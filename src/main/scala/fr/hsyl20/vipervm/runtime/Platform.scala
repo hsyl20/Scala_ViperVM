@@ -30,7 +30,7 @@ class Platform(val drivers:Driver*) {
   def networks: Seq[Network] = drivers.flatMap(_.networks)
 
   /**
-   * Retrieve processors that can work in given memory
+   * Processors
    */
   def processors: Seq[Processor] = drivers.flatMap(_.processors)
 }

@@ -15,6 +15,7 @@ package fr.hsyl20.vipervm.runtime
 
 import scala.collection._
 
+/*
 abstract class Data {
   import BufferState._
   import AccessMode._
@@ -92,4 +93,4 @@ abstract class Data {
    */
   def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {}
 }
-
+*/

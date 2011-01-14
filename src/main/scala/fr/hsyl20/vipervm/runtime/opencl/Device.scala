@@ -88,4 +88,6 @@ class OpenCLDevice(val peer:cl.Device) extends Processor {
    */
   //TODO
   def canExecute(configuredKernel:ConfiguredKernel): Boolean = true
+
+  override def toString = "%s - %s".format(peer.vendor, peer.name)
 }

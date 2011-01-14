@@ -25,5 +25,6 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) {
   val run_demo_codegen = runTask(Some("demos.codegen.Main"), testClasspath) dependsOn(testCompile) describedAs "C code generation demo"
 
   val run_profiler = runTask(Some("fr.hsyl20.vipervm.apps.Profiler"), testClasspath) dependsOn(compile) describedAs "Profiling GUI"
+  val run_info = runTask(Some("fr.hsyl20.vipervm.apps.Info"), testClasspath) dependsOn(compile) describedAs "Platform information"
 }
 

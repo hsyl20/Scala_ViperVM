@@ -12,11 +12,11 @@
 \*                                                  */
 
 package fr.hsyl20.vipervm.dsl
-
+/*
 import fr.hsyl20.vipervm.data._
 
 package object linearalgebra {
   implicit def lamatrix[A<:PrimitiveType](m:Matrix[A]) = new LAMatrix[A](m)
 }
 
-
+*/

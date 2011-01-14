@@ -4,12 +4,36 @@
 **   \ \ /    |  |   |   __/  |     \ \ /    |   |  **
 **    \_/    _|  .__/  \___| _|      \_/    _|  _|  **
 **              _|                                  **
-**                                                  **
-**       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
-**                                                  **
-**         http://www.hsyl20.fr/vipervm             **
-**                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+TODO list
+=========
 
+Data duplication
+ - memcpy
+ - knem
+
+Profiling
+ - Profiler GUI
+ - Traces mechanism
+
+Targets
+ - OpenCL C language
+ - C
+ - x86_64 + SSE
+ - ptx
+
+DSLs
+ - Matlab-like
+ - Lisp-like
+
+Scheduling strategies
+ - Data aware 
+
+Fault-tolerance
+ - Automatic checkpointing mechanism
+
+Networking targets
+ - MPI
+ - MX
+ - NewMad

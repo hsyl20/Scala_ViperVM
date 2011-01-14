@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.apps.profiler
+package fr.hsyl20.vipervm.apps
 
 import scala.swing._
 
@@ -23,7 +23,7 @@ object Profiler {
   }
 }
 
-private[profiler] class ProfilerFrame extends Frame {
+class ProfilerFrame extends MainFrame {
   title = "Scala demo"
   contents = new Button {
     text = "Pouche mi!"

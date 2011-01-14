@@ -21,8 +21,8 @@ import scala.collection._
  * Every buffer must contain the same data.
  * Data can be available or unavailable on each memory node
  */
-abstract class ImmutableData extends Data {
-  import Data._
+abstract class ImmutableBufferSet extends BufferSet {
+  import BufferState._
 
   override def notifyBeforeAccess(buffer:Buffer, mode:AccessMode): Unit = mode match {
     case ReadWrite | WriteOnly => throw new Exception("Trying to access immutable data in write mode")

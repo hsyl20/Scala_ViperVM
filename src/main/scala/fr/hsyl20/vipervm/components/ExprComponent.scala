@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm
+package fr.hsyl20.vipervm.components
 
 abstract class ExprComponent extends CompositeComponent {
 

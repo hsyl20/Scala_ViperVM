@@ -11,19 +11,27 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.opencl.datatype
+package fr.hsyl20.vipervm.runtime.scheduling
 
-trait DataType
+/*/**
+ * Event triggered when a given data configuration is obtained
+ *
+ * You should release the associated DataConfig as soon as possible,
+ * otherwise it will be released on Garbage Collection
+ */
+trait DataConfigEvent extends Event {
 
-trait Primitive extends DataType
+  /** Return the associated data configuration */
+  def config: DataConfig
 
-case object Float extends Primitive
-case object Double extends Primitive
-case object Int extends Primitive
-case object Char extends Primitive
+  /**
+   * Selected memory node (only available after event completion)
+   */
+  def memoryNode: MemoryNode
 
-class Matrix(base:Primitive) extends DataType
-
-object Matrix {
-   def apply(dt:Primitive): DataType = new Matrix(dt)
+  override def finalize: Unit = {
+    config.release
+    super.finalize
+  }
 }
+*/

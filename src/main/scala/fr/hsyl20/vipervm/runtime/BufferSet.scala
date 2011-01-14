@@ -13,15 +13,20 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/*
-abstract class Data {
-  import Data._
+import fr.hsyl20.vipervm.runtime.AccessMode._
+import scala.collection._
+
+/**
+ * A set of buffers in different memories
+ */
+abstract class BufferSet {
+  import BufferState._
 
   /* Buffers on different memory nodes */
   protected var buffers: mutable.Map[MemoryNode,Buffer] = mutable.Map.empty
 
   /* Buffer status */
-  protected var status: mutable.Map[Buffer,State] = mutable.Map.empty
+  protected var status: mutable.Map[Buffer,BufferState] = mutable.Map.empty
 
   /**
    * Return the buffer associated to this data on the given memory node
@@ -31,24 +36,12 @@ abstract class Data {
   /**
    * Return the status of this data on the given node
    */
-  def status(memory:MemoryNode): Option[State] = getBuffer(memory).flatMap(status.get _)
+  def status(memory:MemoryNode): Option[BufferState] = getBuffer(memory).flatMap(status.get _)
 
-
-  /**
-   * Allocate a buffer for this data on some memory node
-   *
-   * Return true on success, false otherwise
-   */
-  def allocate(memory:MemoryNode): Boolean
-
-  /**
-   * Required size of the buffer for this data on the given node
-   */
-  def sizeOn(memory:MemoryNode): Long
 
   /**
    * List memory nodes that can be used as sources to update
-   * buffer contained in given memoryNode
+   * buffer contained in given memory
    */
   def syncSources(memory:MemoryNode): Seq[MemoryNode] =
     buffers.keys.filter(status(_) match {
@@ -90,4 +83,5 @@ abstract class Data {
    */
   def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {}
 }
-*/
+
+

@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
+/*/**
  * Task parameter
  */
 sealed abstract class TaskParameter {
@@ -29,4 +29,4 @@ case class DataTaskParameter(data:Data)       extends TaskParameter
 case class IntTaskParameter(value:Int)        extends TaskParameter
 case class DoubleTaskParameter(value:Double)  extends TaskParameter
 case class FloatTaskParameter(value:Float)    extends TaskParameter
-
+*/

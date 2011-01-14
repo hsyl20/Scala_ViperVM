@@ -20,7 +20,7 @@ package fr.hsyl20.vipervm.runtime
 abstract class Driver {
 
   /** Memory nodes */
-  def memoryNodes:Seq[MemoryNode]
+  def memories:Seq[MemoryNode]
 
   /** Networks */
   def networks:Seq[Network]

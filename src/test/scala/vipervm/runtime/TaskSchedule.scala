@@ -11,17 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.junit._
 
 /*import fr.hsyl20.vipervm.runtime._
 import fr.hsyl20.vipervm.runtime.opencl.OpenCLDriver
 import fr.hsyl20.vipervm.runtime.schedulers.SingleDeviceScheduler
 import fr.hsyl20.vipervm.runtime.dataschedulers.DefaultDataScheduler
 
-class RuntimeSpec extends FlatSpec with ShouldMatchers {
+class TaskSchedule {
 
-  "A runtime" should "be instantiable" in {
+  @Test
+  def test() = {
 
     val r = new Runtime {
       val platform = Platform(new OpenCLDriver)
@@ -29,5 +29,23 @@ class RuntimeSpec extends FlatSpec with ShouldMatchers {
       val taskScheduler = new SingleDeviceScheduler(platform.devices.head, this)
     }
 
+    val clk = new OpenCLKernel {
+    }
+
+    val ks = new KernelSet(
+        KernelParameterDecl(BufferParameterType,ReadOnly),
+        KernelParameterDecl(BufferParameterType,WriteOnly)
+      ){
+        kernels += clk
+    }
+
+    val t = new Task(clk)
+
+    val d1 = Matrix.allocate(100,100)(r)
+    val d2 = Matrix.allocate(100,100)(r)
+
+    r.schedule(t,d1,d2)
+
   }
 }*/
+

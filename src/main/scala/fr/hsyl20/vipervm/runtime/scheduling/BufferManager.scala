@@ -11,26 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.runtime.scheduling
 
 /**
- * Event triggered when a given data configuration is obtained
- *
- * You should release the associated DataConfig as soon as possible,
- * otherwise it will be released on Garbage Collection
+ * Manage buffers on memory nodes
  */
-trait DataConfigEvent extends Event {
-
-  /** Return the associated data configuration */
-  def config: DataConfig
-
-  /**
-   * Selected memory node (only available after event completion)
-   */
-  def memoryNode: MemoryNode
-
-  override def finalize: Unit = {
-    config.release
-    super.finalize
-  }
+class BufferManager {
+  
 }

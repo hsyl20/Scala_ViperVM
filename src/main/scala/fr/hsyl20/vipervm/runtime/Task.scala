@@ -15,7 +15,7 @@ package fr.hsyl20.vipervm.runtime
 
 import fr.hsyl20.vipervm.runtime.AccessMode._
 
-/**
+/*/**
  * A task ready to be scheduled.
  */
 case class Task(kernels:KernelSet, args:List[(TaskParameter,AccessMode)]) {
@@ -27,4 +27,4 @@ case class Task(kernels:KernelSet, args:List[(TaskParameter,AccessMode)]) {
     case DataTaskParameter(d) => Some((d,a._2))
     case _ => None
   })
-}
+}*/

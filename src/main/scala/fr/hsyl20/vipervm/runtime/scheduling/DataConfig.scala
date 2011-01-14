@@ -11,11 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.runtime.scheduling
 
 import fr.hsyl20.vipervm.runtime.AccessMode._
 
-/**
+/*/**
  * Group of Data to access with the specified access mode.
  *
  * Support memory node constraints (include, exclude) and piorities
@@ -41,3 +41,4 @@ class DataConfig(val data:Seq[(Data,AccessMode)]) extends AbstractDataConfig {
    */
   val priorities: Map[MemoryNode, Int] = Map.empty
 }
+*/

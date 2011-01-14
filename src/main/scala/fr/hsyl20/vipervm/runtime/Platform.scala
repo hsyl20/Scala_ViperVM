@@ -17,24 +17,12 @@ package fr.hsyl20.vipervm.runtime
  *
  * Drivers are to be registered into the platform to be used
  */
-class Platform {
+class Platform(val drivers:Driver*) {
    
-  private var drivers:List[Driver] = Nil
-
-  /**
-   * Register a driver
-   *
-   * Devices that can be managed by this driver may be used
-   */
-  def registerDriver(driver:Driver): Unit = {
-    if (!drivers.contains(driver))
-      drivers = driver :: drivers
-  }
-
   /**
    * Memory nodes
    */
-  def memoryNodes: Seq[MemoryNode] = drivers.flatMap(_.memoryNodes)
+  def memories: Seq[MemoryNode] = drivers.flatMap(_.memories)
 
   /**
    * Networks
@@ -44,20 +32,5 @@ class Platform {
   /**
    * Retrieve processors that can work in given memory
    */
-  def processorsFor(mem:MemoryNode):Seq[Processor] = drivers.flatMap(_.processors)
-}
-
-
-object Platform {
-
-  /**
-   * Create a Platform and register given drivers
-   */
-  def apply(drivers:Driver*) = {
-    val p = new Platform
-    for (d <- drivers)
-      p.registerDriver(d)
-    p
-  }
-
+  def processors: Seq[Processor] = drivers.flatMap(_.processors)
 }

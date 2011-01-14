@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm
+package fr.hsyl20.vipervm.components
 
 class MapComponent(fIn:Port, fOut:Port) extends Component {
    val in = new Port

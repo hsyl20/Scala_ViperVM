@@ -11,9 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.runtime.scheduling
 
-/**
+/*/**
  * A data configuration.
  *
  * Data configurations are requests for the data scheduler.
@@ -47,4 +47,4 @@ abstract class AbstractDataConfig {
   def addReleaseCallback(f:this.type=>Unit): Unit = {
     releaseEvent.addCallback(_ => f(this))
   }
-}
+}*/

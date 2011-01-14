@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime.profiling
 
-/**
+/*/**
  * Allow registration of events with their associated date
  */
 class Profiler {
@@ -31,3 +31,4 @@ class Profiler {
    */
   def events = _events
 }
+*/

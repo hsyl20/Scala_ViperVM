@@ -16,7 +16,7 @@ package fr.hsyl20.vipervm.runtime
 import fr.hsyl20.vipervm.runtime.AccessMode._
 import scala.collection._
 
-/** This represents a mutable data. That is, a data where
+/*/** This represents a mutable data. That is, a data where
  * coherency between buffers needs to be managed.
  */
 abstract class MutableData extends Data {
@@ -75,4 +75,4 @@ abstract class MutableData extends Data {
    }
 }
 
-
+*/

@@ -11,8 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime.schedulers
+package fr.hsyl20.vipervm.runtime.scheduling
 
+/*
 import scala.collection.mutable.{Map,HashMap}
 import scala.collection.immutable.{Map => ImmMap}
 
@@ -146,3 +147,5 @@ class SingleDeviceScheduler(proc:Processor, runtime:Runtime) extends Scheduler {
     ks.head
   }
 }
+
+*/

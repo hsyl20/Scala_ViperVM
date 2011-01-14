@@ -11,26 +11,19 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.dsl
+
+trait Action
+
+abstract class ActionStatus(val action:Action) {
+  def terminated: Boolean
+}
 
 /**
- * Task scheduler
- *
- * Schedulers have the responsability of ensuring progression
- * of the computation, load-balancing, etc.
+ * Schedule actions
  */
-abstract class Scheduler {
+abstract class Engine {
   
-  /**
-   * Give a task for the scheduler to schedule after every
-   * dependency has completed
-   *
-   * @return An event indicating task completion
-   */
-  def schedule(t:Task, dependencies:List[Event] = Nil): Event 
-
-  /**
-   * Running tasks
-   */
-  def runningTasks: Seq[Task]
+  /** Submit an action */
+  def submit(action:Action):ActionStatus
 }

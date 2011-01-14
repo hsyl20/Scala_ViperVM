@@ -11,13 +11,13 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime.dataschedulers
-
+package fr.hsyl20.vipervm.runtime.scheduling
+/*
 import scala.collection.mutable.{Map,HashMap}
 import fr.hsyl20.vipervm.runtime._
 import fr.hsyl20.vipervm.runtime.EventGroup._
 
-class DefaultDataScheduler(runtime:Runtime) extends DataScheduler {
+class DefaultDataScheduler(runtime:Runtime) {
 
   protected var waitingConfigs: List[DefaultDataConfigEvent] = Nil
 
@@ -241,3 +241,5 @@ class DefaultDataConfigEvent(val config:DataConfig) extends UserEvent with DataC
 
   def memoryNode = memNode.get
 }
+
+*/

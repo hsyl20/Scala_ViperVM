@@ -11,22 +11,20 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.dsl._
+import scala.actors.Actor
 
-class SimpleDSLSpec extends FlatSpec with ShouldMatchers {
+/*/**
+ * Actor scheduler
+ */
+abstract class ActorScheduler extends Actor with Scheduler {
 
-   "SimpleDSL" should "be able to use map" in {
-      val m = new Matrix2D(TFloat, 1000, 2000)
+  start
+  
+  def schedule(task:Task, dependencies:Seq[Event] = Nil): Event = {
+    self !? ScheduleTask(task,dependencies)
+  }
 
-      val n = m.map(a => a*a)
-
-      val res = SimpleDSL compute (n) where (
-         m -> 'm,
-         n -> 'n)
-
-      println(res)
-   }
 }
+*/

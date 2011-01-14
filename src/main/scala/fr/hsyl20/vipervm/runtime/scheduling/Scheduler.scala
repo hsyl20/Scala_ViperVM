@@ -11,17 +11,23 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime.profiling
-
-import fr.hsyl20.vipervm.runtime._
+package fr.hsyl20.vipervm.runtime.scheduling
 
 /*/**
- * Events supported by the profiler
+ * Scheduler
+ *
+ * Schedulers have the responsability of ensuring progression
+ * of the computation, load-balancing, etc.
  */
-abstract class ProfilingEvent
-case class TaskSubmitted(task:Task) extends ProfilingEvent
-case class TaskScheduled(task:ScheduledTask) extends ProfilingEvent
-case class TaskStart(task:Task) extends ProfilingEvent
-case class TaskEnd(task:Task) extends ProfilingEvent
+trait Scheduler {
+  
+  /**
+   * Give a task for the scheduler to schedule after every
+   * dependency has completed
+   *
+   * @return An event indicating task completion
+   */
+  def schedule(task:Task, dependencies:Seq[Event] = Nil): Event 
 
-case class DataTransfer(data:Data,from:MemoryNode,to:MemoryNode) extends ProfilingEvent*/
+}
+*/

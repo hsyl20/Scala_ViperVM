@@ -11,10 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.dsl
+import org.scalatest.FlatSpec
+import org.scalatest.matchers.ShouldMatchers
 
-abstract class Typ
+import fr.hsyl20.vipervm.dsl.linearalgebra._
 
-case object TFloat extends Typ
-case object TDouble extends Typ
-case object TInt extends Typ
+class DSLSpec extends FlatSpec with ShouldMatchers {
+
+  implicit val engine = new LinearAlgebraEngine
+
+  val m = Matrix.loadFromFile("matrix1.dat")
+  val n = Matrix.loadFromFile("matrix2.dat")
+  val p = Matrix.loadFromFile("matrix3.dat")
+
+  val c = (m + n) * p
+
+  c.saveToFile("matrix_res.dat")
+}
+

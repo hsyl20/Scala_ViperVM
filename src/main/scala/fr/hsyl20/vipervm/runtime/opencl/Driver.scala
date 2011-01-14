@@ -25,5 +25,5 @@ class OpenCLDriver extends Driver {
 
   def networks:Seq[OpenCLNetwork] = for (p <- processors) yield new OpenCLNetwork(p)
 
-  def memoryNodes:Seq[OpenCLMemoryNode] = for (p <- processors) yield new OpenCLMemoryNode(p)
+  def memories:Seq[OpenCLMemoryNode] = for (p <- processors) yield new OpenCLMemoryNode(p)
 }

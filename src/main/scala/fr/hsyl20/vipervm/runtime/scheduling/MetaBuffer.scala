@@ -11,8 +11,5 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.dsl
+package fr.hsyl20.vipervm.runtime
 
-class Matrix2D(typ:Typ, width:Int, height:Int) extends Data {
-   def map(f:Expr => Expr) = new Map(this,f)
-}

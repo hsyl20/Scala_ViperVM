@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
+/*/**
  * A task scheduled on a device.
  */
 class ScheduledTask(val task:Task, val kernel:Kernel, val proc:Processor, memoryNode:MemoryNode) {
@@ -35,4 +35,4 @@ class ScheduledTask(val task:Task, val kernel:Kernel, val proc:Processor, memory
   def canExecute: Boolean = {
     proc.canExecute(configuredKernel)
   }
-}
+}*/

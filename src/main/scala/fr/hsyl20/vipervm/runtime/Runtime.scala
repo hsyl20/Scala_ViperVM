@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
+/*/**
  * A runtime system
  *
  * A runtime system is made of
@@ -43,4 +43,4 @@ abstract class Runtime {
       case _ => ()
     }
   }
-}
+}*/

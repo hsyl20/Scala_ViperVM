@@ -13,12 +13,12 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
+/*/**
  * Matrix data type
  *
  * Matrix uses memory node natural padding
  */
-class Matrix(dims:Seq[Long])(runtime:Runtime) extends Data {
+class Matrix(dims:Seq[Long])(runtime:Runtime) extends BufferSet {
   
   def sizeOn(memoryNode:MemoryNode): Long = {
     //TODO: use natural word size
@@ -44,4 +44,4 @@ object Matrix {
     m
   }
 
-}
+}*/

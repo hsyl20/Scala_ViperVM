@@ -16,7 +16,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 import fr.hsyl20.vipervm._
 
-class ComponentsSpec extends FlatSpec with ShouldMatchers {
+/*class ComponentsSpec extends FlatSpec with ShouldMatchers {
 
    "ExprComponents" should "work" in {
       val e = new ExprComponent {
@@ -41,4 +41,4 @@ class ComponentsSpec extends FlatSpec with ShouldMatchers {
          val m = new MapComponent(e.in, e.out)
       }
    }
-}
+}*/

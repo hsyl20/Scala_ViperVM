@@ -11,19 +11,13 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.dsl
+package fr.hsyl20.vipervm.runtime
 
-class Expr extends Data {
-   def + (e:Expr) = Plus(this,e)
-   def - (e:Expr) = Sub(this,e)
-   def * (e:Expr) = Mul(this,e)
-   def / (e:Expr) = Div(this,e)
+sealed abstract class BufferState
+
+object BufferState {
+  case object Ready extends BufferState
+  case class Shared(readerCount:Int) extends BufferState /* Shared in Read-Only mode */
+  case object Invalid extends BufferState
+  case object Exclusive extends BufferState
 }
-
-
-case class Plus(e1:Expr, e2:Expr) extends Expr
-case class Sub(e1:Expr, e2:Expr) extends Expr
-case class Mul(e1:Expr, e2:Expr) extends Expr
-case class Div(e1:Expr, e2:Expr) extends Expr
-
-case object DummyExpr extends Expr

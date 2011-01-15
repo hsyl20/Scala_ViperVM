@@ -11,21 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime.opencl
-
-import fr.hsyl20.vipervm.runtime.Buffer
-import fr.hsyl20.{opencl => cl}
-import com.sun.jna.Memory
+package fr.hsyl20.vipervm.runtime
 
 /**
- * OpenCL buffer
+ * A view of a buffer
+ *
+ * View can be used for data transfers and as kernel parameters
  */
-class OpenCLBuffer(val size:Long, val peer:cl.Buffer, val memory:OpenCLMemoryNode) extends Buffer {
+trait BufferView {
+  /** Associated buffer */
+  val buffer:Buffer
 
-  private val device = memory.device
-
-  private implicit def buf2buf(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
-
-  def free(): Unit = peer.release
-
+  /** Offset in the buffer */
+  val offset:Long
 }
+
+case class BufferView1D(buffer:Buffer,offset:Long,size:Long) extends BufferView
+case class BufferView2D(buffer:Buffer,offset:Long,width:Long,height:Long,rowPadding:Long) extends BufferView
+case class BufferView3D(buffer:Buffer,offset:Long,width:Long,height:Long,depth:Long,rowPadding:Long,planePadding:Long) extends BufferView

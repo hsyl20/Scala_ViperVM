@@ -18,7 +18,7 @@ import fr.hsyl20.vipervm.runtime._
 /**
  * Network between OpenCL device and host memory
  */
-class OpenCLNetwork(val device:OpenCLDevice) extends Network {
+class OpenCLNetwork(val device:OpenCLDevice) extends Network with Copy1DSupport {
 
   private val mem = device.memory
 
@@ -31,26 +31,25 @@ class OpenCLNetwork(val device:OpenCLDevice) extends Network {
     case _ => None
   }
 
-  def copy(link:Link,source:Buffer,target:Buffer,size:Long,sourceOffset:Long=0,targetOffset:Long=0):DataTransfer1D = {
-
+  override def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer[BufferView1D] = {
     link match {
-      case OpenCLSourceLink(net,src,tgt) => {
+      case OpenCLSourceLink(net,srcMem,tgtMem) => {
         val cq = net.device.commandQueue
-        val srcPeer = src.get(source).peer
-        val tgtPeer = tgt.get(target).peer
-        val ptr = tgtPeer.getPointer(targetOffset)
-        val ev = cq.enqueueReadBuffer(srcPeer, false, sourceOffset, size, ptr, Nil)
+        val srcPeer = srcMem.get(source.buffer).peer
+        val tgtPeer = tgtMem.get(target.buffer).peer
+        val ptr = tgtPeer.getPointer(target.offset)
+        val ev = cq.enqueueReadBuffer(srcPeer, false, source.offset, source.size, ptr, Nil)
         val event = new OpenCLEvent(ev)
-        DataTransfer1D(link,source,target,size,sourceOffset,targetOffset,event)
+        new DataTransfer(link,source,target,event)
       }
-      case OpenCLTargetLink(net,src,tgt) => {
+      case OpenCLTargetLink(net,srcMem,tgtMem) => {
         val cq = net.device.commandQueue
-        val srcPeer = src.get(source).peer
-        val tgtPeer = tgt.get(target).peer
-        val ptr = srcPeer.getPointer(sourceOffset)
-        val ev = cq.enqueueWriteBuffer(tgtPeer, false, targetOffset, size, ptr, Nil)
+        val srcPeer = srcMem.get(source.buffer).peer
+        val tgtPeer = tgtMem.get(target.buffer).peer
+        val ptr = srcPeer.getPointer(source.offset)
+        val ev = cq.enqueueWriteBuffer(tgtPeer, false, target.offset, source.size, ptr, Nil)
         val event = new OpenCLEvent(ev)
-        DataTransfer1D(link,source,target,size,sourceOffset,targetOffset,event)
+        new DataTransfer(link,source,target,event)
       }
       case _ => throw new Exception("trying to copy with invalid link")
     }

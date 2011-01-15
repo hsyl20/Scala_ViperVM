@@ -31,12 +31,12 @@ abstract class Data {
   /**
    * Return the buffer associated to this data on the given memory node
    */
-  def getBuffer(memoryNode:MemoryNode): Option[Buffer] = buffers.get(memoryNode)
+  def getBuffer(memory:MemoryNode): Option[Buffer] = buffers.get(memory)
 
   /**
    * Return the status of this data on the given node
    */
-  def status(memoryNode:MemoryNode): Option[State] = getBuffer(memoryNode).flatMap(status.get _)
+  def status(memory:MemoryNode): Option[State] = getBuffer(memory).flatMap(status.get _)
 
 
   /**
@@ -44,18 +44,18 @@ abstract class Data {
    *
    * Return true on success, false otherwise
    */
-  def allocate(memoryNode:MemoryNode): Boolean
+  def allocate(memory:MemoryNode): Boolean
 
   /**
    * Required size of the buffer for this data on the given node
    */
-  def sizeOn(memoryNode:MemoryNode): Long
+  def sizeOn(memory:MemoryNode): Long
 
   /**
    * List memory nodes that can be used as sources to update
    * buffer contained in given memoryNode
    */
-  def syncSources(memoryNode:MemoryNode): Seq[MemoryNode] =
+  def syncSources(memory:MemoryNode): Seq[MemoryNode] =
     buffers.keys.filter(status(_) match {
       case Some(Ready) 
         |  Some(Shared(_)) => true
@@ -69,9 +69,9 @@ abstract class Data {
    * exception is thrown
    */
   def addBuffer(buffer:Buffer): Unit = {
-    getBuffer(buffer.memoryNode) match {
+    getBuffer(buffer.memory) match {
       case Some(_) => throw new Exception("A buffer for this data is already present on the same memory node")
-      case None => buffers += (buffer.memoryNode -> buffer)
+      case None => buffers += (buffer.memory -> buffer)
     }
   }
 
@@ -80,7 +80,7 @@ abstract class Data {
    *
    * Return the removed buffer
    */
-  def removeBuffer(buffer:Buffer): Option[Buffer] = buffers.remove(buffer.memoryNode)
+  def removeBuffer(buffer:Buffer): Option[Buffer] = buffers.remove(buffer.memory)
 
 
   /**

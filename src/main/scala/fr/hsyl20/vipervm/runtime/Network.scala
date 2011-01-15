@@ -15,6 +15,8 @@ package fr.hsyl20.vipervm.runtime
 
 /**
  * A network between different memory nodes
+ *
+ * Network should at least support 1D data copy
  */
 abstract class Network {
   /**
@@ -26,64 +28,103 @@ abstract class Network {
    * Schedule an asynchronous copy of data
    *
    * @param link    Link handling the transfer
-   * @param source  Source buffer
-   * @param target  Target buffer
-   * @param size    Size to copy (in bytes)
-   * @param sourceOffset Offset in source buffer (in bytes)
-   * @param targetOffset Offset in target buffer (in bytes)
+   * @param source  Source buffer view
+   * @param target  Target buffer view
    */
-  def copy(link:Link,source:Buffer,target:Buffer,size:Long,sourceOffset:Long=0,targetOffset:Long=0):DataTransfer1D
+  def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] =
+    throw new Exception("Unsupported copy")
+}
+
+/**
+ * Link support for 1D copy
+ */
+trait Copy1DSupport extends Network {
+  /**
+   * Schedule an asynchronous copy of 1D data
+   *
+   * @param link    Link handling the transfer
+   * @param source  Source buffer view
+   * @param target  Target buffer view
+   */
+  def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer[BufferView1D]
+
+
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+    
+    if (source.buffer.memory != link.source || target.buffer.memory != link.target)
+      throw new Exception("Invalid copy: link cannot transfer between the given buffers")
+    
+    (source,target) match {
+      case (src:BufferView1D,tgt:BufferView1D) => {
+        if (src.size != tgt.size)
+          throw new Exception("Invalid copy: different view sizes (%d,%d)".format(src.size,tgt.size))
+        copy1D(link,src,tgt)
+      }
+      case _ => super.copy(link,source,target)
+    }
+  }
 }
 
 /**
  * Link support for 2D copy
  */
-trait Copy2DSupport {
+trait Copy2DSupport extends Network {
   /**
    * Schedule an asynchronous copy of 2D data
    *
    * @param link    Link handling the transfer
-   * @param source  Source buffer
-   * @param target  Target buffer
-   * @param elemSize Size of one element (in bytes)
-   * @param width   Row width
-   * @param height  Row count
-   * @param sourcePadding Row padding in source buffer (in bytes)
-   * @param targetPadding Row padding in target buffer (in bytes)
-   * @param sourceOffset Offset in source buffer (in bytes)
-   * @param targetOffset Offset in target buffer (in bytes)
+   * @param source  Source buffer view
+   * @param target  Target buffer view
    */
-  def copy2D(link:Link,source:Buffer,target:Buffer,
-    elemSize:Long,width:Long,height:Long,
-    sourcePadding:Long,targetPadding:Long,
-    sourceOffset:Long=0,targetOffset:Long=0):DataTransfer2D
+  def copy2D(link:Link,source:BufferView2D,target:BufferView2D):DataTransfer[BufferView2D]
+
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+    
+    if (source.buffer.memory != link.source || target.buffer.memory != link.target)
+      throw new Exception("Invalid copy: link cannot transfer between the given buffers")
+    
+    (source,target) match {
+      case (src:BufferView2D,tgt:BufferView2D) => {
+        if (src.width != tgt.width)
+          throw new Exception("Invalid copy: different widths (%d,%d)".format(src.width,tgt.width))
+        if (src.height != tgt.height)
+          throw new Exception("Invalid copy: different heights (%d,%d)".format(src.height,tgt.height))
+        copy2D(link,src,tgt)
+      }
+      case _ => super.copy(link,source,target)
+    }
+  }
 }
 
 /**
  * Link support for 3D copy
  */
-trait Copy3DSupport {
+trait Copy3DSupport extends Network {
   /**
    * Schedule an asynchronous copy of 3D data
    *
    * @param link    Link handling the transfer
-   * @param source  Source buffer
-   * @param target  Target buffer
-   * @param elemSize Size of one element (in bytes)
-   * @param width   Row width
-   * @param height  Row count
-   * @param depth   Plane count
-   * @param sourceRowPadding Row padding in source buffer (in bytes)
-   * @param targetRowPadding Row padding in target buffer (in bytes)
-   * @param sourcePlanePadding Row padding in source buffer (in bytes)
-   * @param targetPlanePadding Row padding in target buffer (in bytes)
-   * @param sourceOffset Offset in source buffer (in bytes)
-   * @param targetOffset Offset in target buffer (in bytes)
+   * @param source  Source buffer view
+   * @param target  Target buffer view
    */
-  def copy3D(link:Link,source:Buffer,target:Buffer,
-    elemSize:Long,width:Long,height:Long,
-    sourceRowPadding:Long,targetRowPadding:Long,
-    sourcePlanePadding:Long,targetPlanePadding:Long,
-    sourceOffset:Long=0,targetOffset:Long=0):DataTransfer3D
-}
+  def copy3D(link:Link,source:BufferView3D,target:BufferView3D):DataTransfer[BufferView3D]
 
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+    
+    if (source.buffer.memory != link.source || target.buffer.memory != link.target)
+      throw new Exception("Invalid copy: link cannot transfer between the given buffers")
+    
+    (source,target) match {
+      case (src:BufferView3D,tgt:BufferView3D) => {
+        if (src.width != tgt.width)
+          throw new Exception("Invalid copy: different widths (%d,%d)".format(src.width,tgt.width))
+        if (src.height != tgt.height)
+          throw new Exception("Invalid copy: different heights (%d,%d)".format(src.height,tgt.height))
+        if (src.depth != tgt.depth)
+          throw new Exception("Invalid copy: different depths (%d,%d)".format(src.depth,tgt.depth))
+        copy3D(link,src,tgt)
+      }
+      case _ => super.copy(link,source,target)
+    }
+  }
+}

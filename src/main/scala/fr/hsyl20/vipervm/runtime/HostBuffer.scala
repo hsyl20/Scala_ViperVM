@@ -23,5 +23,5 @@ abstract class HostBuffer extends Buffer {
   val peer:Memory
 
   /** Associated memory node */
-  val memoryNode:HostMemoryNode
+  val memory:HostMemoryNode
 }

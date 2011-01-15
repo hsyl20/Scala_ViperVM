@@ -18,9 +18,11 @@ import com.sun.jna.Memory
 /**
  * Default host buffer implementation
  */
-class DefaultHostBuffer(val peer:Memory, val memoryNode:HostMemoryNode) extends HostBuffer {
+class DefaultHostBuffer(val peer:Memory, val memory:HostMemoryNode) extends HostBuffer {
 
-  def this(size:Long,memoryNode:HostMemoryNode) = this(new Memory(size), memoryNode)
+  def this(size:Long,memory:HostMemoryNode) = this(new Memory(size), memory)
+
+  val size = peer.getSize
 
   /**
    * Free the buffer in memory node

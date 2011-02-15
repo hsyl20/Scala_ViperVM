@@ -11,29 +11,34 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package fr.hsyl20.vipervm.compilers.opencl
 
-import fr.hsyl20.vipervm.runtime.DefaultRuntime
-import fr.hsyl20.vipervm.dsl.linearalgebra._
-import fr.hsyl20.vipervm.library.opencl.{MatrixMultiplication => MM}
+import fr.hsyl20.vipervm.compilers._
+import fr.hsyl20.vipervm.codegen.opencl.CType
 
-class DSLSpec extends FlatSpec with ShouldMatchers {
 
-  "A DSL" should "work as expected" in {
-
-      implicit val runtime = new DefaultRuntime
-      implicit val engine = new LinearAlgebraEngine
-
-      val m = Matrix.loadFromFile("matrix1.dat")
-      val n = Matrix.loadFromFile("matrix2.dat")
-      val p = Matrix.loadFromFile("matrix3.dat")
-
-      val c = (m + n) * p
-
-      c.saveToFile("matrix_res.dat")
-
-      val matmult = new MM
-  }
+object AddressSpace extends Enumeration {
+  type AddressSpace = Value
+  val Global,Local,Constant,Private = Value
 }
 
+case class Parameter(name:String,typ:CLType)
+
+case class CLType(typ:CType,addressSpace:AddressSpace.AddressSpace)
+
+
+class Kernel {
+  import AddressSpace._
+
+  private var params:List[Parameter] = Nil
+  private var code = new StringBuffer
+
+  def addParam(name:String,typ:CLType): Parameter = {
+    val p = Parameter(name,typ)
+    params ::= p
+    p
+  }
+
+  private def append(s:String) = code.append(s)
+
+}

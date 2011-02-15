@@ -13,15 +13,17 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/*
+import scala.collection._
+
 abstract class Data {
-  import Data._
+  import BufferState._
+  import AccessMode._
 
   /* Buffers on different memory nodes */
   protected var buffers: mutable.Map[MemoryNode,Buffer] = mutable.Map.empty
 
   /* Buffer status */
-  protected var status: mutable.Map[Buffer,State] = mutable.Map.empty
+  protected var status: mutable.Map[Buffer,BufferState] = mutable.Map.empty
 
   /**
    * Return the buffer associated to this data on the given memory node
@@ -31,7 +33,7 @@ abstract class Data {
   /**
    * Return the status of this data on the given node
    */
-  def status(memory:MemoryNode): Option[State] = getBuffer(memory).flatMap(status.get _)
+  def status(memory:MemoryNode): Option[BufferState] = getBuffer(memory).flatMap(status.get _)
 
 
   /**
@@ -90,4 +92,4 @@ abstract class Data {
    */
   def notifyAfterAccess(buffer:Buffer, mode:AccessMode): Unit = {}
 }
-*/
+

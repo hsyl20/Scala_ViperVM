@@ -13,33 +13,10 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
- */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+import fr.hsyl20.vipervm.runtime.{Runtime => VMRuntime}
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
-  /**
-   * Allocate a data somewhere
-   *
-   * Default behavior is to allocate in host memory node
-   */
-  def allocate(data:Data):Unit = {
-    data.status(hostMemoryNode) match {
-      case None =>
-        val size = data.sizeOn(hostMemoryNode)
-        val buf = hostMemoryNode.allocate(size)
-        data.addBuffer(buf)
-      case _ => ()
-    }
-  }
+class DefaultRuntime extends VMRuntime {
+  val platform = new Platform(new opencl.OpenCLDriver)
+  //val taskScheduler
+  
 }

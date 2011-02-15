@@ -11,29 +11,23 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package fr.hsyl20.vipervm.dsl.linearalgebra
 
-import fr.hsyl20.vipervm.runtime.DefaultRuntime
-import fr.hsyl20.vipervm.dsl.linearalgebra._
-import fr.hsyl20.vipervm.library.opencl.{MatrixMultiplication => MM}
+import fr.hsyl20.vipervm.dsl._
+import fr.hsyl20.vipervm.runtime.{Runtime => VMRuntime}
+import scala.collection.mutable.{HashSet,SynchronizedSet}
 
-class DSLSpec extends FlatSpec with ShouldMatchers {
+class LinearAlgebraEngine(implicit val runtime:VMRuntime) extends Engine {
+  var actions = new HashSet[Action] with SynchronizedSet[Action]
 
-  "A DSL" should "work as expected" in {
+  def terminated(action:Action) = actions.contains(action)
 
-      implicit val runtime = new DefaultRuntime
-      implicit val engine = new LinearAlgebraEngine
-
-      val m = Matrix.loadFromFile("matrix1.dat")
-      val n = Matrix.loadFromFile("matrix2.dat")
-      val p = Matrix.loadFromFile("matrix3.dat")
-
-      val c = (m + n) * p
-
-      c.saveToFile("matrix_res.dat")
-
-      val matmult = new MM
+  def submit(action:Action):ActionStatus = {
+    actions += action
+    new LinearAlgebraActionStatus(this,action)
   }
 }
 
+class LinearAlgebraActionStatus(engine:LinearAlgebraEngine,action:Action) extends ActionStatus(action) {
+  def terminated = engine.terminated(action)
+}

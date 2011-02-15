@@ -11,19 +11,16 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.dsl
+package fr.hsyl20.vipervm.library.opencl
 
-trait Action
+import scala.io.Source
 
-abstract class ActionStatus(val action:Action) {
-  def terminated: Boolean
-}
+class MatrixMultiplication() {
+  val s = this.getClass.getResource("linearalgebra/multiplication.cl")
+  if (s == null)
+    throw new Exception("Unable to find kernel in library")
+  val source = Source.fromURL(s)
 
-/**
- * Schedule actions
- */
-abstract class Engine {
-  
-  /** Submit an action */
-  def submit(action:Action):ActionStatus
+  for (line <- source.getLines)
+    println(line)
 }

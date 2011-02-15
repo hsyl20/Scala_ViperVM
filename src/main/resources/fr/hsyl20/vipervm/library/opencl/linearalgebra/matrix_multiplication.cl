@@ -4,8 +4,6 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 
-#pragma OPENCL EXTENSION cl_khr_fp64 : enable
-
 __kernel void matrixMul( __global TYPE* A, __global TYPE* B, __global TYPE* C,
     __local TYPE* As, __local TYPE* Bs, unsigned int wa, unsigned int ha, unsigned int wb)
 {

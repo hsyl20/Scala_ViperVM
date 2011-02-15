@@ -4,12 +4,16 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) {
 
   /* Repositories */
   val javanet = "Java Net Repository" at "http://download.java.net/maven/2/"
+  val scala_tools_snapshots = "Scala-Tools Snapshots" at "http://scala-tools.org/repo-snapshots"
 
   /* Runtime libs */
   val jna = "net.java.dev.jna" % "jna" % "3.2.5"
 
   /* GUI libs */
   val scala_swing = "org.scala-lang" % "scala-swing" % "2.8.1"
+
+  /* Others */
+  val scalaz = "org.scalaz" %% "scalaz-core" % "6.0-SNAPSHOT"
 
   /* Test libs */
   val scalatest = "org.scalatest" % "scalatest" % "1.2"

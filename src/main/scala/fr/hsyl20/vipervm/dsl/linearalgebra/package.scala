@@ -11,15 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.library.opencl
+package fr.hsyl20.vipervm.dsl
 
+import fr.hsyl20.vipervm.data._
 
-class MatrixMultiplication() extends Kernel {
-/*  if (typ == Double)
-    println("#pragma OPENCL EXTENSION cl_khr_fp64 : enable")
-
-  println("#define TYPE %s".format(typ.ctype))
-
-  private val source = fromResource("linearalgebra/matrix_multiplication.cl")
-  //TODO: configure kernel, etc.*/
+package object linearalgebra {
+  implicit def lamatrix[A<:PrimitiveType](m:Matrix[A]) = new LAMatrix[A](m)
 }
+
+

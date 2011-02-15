@@ -13,26 +13,74 @@
 
 package fr.hsyl20.vipervm.dsl.linearalgebra
 
+import fr.hsyl20.vipervm.data._
 import fr.hsyl20.vipervm.dsl._
 
-abstract class Matrix {
-  def *(m:Matrix) = MatrixMultiplication(this,m)
-  def +(m:Matrix) = MatrixAddition(this,m)
-  def -(m:Matrix) = MatrixSubtraction(this,m)
+import java.io._
 
-  def saveToFile(filename:String)(implicit engine:LinearAlgebraEngine) = engine.submit(MatrixSaveToFile(this,filename))
+/** Wrapper adding Linear Algebra methods to matrix */
+class LAMatrix[A <: PrimitiveType](that:Matrix[A]) {
+
+  /** Matrix multiplication */
+  def *(m:Matrix[A]) = {
+    assume(that.width == m.height)
+    MatrixMultiplication(that,m)
+  }
+  
+  /** Matrix addition */
+  def +(m:Matrix[A]) = {
+    assume(that.width == m.width && that.height == m.height)
+    MatrixAddition(that,m)
+  }
+  
+  /** Matrix subtraction */
+  def -(m:Matrix[A]) = {
+    assume(that.width == m.width && that.height == m.height)
+    MatrixSubtraction(that,m)
+  }
+
+  def saveToFile(filename:String)(implicit engine:LinearAlgebraEngine) = {
+    engine.submit(MatrixSaveToFile(that,filename))
+  }
 }
 
-case class MatrixSaveToFile(matrix:Matrix, filename:String) extends Action
+case class MatrixSaveToFile[A<:PrimitiveType](matrix:Matrix[A], filename:String) extends Action
 
-case class MatrixAddition(m:Matrix,n:Matrix) extends Matrix
-case class MatrixSubtraction(m:Matrix,n:Matrix) extends Matrix
-case class MatrixMultiplication(m:Matrix,n:Matrix) extends Matrix
-case class MatrixLoadFromFile(filename:String) extends Matrix
-case class MatrixProduct(m:Matrix, n:Matrix) extends Matrix
-case class MatrixFilled[A](value:A,dims:Long*) extends Matrix
+case class MatrixAddition[A<:PrimitiveType](m:Matrix[A],n:Matrix[A]) extends Matrix[A] {
+  val width = m.width
+  val height = m.height
+}
+
+case class MatrixSubtraction[A<:PrimitiveType](m:Matrix[A],n:Matrix[A]) extends Matrix[A] {
+  val width = m.width
+  val height = m.height
+}
+
+case class MatrixMultiplication[A<:PrimitiveType](m:Matrix[A],n:Matrix[A]) extends Matrix[A] {
+  val width = n.width
+  val height = m.height
+}
+
+case class MatrixFilled[A<:PrimitiveType](value:A, val width:Long, val height:Long) extends Matrix[A]
+
+class MatrixLoadFromStream[A<:PrimitiveType](stream:InputStream) extends Matrix[A] {
+  private val s = new DataInputStream(stream)
+
+  /* Check header */
+  private val id = Array[Byte]('M','2','D','\0')
+  s.readFully(id)
+  if (!(id zip Array[Byte]('M','2','D','\0')).forall(a => a._1 == a._2))
+    throw new Exception("Invalid file")
+
+  val width = s.readLong
+  val height = s.readLong
+}
+
 
 object Matrix {
-  def loadFromFile(filename:String) = MatrixLoadFromFile(filename)
-  def filled[A](value:A,dims:Long*) = MatrixFilled(value, dims:_*)
+  /** Load a matrix from a file */
+  def loadFromStream[A<:PrimitiveType](stream:InputStream) = new MatrixLoadFromStream[A](stream)
+
+  /** Create a new matrix filled with a value */
+  def filled[A<:PrimitiveType](value:A,width:Long,height:Long) = MatrixFilled[A](value,width,height)
 }

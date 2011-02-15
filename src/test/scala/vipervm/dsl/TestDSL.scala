@@ -16,7 +16,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 import fr.hsyl20.vipervm.runtime.DefaultRuntime
 import fr.hsyl20.vipervm.dsl.linearalgebra._
-import fr.hsyl20.vipervm.library.opencl.{MatrixMultiplication => MM}
+import fr.hsyl20.vipervm.data._
 
 class DSLSpec extends FlatSpec with ShouldMatchers {
 
@@ -25,15 +25,13 @@ class DSLSpec extends FlatSpec with ShouldMatchers {
       implicit val runtime = new DefaultRuntime
       implicit val engine = new LinearAlgebraEngine
 
-      val m = Matrix.loadFromFile("matrix1.dat")
-      val n = Matrix.loadFromFile("matrix2.dat")
-      val p = Matrix.loadFromFile("matrix3.dat")
+      val m = Matrix.loadFromStream[TDouble](getClass.getResourceAsStream("matrix1.dat"))
+      val n = Matrix.loadFromStream[TDouble](getClass.getResourceAsStream("matrix2.dat"))
+      val p = Matrix.loadFromStream[TDouble](getClass.getResourceAsStream("matrix3.dat"))
 
       val c = (m + n) * p
 
       c.saveToFile("matrix_res.dat")
-
-      val matmult = new MM
   }
 }
 

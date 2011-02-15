@@ -13,13 +13,14 @@
 
 package fr.hsyl20.vipervm.library.opencl
 
-
-class MatrixMultiplication() extends Kernel {
-/*  if (typ == Double)
+class MatrixAddition() extends Kernel {
+/*
+  if (typ == Double)
     println("#pragma OPENCL EXTENSION cl_khr_fp64 : enable")
 
   println("#define TYPE %s".format(typ.ctype))
 
-  private val source = fromResource("linearalgebra/matrix_multiplication.cl")
+  private val source = fromResource("linearalgebra/matrix_addition.cl")
+
   //TODO: configure kernel, etc.*/
 }

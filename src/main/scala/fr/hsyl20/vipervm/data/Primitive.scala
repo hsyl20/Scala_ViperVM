@@ -11,15 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.library.opencl
+package fr.hsyl20.vipervm.data
 
-
-class MatrixMultiplication() extends Kernel {
-/*  if (typ == Double)
-    println("#pragma OPENCL EXTENSION cl_khr_fp64 : enable")
-
-  println("#define TYPE %s".format(typ.ctype))
-
-  private val source = fromResource("linearalgebra/matrix_multiplication.cl")
-  //TODO: configure kernel, etc.*/
-}
+sealed abstract class PrimitiveType
+class TDouble extends PrimitiveType
+class TSingle extends PrimitiveType
+class TInt32  extends PrimitiveType
+class TInt64  extends PrimitiveType
+class TBoolean  extends PrimitiveType

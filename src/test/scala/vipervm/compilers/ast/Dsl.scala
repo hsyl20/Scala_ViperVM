@@ -22,13 +22,13 @@ class ASTDslSpec extends FlatSpec with ShouldMatchers with TreeDSL  {
   import CODE._
   val printer = new TreePrinter(new PrintWriter(TreePrinter.ConsoleWriter))
 
-  "A module" can "be declared" in {
-      val tree = MODULE("test.module")()
+  "A package" can "be declared" in {
+      val tree = PACKAGE("test.module")()
       printer.print(tree)
   }
 
-  "A module" can "contain val definition" in {
-      val tree = MODULE("test.module")(
+  "A package" can "contain val definition" in {
+      val tree = PACKAGE("test.module")(
         VAL("a") === LIT(10)
       )
       printer.print(tree)

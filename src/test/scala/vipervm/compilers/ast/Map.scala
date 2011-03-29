@@ -21,7 +21,7 @@ class TestAstMap extends JUnitSuite with TreeDSL {
     import CODE._
     val printer = new TreePrinter(new PrintWriter(TreePrinter.ConsoleWriter))
 
-    val tree = MODULE("test.map")(
+    val tree = PACKAGE("test.map")(
       VAL("f") === FUNCTION(
         VAL("a") withType TYP("Float")  //Args
       )(

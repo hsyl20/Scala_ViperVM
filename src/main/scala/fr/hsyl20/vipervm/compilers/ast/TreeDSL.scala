@@ -33,7 +33,7 @@ trait TreeDSL {
       def ===(rhs: Tree) = Assign(target, rhs)
     }
 
-    def MODULE(name:String)(trees:Tree*) = new Module(name, trees.toList)
+    def PACKAGE(name:String)(trees:Tree*) = new Package(name, trees.toList)
     def VAL(name:String): ValTreeStart = new ValTreeStart(name)
     def LIT(value:Any): Literal = Literal(Constant(value))
     def FUNCTION(args:ValDef*)(typ:Tree)(body:Tree)  = new Function(args.toList, body, typ)

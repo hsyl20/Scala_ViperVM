@@ -27,7 +27,7 @@ case class Function(params:List[ValDef], body:Tree, returnTyp:Tree) extends Tree
 case class If(cond:Tree, thenp:Tree, elsep:Tree) extends Tree
 case class Ident(name:String) extends Tree
 case class Literal(value:Constant) extends Tree
-case class Module(name:String, members:List[Tree]) extends Tree
+case class Package(name:String, members:List[Tree]) extends Tree
 case class Bind(name:String, body:Tree) extends Tree
 case class Assign(lhs:Tree,rhs:Tree) extends Tree
 case class Apply(fun: Tree, args: List[Tree]) extends Tree

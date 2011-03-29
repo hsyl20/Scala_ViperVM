@@ -88,7 +88,7 @@ class TreePrinter(out: PrintWriter) {
         print(" = ")
         print(rhs)
       }
-      case Module(name, members) => {
+      case Package(name, members) => {
         print("package %s ".format(name))
         printColumn(members, "{", "", "}")
       }

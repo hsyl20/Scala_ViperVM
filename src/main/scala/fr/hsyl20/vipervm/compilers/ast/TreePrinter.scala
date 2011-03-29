@@ -33,6 +33,12 @@ class TreePrinter(out: PrintWriter) {
       out.write(indentString, 0, indentMargin)
   }
   
+  def backquotedPath(t: Tree): String = t match {
+    case Select(qual, name) => "%s.%s".format(backquotedPath(qual), name)
+    case Ident(name)        => name
+    case _                  => t.toString
+  }
+
   def printSeq[a](ls: List[a])(printelem: a => Unit)(printsep: => Unit) {
     ls match {
       case List() =>
@@ -56,6 +62,19 @@ class TreePrinter(out: PrintWriter) {
     if (!tree.isEmpty) { print(prefix); print(tree) }
   }
 
+  def printValueParams(ts: List[ValDef]) {
+    print("(")
+    printSeq(ts){printParam}{print(", ")}
+    print(")")
+  }
+
+  def printParam(tree: Tree) {
+    tree match {
+      case ValDef(name, tp, rhs) =>
+        print(name); printOpt(": ", tp); printOpt(" = ", rhs)
+    }
+  }
+
   def print(str: String) { out.print(str) }
 
   def printRaw(tree:Tree) {
@@ -75,6 +94,14 @@ class TreePrinter(out: PrintWriter) {
       }
       case Literal(x) =>
         print(x.escapedStringValue)
+      case Function(params, body, returnTyp) => {
+        print("("); printValueParams(params); print(" => "); print(body); print(")")
+      }
+      case Type(name) => print(name)
+      case Apply(fun, vargs) => print(fun); printRow(vargs, "(", ", ", ")")
+      case Select(qualifier, name) =>
+        print(backquotedPath(qualifier)); print("."); print(name)
+      case Ident(name) => print(name)
     }
   }
 

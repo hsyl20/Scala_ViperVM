@@ -11,36 +11,70 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.codegen
+package fr.hsyl20.vipervm.compilers
 
-import scala.collection.immutable.HashMap
+import fr.hsyl20.vipervm.compilers.ast.Tree
+import scala.collection.mutable.HashMap
 
-abstract class SymbolTable[A] {
-   val items:HashMap[String,A]
+sealed abstract class SymbolValue
+case class Package(symtab:SymbolTable) extends SymbolValue
+case class Def(d:Tree) extends SymbolValue
 
-   def + (item: (String,A)) = new SymbolTable[A] {
-      val items = SymbolTable.this.items + item
-   }
+class SymbolTable {
+   val items:HashMap[String,SymbolValue] = HashMap.empty
 
-   def get(s:String): Option[A] = items.get(s)
+   def + (item: (String,SymbolValue)) = items += item
+   def get(s:String): Option[SymbolValue] = items.get(s)
 
-   def declare(item: (Symbol,A)) = this + (item._1.name, item._2)
-
-   /* Perform fusion of two symbol tables */
-   def |+| (ss:SymbolTable[A]): SymbolTable[A] = {
-      (this /: ss.items) { (st, entry) =>
-         st.get(entry._1) match {
-            case None => this + entry
-            case Some(desc2) => error("Conflicting symbols")
-         }
-         st
-      }
-   }
-
+   def declare(item: (String,SymbolValue)) = this + (item._1, item._2)
 }
 
 object SymbolTable {
-   def empty[A]: SymbolTable[A] = new SymbolTable[A] {
-      val items = HashMap.empty[String,A]
-   }
+   def empty: SymbolTable = new SymbolTable
+}
+
+
+/**
+ * A hierarchical symbol table
+ * 
+ * It takes into account packages, imports and scopes
+ */
+class HierarchicalSymbolTable {
+
+  private val root: SymbolTable = SymbolTable.empty
+  private var current: List[SymbolTable] = List(root)
+  
+  private def getFrom(path:List[String], symtab:SymbolTable): Option[SymbolValue] = {
+    if (path isEmpty) None
+    else {
+      symtab.get(path.head) match {
+        case None => None
+        case Some(Package(st)) => getFrom(path.drop(1), st)
+        case a => a
+      }
+    }
+  }
+
+  private def getFromCurrent(path:List[String], curr:List[SymbolTable] = current): Option[SymbolValue] = {
+    if (path isEmpty) None
+    else {
+      curr match {
+        case Nil => None
+        case a :: as => getFrom(path, a) match {
+          case None => getFromCurrent(path, curr.drop(1))
+          case a => a
+        }
+      }
+    }
+  }
+
+  /** Return value associated to symbol s if found */
+  def get(s:String): Option[SymbolValue] = {
+    val path = s.split(".").toList
+
+    path match {
+      case a::as if a == "_root_" => getFrom(path.drop(1), root)
+      case _   => getFromCurrent(path)
+    }
+  }
 }

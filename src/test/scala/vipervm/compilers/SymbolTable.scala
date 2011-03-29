@@ -14,12 +14,13 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import fr.hsyl20.vipervm.codegen._
+import fr.hsyl20.vipervm.compilers._
+import fr.hsyl20.vipervm.compilers.ast._
 
 class SymbolTableSpec extends FlatSpec with ShouldMatchers {
 
    "A symbol table" should "be able to store elements" in {
-      val s = SymbolTable.empty[String]
-      val s2 = s declare ('a -> "pouet")
+      val s = SymbolTable.empty
+      val s2 = s declare ("a" -> Def(Literal(Constant("pouet"))))
    }
 }

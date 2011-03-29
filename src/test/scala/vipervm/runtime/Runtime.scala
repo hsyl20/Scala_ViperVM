@@ -21,7 +21,7 @@ import fr.hsyl20.vipervm.runtime.dataschedulers.DefaultDataScheduler
 
 class RuntimeSpec extends FlatSpec with ShouldMatchers {
 
-/*  "A runtime" should "be instantiable" in {
+  "A runtime" should "be instantiable" in {
 
     val r = new Runtime {
       val platform = Platform(new OpenCLDriver)
@@ -29,10 +29,5 @@ class RuntimeSpec extends FlatSpec with ShouldMatchers {
       val taskScheduler = new SingleDeviceScheduler(platform.devices.head, this)
     }
 
-<<<<<<< HEAD
   }
 }*/
-=======
-  }*/
-}
->>>>>>> Work in progress

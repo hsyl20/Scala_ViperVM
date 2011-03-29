@@ -13,22 +13,14 @@
 
 import org.junit._
 
-<<<<<<< HEAD
 /*import fr.hsyl20.vipervm.runtime._
-=======
-import fr.hsyl20.vipervm.runtime._
->>>>>>> Work in progress
 import fr.hsyl20.vipervm.runtime.opencl.OpenCLDriver
 import fr.hsyl20.vipervm.runtime.schedulers.SingleDeviceScheduler
 import fr.hsyl20.vipervm.runtime.dataschedulers.DefaultDataScheduler
 
 class TaskSchedule {
 
-<<<<<<< HEAD
   @Test
-=======
-/*  @Test
->>>>>>> Work in progress
   def test() = {
 
     val r = new Runtime {
@@ -54,11 +46,6 @@ class TaskSchedule {
 
     r.schedule(t,d1,d2)
 
-<<<<<<< HEAD
   }
 }*/
-=======
-  }*/
-}
->>>>>>> Work in progress
 

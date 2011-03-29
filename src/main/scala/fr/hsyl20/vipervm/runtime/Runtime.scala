@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/*/**
+/**
  * A runtime system
  *
  * A runtime system is made of
@@ -33,7 +33,7 @@ abstract class Runtime {
    *
    * Default behavior is to allocate in host memory node
    */
-  def allocate(data:Data):Unit = {
+/*  def allocate(data:Data):Unit = {
     data.status(hostMemoryNode) match {
       case None =>
         val size = data.sizeOn(hostMemoryNode)
@@ -41,5 +41,5 @@ abstract class Runtime {
         data.addBuffer(buf)
       case _ => ()
     }
-  }
-}*/
+  }*/
+}

@@ -20,13 +20,12 @@ sealed abstract class SymbolValue
 case class Package(symtab:SymbolTable) extends SymbolValue
 case class Def(d:Tree) extends SymbolValue
 
-class SymbolTable {
-   val items:HashMap[String,SymbolValue] = HashMap.empty
+class SymbolTable extends HashMap[String,SymbolValue] {
 
-   def + (item: (String,SymbolValue)) = items += item
-   def get(s:String): Option[SymbolValue] = items.get(s)
-
-   def declare(item: (String,SymbolValue)) = this + (item._1, item._2)
+  def declare(item: (String,SymbolValue)) = {
+    this += (item._1 -> item._2)
+    this
+  }
 }
 
 object SymbolTable {
@@ -76,5 +75,18 @@ class HierarchicalSymbolTable {
       case a::as if a == "_root_" => getFrom(path.drop(1), root)
       case _   => getFromCurrent(path)
     }
+  }
+
+  def put(path:String, value:SymbolValue) {
+    current.head += (path -> value)
+  }
+
+
+  def enterScope {
+    current = SymbolTable.empty :: current
+  }
+
+  def exitScope {
+    current = current.tail
   }
 }

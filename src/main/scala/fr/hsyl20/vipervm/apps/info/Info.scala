@@ -16,6 +16,9 @@ package fr.hsyl20.vipervm.apps
 import fr.hsyl20.vipervm.runtime.Platform
 import fr.hsyl20.vipervm.runtime.opencl.OpenCLDriver
 
+/**
+ * Application showing informations about the platform (available devices, etc.)
+ */
 object Info {
 
   def main(args:Array[String]): Unit = {

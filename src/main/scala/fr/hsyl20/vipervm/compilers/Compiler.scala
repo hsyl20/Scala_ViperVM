@@ -11,19 +11,23 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package fr.hsyl20.vipervm.compilers
 
-import fr.hsyl20.vipervm.compilers._
 import fr.hsyl20.vipervm.compilers.ast._
 
-class SymbolTableSpec extends FlatSpec with ShouldMatchers {
+class Compiler {
+  private val out = new StringBuilder
+  private val symtab = new HierarchicalSymbolTable
 
-  "A symbol table" should "be able to store entities" in {
-    val s = SymbolTable.empty
-
-    s declare ("a" -> Def(Literal(Constant("dummy"))))
-    s should (contain key "a")
+  def compile(t:Tree):String = {
+    
+    /*t match {
+      case ValDef(name, typ, rhs) => {
+        symtab.put(name, Def(rhs))
+      }
+      case Package(name, members) => members map compile
+      case Select(qualifier, name) =>
+    }*/
+    ""
   }
-
 }

@@ -11,23 +11,16 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform.opencl
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import fr.hsyl20.vipervm.platform.{HostMemoryNode,Link}
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
- */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+case class OpenCLSourceLink(
+  network:OpenCLNetwork,
+  source:OpenCLMemoryNode,
+  target:HostMemoryNode) extends Link
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
-}
+case class OpenCLTargetLink(
+  network:OpenCLNetwork,
+  source:HostMemoryNode,
+  target:OpenCLMemoryNode) extends Link

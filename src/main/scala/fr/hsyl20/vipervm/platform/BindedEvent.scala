@@ -11,23 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * Event triggered when "event" is triggered
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
-
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
+class BindedEvent(event:Event) extends Event {
+  event.addCallback(_ => complete)
 }

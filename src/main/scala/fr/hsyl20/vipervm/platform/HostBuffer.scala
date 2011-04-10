@@ -11,23 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import com.sun.jna.Memory
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * A buffer in host memory
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+abstract class HostBuffer extends Buffer {
+  /** JNA Memory (C pointer) */
+  val peer:Memory
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
+  /** Associated memory node */
+  val memory:HostMemoryNode
 }

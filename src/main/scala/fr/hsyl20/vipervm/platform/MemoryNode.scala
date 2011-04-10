@@ -11,18 +11,36 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform
 
-import fr.hsyl20.vipervm.platform.Event
+import scala.collection.immutable.{NumericRange,HashSet}
 
 /**
- * Event that can be triggered by user code.
+ * A memory node
  */
-class UserEvent extends Event {
-  
-  /**
-   * Trigger the event
-   */
-  def trigger: Unit = complete
+abstract class MemoryNode {
 
+  type BufferType <: Buffer
+
+  protected var buffers:HashSet[Buffer] = HashSet.empty
+
+  /** 
+   * Estimated available memory
+   */
+  def availableMemory: Long
+
+  /**
+   * Allocate a buffer
+   */
+  def allocate(size:Long): BufferType
+
+  /**
+   * Returns the buffer with its real type if this memory node contains it.
+   * Otherwise, an exception is thrown.
+   */
+  def get(buffer:Buffer): BufferType = {
+    if (!buffers.contains(buffer))
+      throw new Exception("This buffer doesn't belong to this memory node")
+    buffer.asInstanceOf[BufferType]
+  }
 }

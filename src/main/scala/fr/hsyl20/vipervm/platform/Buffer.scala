@@ -11,23 +11,15 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * A buffer in a memory node
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
-
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
+abstract class Buffer {
+  val memory:MemoryNode
+  
+  val size:Long
 }
+
+

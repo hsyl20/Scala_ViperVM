@@ -11,23 +11,22 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
+ * A network between different memory nodes
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * Network should at least support 1D data copy
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+abstract class Network {
+  /**
+   * Return a link from source to target using this network if possible
+   */
+  def link(source:MemoryNode,target:MemoryNode): Option[Link]
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
+  /**
+   * Return a MemoryCopier that uses this network
+   */
+  def memoryCopier: MemoryCopier
 }
+

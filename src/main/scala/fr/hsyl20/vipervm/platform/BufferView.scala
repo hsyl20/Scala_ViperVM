@@ -11,23 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
+ * A view of a buffer
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * View can be used for data transfers and as kernel parameters
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+trait BufferView {
+  /** Associated buffer */
+  val buffer:Buffer
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
+  /** Offset in the buffer */
+  val offset:Long
 }
+
+case class BufferView1D(buffer:Buffer,offset:Long,size:Long) extends BufferView
+case class BufferView2D(buffer:Buffer,offset:Long,width:Long,height:Long,rowPadding:Long) extends BufferView
+case class BufferView3D(buffer:Buffer,offset:Long,width:Long,height:Long,depth:Long,rowPadding:Long,planePadding:Long) extends BufferView

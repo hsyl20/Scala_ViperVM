@@ -11,23 +11,25 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * A processor can execute programs to transform data that are stored in some memories
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+abstract class Processor {
+  /**
+   * Memories in which the processor can work
+   */
+  def memories:Seq[MemoryNode]
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  /**
+   * Execute the kernel with the specified parameters
+   */
+  def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent
 
+  /**
+   * Test if the kernel can be executed with the given parameters
+   * Return a list of errors or Nil if none
+   */
+  def canExecute(kernel:Kernel, args:Seq[KernelParameter]): Boolean
 }

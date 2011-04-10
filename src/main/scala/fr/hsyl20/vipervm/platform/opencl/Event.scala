@@ -11,23 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform.opencl
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import fr.hsyl20.vipervm.platform.Event
+import fr.hsyl20.{opencl => cl}
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
- */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
-
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
-}
+class OpenCLEvent(val peer:cl.Event) extends Event

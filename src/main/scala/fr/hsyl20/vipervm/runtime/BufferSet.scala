@@ -13,6 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
+import fr.hsyl20.vipervm.platform._
 import fr.hsyl20.vipervm.runtime.AccessMode._
 import scala.collection._
 

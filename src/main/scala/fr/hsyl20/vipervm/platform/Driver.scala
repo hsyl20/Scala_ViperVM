@@ -11,23 +11,20 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
-
-/**
- * A runtime system
+/** Drivers give access to some devices (CUDA, OpenCL, CELL...)
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * They are to be registered into a platform to be used
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+abstract class Driver {
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  /** Memory nodes */
+  def memories:Seq[MemoryNode]
 
+  /** Networks */
+  def networks:Seq[Network]
+
+  /** Processors */
+  def processors:Seq[Processor]
 }

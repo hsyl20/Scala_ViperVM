@@ -11,23 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform.opencl
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import fr.hsyl20.vipervm.platform.Buffer
+import fr.hsyl20.{opencl => cl}
+import com.sun.jna.Memory
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * OpenCL buffer
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+class OpenCLBuffer(val size:Long, val peer:cl.Buffer, val memory:OpenCLMemoryNode) extends Buffer {
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  private val device = memory.device
+
+  private implicit def buf2buf(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
+
+  def free(): Unit = peer.release
 
 }

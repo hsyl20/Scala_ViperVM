@@ -11,23 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
+ * Data transfer for contiguous memory
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * @param link    Link handling the transfer
+ * @param source  Source buffer view
+ * @param target  Target buffer view
+ * @param event   Event indicating data transfer completion
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
-
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
-
-}
+class DataTransfer[+V <: BufferView](link:Link,source:V,target:V,event:Event)

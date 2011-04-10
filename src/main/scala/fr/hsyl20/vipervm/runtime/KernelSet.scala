@@ -13,6 +13,8 @@
 
 package fr.hsyl20.vipervm.runtime
 
+import fr.hsyl20.vipervm.platform.Kernel
+
 /**
  * A kernel set is a set of kernels accomplishing the same task and
  * that can be run on different devices

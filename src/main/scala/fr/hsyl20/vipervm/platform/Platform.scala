@@ -11,23 +11,26 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
-
-/**
- * A runtime system
+/** This class gives a unified representation of the runtime platform.
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * Drivers are to be registered into the platform to be used
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+class Platform(val drivers:Driver*) {
+   
+  /**
+   * Memory nodes
+   */
+  def memories: Seq[MemoryNode] = drivers.flatMap(_.memories)
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  /**
+   * Networks
+   */
+  def networks: Seq[Network] = drivers.flatMap(_.networks)
 
+  /**
+   * Processors
+   */
+  def processors: Seq[Processor] = drivers.flatMap(_.processors)
 }

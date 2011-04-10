@@ -11,23 +11,19 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform.opencl
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import fr.hsyl20.vipervm.platform._
+import fr.hsyl20.{opencl => cl}
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+/** OpenCL Driver
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+class OpenCLDriver extends Driver {
+   
+  def processors:Seq[OpenCLDevice] = for (p <- cl.OpenCL.platforms ; peer <- p.devices())
+    yield new OpenCLDevice(peer)
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  def networks:Seq[OpenCLNetwork] = for (p <- processors) yield new OpenCLNetwork(p)
 
+  def memories:Seq[OpenCLMemoryNode] = for (p <- processors) yield new OpenCLMemoryNode(p)
 }

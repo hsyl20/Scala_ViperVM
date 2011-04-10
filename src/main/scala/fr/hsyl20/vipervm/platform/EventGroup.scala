@@ -11,23 +11,33 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform
 
-import fr.hsyl20.vipervm.platform.{HostMemoryNode,DefaultHostMemoryNode, Platform}
+import scala.concurrent.Lock
 
 /**
- * A runtime system
+ * An event that completes when all events it contains have completed
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * @param events Events in this group
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+class EventGroup[E <: Event](val events:Seq[E]) extends Event {
 
-  /** Memory node for the host */
-  val hostMemoryNode:HostMemoryNode = new DefaultHostMemoryNode
+  private var remaining: Int = events.size
+  private val lock = new Lock
+  
+  for (e <- events) {
+    e.addCallback(_ => {
+      val rem = lock.synchronized[Int] {
+        remaining -= 1
+        remaining
+      }
+      if (rem == 0) complete
+    })
+  }
+}
 
+object EventGroup {
+  implicit def seqev[E<:Event](evs:Seq[E]) = new {
+    def group = new EventGroup[E](evs)
+  }
 }

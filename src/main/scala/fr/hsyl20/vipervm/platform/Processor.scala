@@ -26,10 +26,4 @@ abstract class Processor {
    * Execute the kernel with the specified parameters
    */
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent
-
-  /**
-   * Test if the kernel can be executed with the given parameters
-   * Return a list of errors or Nil if none
-   */
-  def canExecute(kernel:Kernel, args:Seq[KernelParameter]): Boolean
 }

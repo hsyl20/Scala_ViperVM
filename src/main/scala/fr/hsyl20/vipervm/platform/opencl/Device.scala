@@ -80,12 +80,5 @@ class OpenCLDevice(val peer:cl.Device) extends Processor {
     }
   }
 
-  /**
-   * Test if the kernel can be executed with the given parameters
-   * Return a list of errors or Nil if none
-   */
-  //TODO
-  def canExecute(kernel:Kernel, args:Seq[KernelParameter]): Boolean = true
-
   override def toString = "%s - %s".format(peer.vendor, peer.name)
 }

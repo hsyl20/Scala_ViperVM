@@ -13,11 +13,8 @@
 
 package fr.hsyl20.vipervm.runtime
 
-/**
- * Types supported for kernel parameters
- */
-sealed abstract class KernelParameterType
-case object BufferParameterType extends KernelParameterType
-case object IntParameterType  extends KernelParameterType
-case object DoubleParameterType extends KernelParameterType
-case object FloatParameterType  extends KernelParameterType
+sealed abstract class KernelParameter
+case class DoubleParam(value:Double) extends KernelParameter
+case class FloatParam(value:Float) extends KernelParameter
+case class IntParam(value:Int) extends KernelParameter
+case class DataParam(value:Data) extends KernelParameter

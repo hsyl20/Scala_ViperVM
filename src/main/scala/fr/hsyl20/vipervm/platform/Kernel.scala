@@ -14,8 +14,16 @@
 package fr.hsyl20.vipervm.platform
 
 /**
- * Abstract class for kernels.
+ * A kernel 
  *
  * Backends provide concrete implementations
  */
-abstract class Kernel
+trait Kernel {
+
+  /**
+   * Test if this kernel can be executed by the given processor
+   */
+  def canExecuteOn(proc:Processor): Boolean
+
+}
+

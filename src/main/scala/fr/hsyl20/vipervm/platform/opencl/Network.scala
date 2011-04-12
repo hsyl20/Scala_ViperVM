@@ -35,7 +35,6 @@ class OpenCLNetwork(val device:OpenCLDevice) extends Network {
 
 }
 
-
 class OpenCLMemoryCopier extends MemoryCopier with Copy1DSupport {
   def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer[BufferView1D] = {
     link match {

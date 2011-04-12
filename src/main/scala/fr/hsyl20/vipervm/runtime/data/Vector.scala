@@ -16,4 +16,6 @@ package fr.hsyl20.vipervm.runtime.data
 import fr.hsyl20.vipervm.platform.BufferView1D
 import fr.hsyl20.vipervm.runtime.Data
 
-class Vector extends Data[BufferView1D]
+class Vector extends Data {
+  type ViewType = BufferView1D
+}

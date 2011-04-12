@@ -13,7 +13,6 @@
 
 package fr.hsyl20.vipervm.runtime
 
-object AccessMode extends Enumeration {
-   type AccessMode = Value
-   val ReadOnly, WriteOnly, ReadWrite = Value
-}
+sealed abstract class AccessMode
+case object ReadOnly extends AccessMode
+case object ReadWrite extends AccessMode

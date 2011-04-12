@@ -13,9 +13,18 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.runtime.AccessMode.AccessMode
+import fr.hsyl20.vipervm.platform.{Kernel,Processor}
 
 /**
- * This class describes a kernel parameter
+ * A kernel that can be executed on different architectures
+ *
+ * Kernels must all take the same parameters as input (same prototype)
  */
-case class KernelParameterDecl(datatype:KernelParameterType, mode:AccessMode, name:String = "")
+trait MetaKernel extends Kernel {
+
+  /**
+   * Get the kernel for the given processor
+   */
+  def getKernelFor(proc:Processor): Option[Kernel]
+
+}

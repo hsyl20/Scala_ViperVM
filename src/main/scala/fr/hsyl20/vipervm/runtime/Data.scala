@@ -15,6 +15,8 @@ package fr.hsyl20.vipervm.runtime
 
 import fr.hsyl20.vipervm.platform.BufferView
 
-class Data[V <: BufferView] {
-  val views = ViewSet.empty[V]
+class Data {
+  type ViewType <: BufferView
+
+  val views = ViewSet.empty[ViewType]
 }

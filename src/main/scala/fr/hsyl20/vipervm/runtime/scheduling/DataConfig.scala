@@ -13,8 +13,6 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.runtime.AccessMode._
-
 /*/**
  * Group of Data to access with the specified access mode.
  *

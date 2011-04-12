@@ -11,8 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.runtime.data
 
 import fr.hsyl20.vipervm.platform.BufferView1D
+import fr.hsyl20.vipervm.runtime.ViewSet
 
 class Vector extends ViewSet[BufferView1D]

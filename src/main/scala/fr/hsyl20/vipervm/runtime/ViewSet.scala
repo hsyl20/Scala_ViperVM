@@ -13,15 +13,12 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.runtime.AccessMode._
-import scala.collection._
+import fr.hsyl20.vipervm.platform.BufferView
+import fr.hsyl20.vipervm.platform.MemoryNode
 
-/** This represents an immutable data.
- *
- * Every buffer must contain the same data.
- * Data can be available or unavailable on each memory node
+import scala.collection.mutable.HashMap
+
+/**
+ * A set of buffer views
  */
-abstract class ImmutableBufferSet extends BufferSet {
-  import BufferState._
-}
-
+class ViewSet[V <: BufferView] extends HashMap[MemoryNode,V]

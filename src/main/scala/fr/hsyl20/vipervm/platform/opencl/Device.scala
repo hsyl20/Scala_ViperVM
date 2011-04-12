@@ -52,29 +52,29 @@ class OpenCLDevice(val peer:cl.Device) extends Processor {
    */
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
 
+    /* Check params */
+    val config = kernel.rawConfigure(this, args) match {
+      case None => throw new Exception("Invalid kernel parameters")
+      case Some(p) => p
+    }
+
     /* Get compiled kernel for this device */
     val k = kernel.get(this)
-
-    /* Get work sizes */
-    val global = kernel.computeGlobalWorkSize(this, args)
-    val local = kernel.computeLocalWorkSize(this, args)
-
-    /* Get parameter list */
-    val params = kernel.computeParameters(this, args)
 
     /* We need to synchronize as OpenCL kernels are not thread safe */
     k.synchronized {
 
       /* Set parameters */
-      for ((a,idx) <- params.zipWithIndex) a match {
+      for ((a,idx) <- config.parameters.zipWithIndex) a match {
         case BufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, b.peer.peer)
         case IntKernelParameter(v) => k.setArg(idx, 4, new IntByReference(v).getPointer)
+        case LongKernelParameter(v) => k.setArg(idx, 8, new LongByReference(v).getPointer)
         case DoubleKernelParameter(v) => k.setArg(idx, 8, new DoubleByReference(v).getPointer)
         case FloatKernelParameter(v) => k.setArg(idx, 4, new FloatByReference(v).getPointer)
       }
 
       /* Enqueue kernel */
-      val e = commandQueue.enqueueKernel(k, global, local, null)
+      val e = commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, null)
 
       new KernelEvent(kernel, args, this, new OpenCLEvent(e))
     }

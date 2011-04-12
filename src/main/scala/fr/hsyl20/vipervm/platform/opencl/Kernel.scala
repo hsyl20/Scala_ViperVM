@@ -50,25 +50,54 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
   }
 
   /**
-   * Compute global work size. Concrete kernels must implement this
+   * Convert kernel parameters to a more convenient representation before giving them to the configure method
    */
-  def computeGlobalWorkSize(device:OpenCLDevice, args:Seq[KernelParameter]):List[Long]
+  def rawConfigure(device:OpenCLDevice, params:Seq[KernelParameter]): Option[OpenCLKernelConfig] = {
+    getParams(params) match {
+      case None => None
+      case Some(ps) => configure(device, ps)
+    }
+  }
 
   /**
-   * Compute local work size. Concrete kernels should implement this
+   * Indicate if the kernel can be executed on the given processor.
+   * 
+   * Default behavior is to valid any OpenCLDevice. Kernels should overwrite
+   * this to set more precise constraints (double support, etc.)
+   */
+  def canExecuteOn(proc:Processor): Boolean = proc match {
+    case _:OpenCLDevice => true
+    case _ => false
+  }
+
+  /**
+   * Retrieve kernel configuration from parameters. Concrete kernels must implement this
+   */
+  def configure(device:OpenCLDevice, params:ParamsType): Option[OpenCLKernelConfig]
+}
+
+/**
+ * Configuration for a kernel execution
+ */
+abstract class OpenCLKernelConfig {
+
+  /**
+   * Global work size
+   */
+  val globalWorkSize: List[Long]
+
+  /**
+   * Local work size (optional)
    *
    * Default behavior is to let the OpenCL implementation decide how
    * to break the global work-items into work-groups
    */
-  def computeLocalWorkSize(device:OpenCLDevice, args:Seq[KernelParameter]):Option[List[Long]] = None
+  val localWorkSize: Option[List[Long]] = None
 
   /**
-   * Compute parameters that will be given to the real OpenCL kernel.
+   * Effective kernel parameters
    *
-   * Default behavior is to pass all parameters. This method may be
-   * overriden by inherited classes
+   * These parameters can include shared memory allocation, etc.
    */
-  def computeParameters(device:OpenCLDevice, args:Seq[KernelParameter]): Seq[KernelParameter] =
-    args
-
+  val parameters: Seq[KernelParameter]
 }

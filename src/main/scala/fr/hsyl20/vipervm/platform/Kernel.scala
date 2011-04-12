@@ -20,6 +20,13 @@ package fr.hsyl20.vipervm.platform
  */
 trait Kernel {
 
+  type ParamsType
+
+  /**
+   * Check that parameters are valid and return them in a convenient object
+   */
+  def getParams(args:Seq[KernelParameter]): Option[ParamsType]
+
   /**
    * Test if this kernel can be executed by the given processor
    */

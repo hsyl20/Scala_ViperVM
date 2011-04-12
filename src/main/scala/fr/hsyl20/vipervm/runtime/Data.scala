@@ -14,15 +14,7 @@
 package fr.hsyl20.vipervm.runtime
 
 import fr.hsyl20.vipervm.platform.BufferView
-import fr.hsyl20.vipervm.platform.MemoryNode
 
-import scala.collection.mutable.HashMap
-
-/**
- * A set of buffer views
- */
-class ViewSet[V <: BufferView] extends HashMap[MemoryNode,V]
-
-object ViewSet {
-  def empty[V <: BufferView] = new ViewSet[V]
+class Data[V <: BufferView] {
+  val views = ViewSet.empty[V]
 }

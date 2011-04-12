@@ -30,7 +30,9 @@ class OpenCLMemoryNode(val device:OpenCLDevice) extends MemoryNode {
   def availableMemory: Long = _availableMemory
 
   /**
-   * Allocate a OpenCL buffer
+   * Allocate a OpenCL buffer on this memory node
+   *
+   * @param size Size of the buffer
    */
   override def allocate(size:Long): OpenCLBuffer = {
     val peer = cl.Buffer.create(device.context, size)

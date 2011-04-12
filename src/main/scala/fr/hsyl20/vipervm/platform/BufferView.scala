@@ -14,9 +14,9 @@
 package fr.hsyl20.vipervm.platform
 
 /**
- * A view of a buffer
+ * Describe a set of memory cells (not necessarily contiguous)
  *
- * View can be used for data transfers and as kernel parameters
+ * Views can be used for data transfers and as kernel parameters
  */
 trait BufferView {
   /** Associated buffer */
@@ -26,6 +26,11 @@ trait BufferView {
   val offset:Long
 }
 
+/** Contiguous view */
 case class BufferView1D(buffer:Buffer,offset:Long,size:Long) extends BufferView
+
+/** 2D view with row padding */
 case class BufferView2D(buffer:Buffer,offset:Long,width:Long,height:Long,rowPadding:Long) extends BufferView
+
+/** 2D view with row and plane paddings */
 case class BufferView3D(buffer:Buffer,offset:Long,width:Long,height:Long,depth:Long,rowPadding:Long,planePadding:Long) extends BufferView

@@ -22,10 +22,8 @@ import com.sun.jna.Memory
  */
 class OpenCLBuffer(val size:Long, val peer:cl.Buffer, val memory:OpenCLMemoryNode) extends Buffer {
 
-  private val device = memory.device
-
-  private implicit def buf2buf(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
-
+  /**
+   * Free this buffer from the memory node
+   */
   def free(): Unit = peer.release
-
 }

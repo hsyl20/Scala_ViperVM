@@ -18,7 +18,7 @@ package fr.hsyl20.vipervm.platform
  *
  * Views can be used for data transfers and as kernel parameters
  */
-trait BufferView {
+sealed abstract class BufferView {
   /** Associated buffer */
   val buffer:Buffer
 

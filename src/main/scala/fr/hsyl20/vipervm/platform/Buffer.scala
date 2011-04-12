@@ -14,7 +14,7 @@
 package fr.hsyl20.vipervm.platform
 
 /**
- * A buffer in a memory node
+ * A contiguous set of cells of memory in a memory node
  */
 abstract class Buffer {
   val memory:MemoryNode

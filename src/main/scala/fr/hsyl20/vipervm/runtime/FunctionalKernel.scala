@@ -36,11 +36,6 @@ abstract class FunctionalKernel(kernel:Kernel) {
   def pre(ks:Seq[KernelParameter]):Seq[KernelParameter]
 
   /**
-   * Access modes for kernel parameters
-   */
-  val modes: Seq[AccessMode]
-
-  /**
    * Get function's outputs from kernel parameters
    */
   def post(ks:Seq[KernelParameter]):Seq[KernelParameter]

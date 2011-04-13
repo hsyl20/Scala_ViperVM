@@ -23,19 +23,15 @@ class RuntimeSpec extends FlatSpec with ShouldMatchers {
     val program = new Program(source)
 
     val kernel = new OpenCLKernel(program, "dummy") {
-      case class Params(in: Buffer, out: Buffer, factor:Int, size:Long)
-      type ParamsType = Params
   
-      val extractParameters:PartialFunction[Seq[KernelParameter],Params] = {
-        case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Params(in,out,factor,size)
-      }
-
       val modes = ReadOnly :: ReadOnly :: ReadWrite :: ReadOnly :: Nil
 
-      def configure(device:OpenCLDevice,params:ParamsType):Some[OpenCLKernelConfig] = Some(new OpenCLKernelConfig {
-        val globalWorkSize = List(params.size, 1, 1)
-        val parameters = List(BufferKernelParameter(params.in), BufferKernelParameter(params.out), IntKernelParameter(params.factor))
-      })
+      def configure(device:OpenCLDevice) = {
+        case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Some(new OpenCLKernelConfig {
+          val globalWorkSize = List(size, 1, 1)
+          val parameters = List(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+        })
+      }
     }
 
   }

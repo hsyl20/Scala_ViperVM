@@ -50,11 +50,11 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
   }
 
   /**
-   * Convert kernel parameters to a more convenient representation before giving them to the configure method
+   * Return a kernel configuration if possible
    */
   def rawConfigure(device:OpenCLDevice, params:Seq[KernelParameter]): Option[OpenCLKernelConfig] = {
-    if (extractParameters.isDefinedAt(params)) configure(device,extractParameters(params))
-    else None
+    val config = configure(device)
+    if (config.isDefinedAt(params)) config(params) else None
   }
 
   /**
@@ -71,7 +71,7 @@ abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
   /**
    * Retrieve kernel configuration from parameters. Concrete kernels must implement this
    */
-  def configure(device:OpenCLDevice, params:ParamsType): Option[OpenCLKernelConfig]
+  def configure(device:OpenCLDevice): PartialFunction[Seq[KernelParameter],Option[OpenCLKernelConfig]]
 }
 
 /**

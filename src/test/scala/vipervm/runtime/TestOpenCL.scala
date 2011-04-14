@@ -29,8 +29,15 @@ class RuntimeSpec extends FlatSpec with ShouldMatchers {
       def configure(device:OpenCLDevice) = {
         case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Some(new OpenCLKernelConfig {
           val globalWorkSize = List(size, 1, 1)
-          val parameters = List(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+          val parameters = IndexedSeq(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
         })
+      }
+
+      /**
+       * Retrieve output parameters from OpenCLKernelConfig.parameters
+       */
+      def outputParameters(config:OpenCLKernelConfig): Seq[KernelParameter] = {
+        List(config.parameters(1))
       }
     }
 

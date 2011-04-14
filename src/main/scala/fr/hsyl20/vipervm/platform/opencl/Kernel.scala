@@ -72,6 +72,11 @@ abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
    * Retrieve kernel configuration from parameters. Concrete kernels must implement this
    */
   def configure(device:OpenCLDevice): PartialFunction[Seq[KernelParameter],Option[OpenCLKernelConfig]]
+
+  /**
+   * Retrieve output parameters from OpenCLKernelCOnfig
+   */
+  def outputParameters(config:OpenCLKernelConfig): Seq[KernelParameter]
 }
 
 /**
@@ -97,5 +102,5 @@ abstract class OpenCLKernelConfig {
    *
    * These parameters can include shared memory allocation, etc.
    */
-  val parameters: Seq[KernelParameter]
+  val parameters: IndexedSeq[KernelParameter]
 }

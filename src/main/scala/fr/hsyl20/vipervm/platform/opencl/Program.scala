@@ -38,6 +38,7 @@ class OpenCLProgram(val source:String) {
 
   /**
    * Try to compile the program for the given device.
+   * TODO: program should be compiled once for every possible target
    */
   def compileFor(device:OpenCLDevice): Program = {
     val t = isCompatibleWith(device).getOrElse(true)

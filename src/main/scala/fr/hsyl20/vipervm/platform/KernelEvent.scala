@@ -13,4 +13,4 @@
 
 package fr.hsyl20.vipervm.platform
 
-class KernelEvent(kernel: Kernel, args: Seq[KernelParameter], processor: Processor, event:Event) extends BindedEvent(event)
+class KernelEvent(val kernel:Kernel, val args:Seq[KernelParameter], val processor:Processor, event:Event) extends BindedEvent(event)

@@ -16,4 +16,6 @@ package fr.hsyl20.vipervm.platform.opencl
 import fr.hsyl20.vipervm.platform.Event
 import fr.hsyl20.{opencl => cl}
 
-class OpenCLEvent(val peer:cl.Event) extends Event
+class OpenCLEvent(val peer:cl.Event) extends Event {
+  def syncWait: Unit = peer.syncWait
+}

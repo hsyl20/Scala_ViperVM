@@ -32,6 +32,8 @@ class Event(val commandQueue:CommandQueue, val peer:Pointer) extends Entity with
    def executionStatus = ExecutionStatus(getIntInfo(CL_EVENT_COMMAND_EXECUTION_STATUS))
 
    val profilingInfo = new ProfilingInfo(this)
+
+   def syncWait:Unit = Event.waitFor(this)
 }
 
 

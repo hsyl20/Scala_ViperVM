@@ -42,6 +42,11 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
   "A OpenCL kernel" should "be instantiable" in {
 
+    com.sun.jna.Native.setProtected(true)
+    if (com.sun.jna.Native.isProtected)
+      println("Protected!!")
+    else 
+      println("Not Protected!!")
     val kernel = new DummyKernel
 
     val driver = new OpenCLDriver
@@ -56,6 +61,8 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
     try {
       val event = proc.execute(kernel,params)
+      Thread.sleep(5000)
+      event.syncWait
     }
     catch {
       case e@OpenCLBuildProgramException(err,program,devices) =>

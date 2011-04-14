@@ -18,4 +18,6 @@ package fr.hsyl20.vipervm.platform
  */
 class BindedEvent(event:Event) extends Event {
   event.addCallback(_ => complete)
+
+  def syncWait:Unit = event.syncWait
 }

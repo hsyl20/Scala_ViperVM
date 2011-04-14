@@ -34,6 +34,9 @@ class EventGroup[E <: Event](val events:Seq[E]) extends Event {
       if (rem == 0) complete
     })
   }
+
+  def syncWait:Unit = events.foreach(_.syncWait)
+
 }
 
 object EventGroup {

@@ -23,6 +23,10 @@ class UserEvent extends Event {
   /**
    * Trigger the event
    */
-  def trigger: Unit = complete
+  def trigger:Unit = complete
 
+  def syncWait:Unit = this.synchronized {
+    if (!completed)
+      this.wait
+  }
 }

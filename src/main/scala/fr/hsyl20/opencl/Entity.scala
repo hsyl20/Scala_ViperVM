@@ -90,6 +90,7 @@ trait Retainable extends Entity {
 
    override protected def finalize: Unit = {
       try {
+        scala.Console.err.println("releasing: "+this)
          release
       } catch {
          case e:OpenCLException => ()

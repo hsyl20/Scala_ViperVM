@@ -34,8 +34,7 @@ abstract class Event {
   /**
    * Synchronously wait for an event to complete
    */
-  //TODO
-  //def wait: Unit
+  def syncWait: Unit
 
   /**
    * Add an actor to the list of actors to notify when the event completes.

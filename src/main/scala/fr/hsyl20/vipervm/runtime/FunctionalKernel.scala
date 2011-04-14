@@ -39,6 +39,16 @@ abstract class FunctionalKernel(kernel:Kernel) {
    * Get function's outputs from kernel parameters
    */
   def post(ks:Seq[KernelParameter]):Seq[KernelParameter]
+
+  /**
+   * Create output data
+   */
+  def createOutputData:Seq[Data]
+
+  /**
+   * Create an instance of this kernel
+   */
+  def createInstance(input:Seq[Data]) = new FunctionalKernelInstance(this, input, createOutputData)
 }
 
 

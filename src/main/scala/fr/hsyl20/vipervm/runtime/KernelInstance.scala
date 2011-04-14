@@ -13,10 +13,9 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.platform.BufferView
+import fr.hsyl20.vipervm.platform.Kernel
 
-class Data {
-  type ViewType <: BufferView
-
-  var views = ViewSet.empty[ViewType]
-}
+/**
+ * A kernel with its arguments, ready to be scheduled
+ */
+case class FunctionalKernelInstance(kernel:FunctionalKernel, input:Seq[Data], output:Seq[Data])

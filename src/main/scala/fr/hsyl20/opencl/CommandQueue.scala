@@ -75,7 +75,7 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
    }
 
    def enqueueWriteBuffer(buffer:Buffer, blocking:Boolean, offset:Long, mem:Memory, events:Seq[Event]): Event =
-      enqueueWriteBuffer(buffer, blocking, offset, mem.getSize, mem.getPointer(0), events)
+      enqueueWriteBuffer(buffer, blocking, offset, mem.size, mem.getPointer(0), events)
 
    def enqueueCopyBuffer(src:Buffer, dst:Buffer, srcOffset:Long, dstOffset:Long, size:Long, events:Seq[Event]): Event = {
       val ev = new PointerByReference

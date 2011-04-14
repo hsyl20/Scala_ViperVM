@@ -20,7 +20,7 @@ import com.sun.jna.Pointer
 import com.sun.jna.ptr._
 
 /* OpenCL device */
-class OpenCLDevice(val peer:cl.Device) extends Processor {
+class OpenCLProcessor(val peer:cl.Device) extends Processor {
 
   implicit def ker2ker(k:Kernel):OpenCLKernel =
     k.asInstanceOf[OpenCLKernel]

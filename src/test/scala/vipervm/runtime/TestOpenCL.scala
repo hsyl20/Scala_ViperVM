@@ -29,7 +29,7 @@ private class DummyKernel extends OpenCLKernel {
 
   val modes = ReadOnly :: ReadOnly :: ReadWrite :: ReadOnly :: Nil
 
-  def configure(device:OpenCLDevice, params:Seq[KernelParameter]) = params match {
+  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = params match {
     case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Some(new OpenCLKernelConfig {
       val globalWorkSize = List(size, 1, 1)
       val parameters = IndexedSeq(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
@@ -38,7 +38,7 @@ private class DummyKernel extends OpenCLKernel {
   }
 }
 
-class RuntimeSpec extends FlatSpec with ShouldMatchers {
+class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
   "A OpenCL kernel" should "be instantiable" in {
 

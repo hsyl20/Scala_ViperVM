@@ -16,9 +16,9 @@ package fr.hsyl20.vipervm.platform.opencl
 import fr.hsyl20.vipervm.platform._
 
 /**
- * Network between OpenCL device and host memory
+ * Network between OpenCL device memory and host memory
  */
-class OpenCLNetwork(val device:OpenCLDevice) extends Network {
+class OpenCLNetwork(val device:OpenCLProcessor) extends Network {
 
   private val mem = device.memory
 

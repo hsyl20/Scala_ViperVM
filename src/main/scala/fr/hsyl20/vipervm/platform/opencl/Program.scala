@@ -23,8 +23,8 @@ import fr.hsyl20.opencl._
  */
 class OpenCLProgram(val source:String) {
 
-  private var peers: Map[OpenCLDevice,Program] = Map.empty
-  private var compatibleDevices: Map[OpenCLDevice,Boolean] = Map.empty
+  private var peers: Map[OpenCLProcessor,Program] = Map.empty
+  private var compatibleDevices: Map[OpenCLProcessor,Boolean] = Map.empty
 
   /**
    * Indicate whether the program can be executed on the given device (None if we don't know)
@@ -33,14 +33,14 @@ class OpenCLProgram(val source:String) {
    * to compile it for the device.
    * Inherited classes overload this method to enhance this
    */
-  def isCompatibleWith(device:OpenCLDevice): Option[Boolean] = compatibleDevices.get(device)
+  def isCompatibleWith(device:OpenCLProcessor): Option[Boolean] = compatibleDevices.get(device)
 
 
   /**
    * Try to compile the program for the given device.
    * TODO: program should be compiled once for every possible target
    */
-  def compileFor(device:OpenCLDevice): Program = {
+  def compileFor(device:OpenCLProcessor): Program = {
     val t = isCompatibleWith(device).getOrElse(true)
     if (!t)
       error("This program isn't compatible with the specified device")
@@ -59,7 +59,7 @@ class OpenCLProgram(val source:String) {
   /**
    * Return the compiled program for the device
    */
-  def get(device:OpenCLDevice): Program = peers.get(device) match {
+  def get(device:OpenCLProcessor): Program = peers.get(device) match {
     case Some(p) => p
     case None => compileFor(device)
   }

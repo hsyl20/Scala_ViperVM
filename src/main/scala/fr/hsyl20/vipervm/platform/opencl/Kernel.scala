@@ -29,13 +29,13 @@ abstract class OpenCLKernel extends Kernel {
    * of the responsability of the scheduler to provide backends
    * with appropriate device and buffer types.
    */
-  private implicit def dev2dev(d:Processor): OpenCLDevice =
-    d.asInstanceOf[OpenCLDevice]
+  private implicit def proc2proc(d:Processor): OpenCLProcessor =
+    d.asInstanceOf[OpenCLProcessor]
 
   private implicit def buf2buf(b:Buffer): OpenCLBuffer =
     b.asInstanceOf[OpenCLBuffer]
 
-  private var peers: Map[OpenCLDevice,cl.Kernel] = Map.empty
+  private var peers: Map[OpenCLProcessor,cl.Kernel] = Map.empty
 
   /** Source program */
   val program: OpenCLProgram
@@ -45,7 +45,7 @@ abstract class OpenCLKernel extends Kernel {
   /**
    * Return peer kernel for the given device
    */
-  def get(device:OpenCLDevice): cl.Kernel = peers.get(device) match {
+  def get(device:OpenCLProcessor): cl.Kernel = peers.get(device) match {
     case Some(k) => k
     case None => {
       val k = new cl.Kernel(program.get(device), name)
@@ -57,18 +57,18 @@ abstract class OpenCLKernel extends Kernel {
   /**
    * Indicate if the kernel can be executed on the given processor.
    * 
-   * Default behavior is to valid any OpenCLDevice. Kernels should overwrite
+   * Default behavior is to valid any OpenCLProcessor. Kernels should overwrite
    * this to set more precise constraints (double support, etc.)
    */
   def canExecuteOn(proc:Processor): Boolean = proc match {
-    case _:OpenCLDevice => true
+    case _:OpenCLProcessor => true
     case _ => false
   }
 
   /**
    * Retrieve kernel configuration from parameters. Concrete kernels must implement this
    */
-  def configure(device:OpenCLDevice, params:Seq[KernelParameter]): Option[OpenCLKernelConfig]
+  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]): Option[OpenCLKernelConfig]
 }
 
 /**

@@ -19,7 +19,7 @@ import fr.hsyl20.vipervm.platform.{MemoryNode,Buffer}
 import fr.hsyl20.{opencl => cl}
 
 /* OpenCL memory node */
-class OpenCLMemoryNode(val device:OpenCLDevice) extends MemoryNode {
+class OpenCLMemoryNode(val device:OpenCLProcessor) extends MemoryNode {
 
   type BufferType = OpenCLBuffer
 

@@ -32,13 +32,6 @@ class RuntimeSpec extends FlatSpec with ShouldMatchers {
           val parameters = IndexedSeq(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
         })
       }
-
-      /**
-       * Retrieve output parameters from OpenCLKernelConfig.parameters
-       */
-      def outputParameters(config:OpenCLKernelConfig): Seq[KernelParameter] = {
-        List(config.parameters(1))
-      }
     }
 
   }

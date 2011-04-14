@@ -22,7 +22,7 @@ import fr.hsyl20.{opencl => cl}
 /**
  * An OpenCL kernel
  */
-abstract class OpenCLKernel(program:Program, name:String) extends Kernel {
+abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
 
   /* We use implicit conversions to cast from generic types
    * to backend types. We can do this because it is the

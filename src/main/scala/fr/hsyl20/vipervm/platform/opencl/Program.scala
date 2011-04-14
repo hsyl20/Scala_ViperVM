@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.platform.opencl
 
-import fr.hsyl20.{opencl => cl}
+import fr.hsyl20.opencl._
 
 
 /**
@@ -21,9 +21,9 @@ import fr.hsyl20.{opencl => cl}
  * 
  * It stores a list of built programs for different devices
  */
-class Program(val source:String) {
+class OpenCLProgram(val source:String) {
 
-  private var peers: Map[OpenCLDevice,cl.Program] = Map.empty
+  private var peers: Map[OpenCLDevice,Program] = Map.empty
   private var compatibleDevices: Map[OpenCLDevice,Boolean] = Map.empty
 
   /**
@@ -39,13 +39,13 @@ class Program(val source:String) {
   /**
    * Try to compile the program for the given device.
    */
-  def compileFor(device:OpenCLDevice): cl.Program = {
+  def compileFor(device:OpenCLDevice): Program = {
     val t = isCompatibleWith(device).getOrElse(true)
     if (!t)
       error("This program isn't compatible with the specified device")
 
     try {
-      val p = new cl.Program(device.context, source)
+      val p = new Program(device.context, source)
       p.build(List(device.peer))
       peers += (device -> p)
       compatibleDevices += (device -> true)
@@ -58,7 +58,7 @@ class Program(val source:String) {
   /**
    * Return the compiled program for the device
    */
-  def get(device:OpenCLDevice): cl.Program = peers.get(device) match {
+  def get(device:OpenCLDevice): Program = peers.get(device) match {
     case Some(p) => p
     case None => compileFor(device)
   }

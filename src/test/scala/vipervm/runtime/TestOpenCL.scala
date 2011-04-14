@@ -20,7 +20,7 @@ import fr.hsyl20.vipervm.platform._
 class RuntimeSpec extends FlatSpec with ShouldMatchers {
 
   "A OpenCL kernel" should "be instantiable" in {
-    val program = new Program(source)
+    val program = new OpenCLProgram(source)
 
     val kernel = new OpenCLKernel(program, "dummy") {
   

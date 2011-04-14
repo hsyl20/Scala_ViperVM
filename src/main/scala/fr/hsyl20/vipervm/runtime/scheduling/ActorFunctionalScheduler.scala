@@ -33,6 +33,9 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
     loop {
       react {
         case InstanceEnqueued(instance) => onInstanceEnqueued(instance)
+        case InputDataReady(instance) => onInputDataReady(instance)
+        case DataConfigReady(instance,configs) => onDataConfigReady(instance,configs)
+        case InstanceExecuted(instance,config) => onInstanceExecuted(instance,config)
       }
     }
   }
@@ -41,9 +44,15 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
    * Called when an instance has been enqueued
    */
   def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit
+  def onInputDataReady(instance:FunctionalKernelInstance): Unit
+  def onDataConfigReady(instance:FunctionalKernelInstance,configs:Seq[DataConfigInstance]): Unit
+  def onInstanceExecuted(instance:FunctionalKernelInstance,config:DataConfigInstance): Unit
 
   /** Actor messages */
   private case class InstanceEnqueued(instance:FunctionalKernelInstance)
+  private case class InputDataReady(instance:FunctionalKernelInstance)
+  private case class DataConfigReady(instance:FunctionalKernelInstance, configs:Seq[DataConfigInstance])
+  private case class InstanceExecuted(instance:FunctionalKernelInstance, config:DataConfigInstance)
 }
 
 

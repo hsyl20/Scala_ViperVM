@@ -61,7 +61,6 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
     try {
       val event = proc.execute(kernel,params)
-      Thread.sleep(5000)
       event.syncWait
     }
     catch {

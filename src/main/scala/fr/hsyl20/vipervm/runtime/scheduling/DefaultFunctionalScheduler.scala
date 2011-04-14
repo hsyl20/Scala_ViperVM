@@ -13,33 +13,13 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.runtime.{FunctionalKernel,Data,FunctionalKernelInstance}
+import fr.hsyl20.vipervm.runtime.FunctionalKernelInstance
 
 /**
- * Schedule functional kernels
+ * Default implementation for functional scheduler
  */
-trait FunctionalScheduler {
+class DefaultFunctionalScheduler extends ActorFunctionalScheduler {
 
-  /**
-   * Schedule the given functional kernel
-   *
-   * @param f The kernel to schedule
-   * @param input Kernel inputs
-   * @return kernel outputs
-   */
-  def schedule(f:FunctionalKernel, input:Seq[Data]):Seq[Data] = {
-    /* Create kernel instance */
-    val instance = f.createInstance(input)
-
-    /* Put instance into run queue */
-    enqueue(instance)
-
-    /* Return output data */
-    instance.output
+  def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit = {
   }
-
-  /**
-   * Enqueue an instance to be executed
-   */
-  protected def enqueue(instance:FunctionalKernelInstance): Unit
 }

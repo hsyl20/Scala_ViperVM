@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.platform.Kernel
+import fr.hsyl20.vipervm.platform.{Kernel,Processor}
 
 /**
  * A kernel set is a set of kernels accomplishing the same task and
@@ -22,4 +22,13 @@ import fr.hsyl20.vipervm.platform.Kernel
  * Added kernels must support kernel set prototype (i.e. kernel parameters)
  * @param prototype Prototype for every kernel in this set
  */
-abstract class KernelSet(kernels:Seq[Kernel]) extends MetaKernel
+class KernelSet(kernels:Seq[Kernel]) extends MetaKernel {
+
+  //TODO: check that prototypes of all kernels are the same
+
+  /**
+   * Return kernels that can be executed on the processor
+   */
+  def getKernelsFor(proc:Processor): Seq[Kernel] = kernels.filter(_.canExecuteOn(proc))
+
+}

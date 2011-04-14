@@ -20,11 +20,11 @@ import fr.hsyl20.vipervm.platform.{Kernel,Processor}
  *
  * Kernels must all take the same parameters as input (same prototype)
  */
-trait MetaKernel extends Kernel {
+trait MetaKernel {
 
   /**
    * Get the kernel for the given processor
    */
-  def getKernelFor(proc:Processor): Option[Kernel]
+  def getKernelsFor(proc:Processor): Seq[Kernel]
 
 }

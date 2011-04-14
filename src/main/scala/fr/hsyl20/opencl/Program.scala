@@ -35,7 +35,8 @@ class Program(val context:Context, val source:String) extends Entity with Retain
 
    def build(devices:Seq[Device], options:String = ""): Unit = {
       val err = clBuildProgram(peer, devices.size, devices.map(_.peer).toArray, options, NULL,NULL)
-      checkError(err)
+      if (err != OpenCLException.CL_SUCCESS)
+        throw new OpenCLBuildProgramException(err, this, devices)
       //TODO: add built devices to a list
    }
 

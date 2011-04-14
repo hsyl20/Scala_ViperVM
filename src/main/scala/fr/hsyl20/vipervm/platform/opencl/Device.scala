@@ -53,7 +53,7 @@ class OpenCLDevice(val peer:cl.Device) extends Processor {
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
 
     /* Check params */
-    val config = kernel.rawConfigure(this, args) match {
+    val config = kernel.configure(this, args) match {
       case None => throw new Exception("Invalid kernel parameters")
       case Some(p) => p
     }
@@ -74,7 +74,7 @@ class OpenCLDevice(val peer:cl.Device) extends Processor {
       }
 
       /* Enqueue kernel */
-      val e = commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, null)
+      val e = commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, Nil)
 
       new KernelEvent(kernel, args, this, new OpenCLEvent(e))
     }

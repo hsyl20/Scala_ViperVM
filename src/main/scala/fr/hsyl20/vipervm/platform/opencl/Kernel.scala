@@ -22,7 +22,7 @@ import fr.hsyl20.{opencl => cl}
 /**
  * An OpenCL kernel
  */
-abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
+abstract class OpenCLKernel extends Kernel {
 
   /* We use implicit conversions to cast from generic types
    * to backend types. We can do this because it is the
@@ -37,6 +37,11 @@ abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
 
   private var peers: Map[OpenCLDevice,cl.Kernel] = Map.empty
 
+  /** Source program */
+  val program: OpenCLProgram
+  /** Kernel name in the program */
+  val name:String
+
   /**
    * Return peer kernel for the given device
    */
@@ -47,14 +52,6 @@ abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
       peers += (device -> k)
       k
     }
-  }
-
-  /**
-   * Return a kernel configuration if possible
-   */
-  def rawConfigure(device:OpenCLDevice, params:Seq[KernelParameter]): Option[OpenCLKernelConfig] = {
-    val config = configure(device)
-    if (config.isDefinedAt(params)) config(params) else None
   }
 
   /**
@@ -71,7 +68,7 @@ abstract class OpenCLKernel(program:OpenCLProgram, name:String) extends Kernel {
   /**
    * Retrieve kernel configuration from parameters. Concrete kernels must implement this
    */
-  def configure(device:OpenCLDevice): PartialFunction[Seq[KernelParameter],Option[OpenCLKernelConfig]]
+  def configure(device:OpenCLDevice, params:Seq[KernelParameter]): Option[OpenCLKernelConfig]
 }
 
 /**

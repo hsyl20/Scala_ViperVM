@@ -14,7 +14,11 @@
 package fr.hsyl20.opencl
 
 
-case class OpenCLException(val code: Int) extends RuntimeException(OpenCLException.errorMsg(code))
+class OpenCLException(val code: Int) extends RuntimeException(OpenCLException.errorMsg(code))
+
+case class OpenCLBuildProgramException(override val code:Int, program:Program, devices:Seq[Device]) extends OpenCLException(code) {
+  def buildInfo(device:Device) = new BuildInfo(program, device)
+}
 
 object OpenCLException {
    val CL_SUCCESS                               =   0
@@ -117,4 +121,7 @@ object OpenCLException {
       case CL_INVALID_GLOBAL_WORK_SIZE => "Invalid global work size"
       case _ => "Unknown error"
    }
+
+   def unapply(e:OpenCLException):Option[Int] = Some(e.code)
 }
+

@@ -105,7 +105,8 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
          case None => null
          case Some(a) => a.map(new NativeSize(_)).toArray
       }
-      checkError(clEnqueueNDRangeKernel(peer, kernel.peer, gws.size, null, gws, lws, events.size, eventWaitList(events), ev.getPointer))
+      val err = clEnqueueNDRangeKernel(peer, kernel.peer, gws.size, null, gws, lws, events.size, eventWaitList(events), ev.getPointer)
+      checkError(err)
       new Event(this, ev.getValue)
    }
 

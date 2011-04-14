@@ -27,7 +27,7 @@ object OpenCL {
 
    def checkError(err:Int): Unit = {
       if (err != OpenCLException.CL_SUCCESS)
-         throw OpenCLException(err)
+         throw new OpenCLException(err)
    }
 
    /** List available OpenCL platforms */

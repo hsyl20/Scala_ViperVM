@@ -24,7 +24,7 @@ abstract class Event {
 
   private var actors:List[Actor] = Nil
   private var callbacks:List[this.type=>Unit] = Nil
-  private var completed:Boolean = false
+  protected var completed:Boolean = false
 
   /**
    * Return true if this event completed
@@ -41,7 +41,7 @@ abstract class Event {
    * Add an actor to the list of actors to notify when the event completes.
    * A message is sent immediately if event is already completed
    */
-  def notify(actor:Actor): Unit = actors ::= actor
+  def addActor(actor:Actor): Unit = actors ::= actor
 
   /**
    * Add a callback method that will be called when the event completes
@@ -54,8 +54,12 @@ abstract class Event {
   /**
    * Implementations should call this method when the event completes
    */
-  protected def complete: Unit = {
-    completed = true
+  def complete: Unit = {
+
+    this.synchronized {
+      completed = true
+      this.notifyAll
+    }
 
     for (a <- actors)
       a ! EventComplete(this)

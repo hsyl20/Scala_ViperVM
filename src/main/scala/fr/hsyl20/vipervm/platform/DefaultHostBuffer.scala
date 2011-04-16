@@ -22,7 +22,7 @@ class DefaultHostBuffer(val peer:Memory, val memory:HostMemoryNode) extends Host
 
   def this(size:Long,memory:HostMemoryNode) = this(new Memory(size), memory)
 
-  val size = peer.getSize
+  val size = peer.size
 
   /**
    * Free the buffer in memory node

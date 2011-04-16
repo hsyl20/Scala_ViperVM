@@ -66,7 +66,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
 
       /* Set parameters */
       for ((a,idx) <- config.parameters.zipWithIndex) a match {
-        case BufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, b.peer.peer)
+        case BufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, new PointerByReference(b.peer.peer).getPointer)
         case IntKernelParameter(v) => k.setArg(idx, 4, new IntByReference(v).getPointer)
         case LongKernelParameter(v) => k.setArg(idx, 8, new LongByReference(v).getPointer)
         case DoubleKernelParameter(v) => k.setArg(idx, 8, new DoubleByReference(v).getPointer)

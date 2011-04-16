@@ -22,6 +22,19 @@ import scala.collection.immutable._
 object OpenCL {
    import Wrapper._
 
+  /* Enable protected mode */
+  com.sun.jna.Native.setProtected(true)
+  if (com.sun.jna.Native.isProtected)
+    println("JNA protected mode: enabled")
+  else 
+    println("JNA protected mode: disabled")
+
+  /* Check for libjsig.so */
+  val checkjsig = Option(System.getenv().get("LD_PRELOAD")).map(_.contains("libjsig")).getOrElse(false)
+  if (!checkjsig)
+    println("If you encounter JVM crash, use the following command:\n  export LD_PRELOAD=/path/to/your/jvm/lib/yourarch/libjsig.so")
+
+
    val CL_FALSE = 0
    val CL_TRUE  = 1
 

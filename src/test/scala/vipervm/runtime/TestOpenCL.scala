@@ -27,7 +27,7 @@ private class DummyKernel extends OpenCLKernel {
   val program = new OpenCLProgram(source)
   val name = "dummy"
 
-  val modes = ReadOnly :: ReadOnly :: ReadWrite :: ReadOnly :: Nil
+  val param_modes:Array[AccessMode] = Array(ReadOnly, ReadOnly, ReadWrite, ReadOnly)
 
   def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = params match {
     case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Some(new OpenCLKernelConfig {

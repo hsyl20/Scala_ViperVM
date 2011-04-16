@@ -28,8 +28,7 @@ trait Kernel {
   /**
    * Access modes for kernel parameters
    */
-  val modes: Seq[AccessMode]
-
+  val param_modes: Array[AccessMode]
 }
 
 sealed abstract class AccessMode

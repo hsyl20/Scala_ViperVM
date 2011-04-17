@@ -100,7 +100,7 @@ object Event {
       checkError(clWaitForEvents(events.size, events.map(_.peer).toArray))
    }
 
-   def waitFor(event:Event): Unit = waitFor(List(event))
+   def waitFor(event:Event): Unit = waitFor(IndexedSeq(event))
 }
 
 class ProfilingInfo(event:Event) extends Info {

@@ -79,5 +79,10 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
     new KernelEvent(kernel, args, this, new OpenCLEvent(e))
   }
 
-  override def toString = "%s - %s".format(peer.vendor, peer.name)
+  override def toString = "OpenCL: %s - %s".format(peer.vendor, peer.name)
+
+  override def equals(a:Any):Boolean = a match {
+    case a:OpenCLProcessor if a.peer == peer => true
+    case _ => false
+  }
 }

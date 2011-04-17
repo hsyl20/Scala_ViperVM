@@ -48,7 +48,16 @@ abstract class Event {
    * Blocking or time-consuming callbacks should be avoided. Use actors
    * and notify method instead
    */
-  def addCallback(f:(this.type) => Unit): Unit = callbacks ::= f
+  def addCallback(f:(this.type) => Unit): Unit = {
+    val perform = this.synchronized {
+      if (!completed)
+        callbacks ::= f
+      completed
+    }
+    
+    if (perform)
+      f(this)
+  }
 
   /**
    * Implementations should call this method when the event completes

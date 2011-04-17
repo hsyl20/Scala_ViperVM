@@ -58,7 +58,7 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
     }
 
     /* Select a memory in which the processor can compute */
-    val mem = proc.memories.head
+    val mem = proc.memory
 
     val n:Long = 100
     val factor = 10

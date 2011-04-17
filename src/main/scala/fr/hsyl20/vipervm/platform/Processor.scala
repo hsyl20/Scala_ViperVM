@@ -22,12 +22,12 @@ abstract class Processor {
   /**
    * Memories in which the processor can work
    */
-  def memories:Seq[MemoryNodeType]
+  val memories:Seq[MemoryNodeType]
 
   /**
    * Default memory for this processor 
    */
-  def memory:MemoryNodeType = memories.head
+  lazy val memory:MemoryNodeType = memories.head
 
   /**
    * Execute the kernel with the specified parameters

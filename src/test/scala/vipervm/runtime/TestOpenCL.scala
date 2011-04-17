@@ -15,6 +15,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import fr.hsyl20.vipervm.platform.opencl._
+import fr.hsyl20.vipervm.platform.host._
 import fr.hsyl20.vipervm.platform._
 import fr.hsyl20.opencl.OpenCLBuildProgramException
 
@@ -44,25 +45,30 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
     val kernel = new DummyKernel
 
-    val driver = new OpenCLDriver
-    val proc = driver.processors.head
-    val mem = proc.memory
+    val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
 
-    val n:Long = 100
-    val factor = 10
-    val in = mem.allocate(n * 4)
-    val out = mem.allocate(n * 4)
-    val params = Seq(LongKernelParameter(n), BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+    platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption match {
+      case None => println("No OpenCL device available")
+      case Some(proc) => {
 
-    try {
-      val event = proc.execute(kernel,params)
-      event.syncWait
+        val mem = proc.memories.head
+
+        val n:Long = 100
+        val factor = 10
+        val in = mem.allocate(n * 4)
+        val out = mem.allocate(n * 4)
+        val params = Seq(LongKernelParameter(n), BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+
+        try {
+          val event = proc.execute(kernel,params)
+          event.syncWait
+        }
+        catch {
+          case e@OpenCLBuildProgramException(err,program,devices) =>
+            devices.foreach(dev => println(e.buildInfo(dev).log))
+        }
+      }
     }
-    catch {
-      case e@OpenCLBuildProgramException(err,program,devices) =>
-        println(e.buildInfo(proc.peer).log)
-    }
-
   }
 
 }

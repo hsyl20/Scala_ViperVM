@@ -11,8 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.platform
+package fr.hsyl20.vipervm.platform.host
 
+import fr.hsyl20.vipervm.platform.{HostBuffer,HostMemoryNode}
 import com.sun.jna.Memory
 
 /**

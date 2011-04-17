@@ -11,21 +11,18 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
-
-import fr.hsyl20.vipervm.platform.Platform
+package fr.hsyl20.vipervm.platform
 
 /**
- * A runtime system
+ * Driver for the host
  *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
+ * Host uses a special driver because other drivers
+ * need to know how to transfer data between an host buffer
+ * and one of their buffers
  */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+abstract class HostDriver extends Driver {
 
+  /** Host memory nodes */
+  def memories:Seq[HostMemoryNode]
 
 }

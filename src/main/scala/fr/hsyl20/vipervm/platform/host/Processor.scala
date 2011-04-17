@@ -11,24 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.platform
+package fr.hsyl20.vipervm.platform.host
 
-import com.sun.jna.Memory
+import fr.hsyl20.vipervm.platform._
 
-/**
- * Default host buffer implementation
- */
-class DefaultHostBuffer(val peer:Memory, val memory:HostMemoryNode) extends HostBuffer {
+class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends Processor {
+  val memories = Seq(mem)
 
-  def this(size:Long,memory:HostMemoryNode) = this(new Memory(size), memory)
-
-  val size = peer.size
-
-  /**
-   * Free the buffer in memory node
-   *
-   * Current implementation free host buffer on GC.
-   * TODO: force instant call of free
-   */
-  def free():Unit = {}
+  def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
+    throw new Exception("Unable to execute kernels (not implemented)")
+  }
 }

@@ -11,21 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.runtime
+package fr.hsyl20.vipervm.platform.host
 
-import fr.hsyl20.vipervm.platform.Platform
+import fr.hsyl20.vipervm.platform._
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- *  - a data scheduler
- */
-abstract class Runtime {
-  val platform:Platform
-  //val taskScheduler:Scheduler
+class DefaultHostDriver extends HostDriver {
+  private val mem = new DefaultHostMemoryNode
+  private val proc = new DefaultHostProcessor(mem)
 
+  def processors:Seq[Processor] = Seq(proc)
 
+  def networks:Seq[Network] = Nil
+
+  def memories:Seq[HostMemoryNode] = Seq(mem)
 }

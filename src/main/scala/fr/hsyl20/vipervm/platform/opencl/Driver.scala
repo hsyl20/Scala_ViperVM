@@ -20,10 +20,9 @@ import fr.hsyl20.{opencl => cl}
  */
 class OpenCLDriver extends Driver {
    
-  val processors:Seq[OpenCLProcessor] = for (p <- cl.OpenCL.platforms ; peer <- p.devices())
-    yield new OpenCLProcessor(peer)
+  val processors:Seq[OpenCLProcessor] = cl.OpenCL.platforms.flatMap(_.devices()).map(new OpenCLProcessor(_))
 
-  val networks:Seq[OpenCLNetwork] = for (p <- processors) yield new OpenCLNetwork(p)
+  val networks:Seq[OpenCLNetwork] = processors.map(new OpenCLNetwork(_))
 
-  val memories:Seq[OpenCLMemoryNode] = for (p <- processors) yield new OpenCLMemoryNode(p)
+  val memories:Seq[OpenCLMemoryNode] = processors.map(new OpenCLMemoryNode(_))
 }

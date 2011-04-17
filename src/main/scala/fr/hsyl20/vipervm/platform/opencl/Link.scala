@@ -15,12 +15,12 @@ package fr.hsyl20.vipervm.platform.opencl
 
 import fr.hsyl20.vipervm.platform.{HostMemoryNode,Link}
 
-case class OpenCLSourceLink(
+case class OpenCLReadLink(
   network:OpenCLNetwork,
   source:OpenCLMemoryNode,
   target:HostMemoryNode) extends Link
 
-case class OpenCLTargetLink(
+case class OpenCLWriteLink(
   network:OpenCLNetwork,
   source:HostMemoryNode,
   target:OpenCLMemoryNode) extends Link

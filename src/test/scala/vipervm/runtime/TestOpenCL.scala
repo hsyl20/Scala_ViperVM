@@ -19,10 +19,13 @@ import fr.hsyl20.vipervm.platform.host._
 import fr.hsyl20.vipervm.platform._
 import fr.hsyl20.opencl.OpenCLBuildProgramException
 
+import java.util.Random
+
 private class DummyKernel extends OpenCLKernel {
   val source = """__kernel void dummy(__global float * in, __global float * out, int a) {
                     int i = get_global_id(0);
-                    out[i] = in[i] * a;
+                    out[i] = in[i] * (float)a;
+                    out[i] = 1024.0;
                   }"""
 
   val program = new OpenCLProgram(source)
@@ -47,8 +50,9 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
     /* Initialize a platform using OpenCL */
     val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
 
-    /* Create a dummy kernel */
-    val kernel = new DummyKernel
+    /* Kernel parameters */
+    val n = 100
+    val factor = 10
 
     /* Select an OpenCL processor */
     val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
@@ -60,20 +64,82 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
     /* Select a memory in which the processor can compute */
     val mem = proc.memory
 
-    val n:Long = 100
-    val factor = 10
-    val in = mem.allocate(n * 4)
-    val out = mem.allocate(n * 4)
-    val params = Seq(LongKernelParameter(n), BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+    /* Allocate buffer in device memory */
+    val inBuf = mem.allocate(n * 4)
+    val outBuf = mem.allocate(n * 4)
 
-    try {
-      val event = proc.execute(kernel,params)
-      event.syncWait
+    /* Allocate and initialize host buffer */
+    val hostBuf = platform.hostMemory.allocate(n * 4)
+    val hostOutBuf = platform.hostMemory.allocate(n * 4)
+
+    val rand = new Random
+    val fb = hostBuf.byteBuffer.asFloatBuffer; 
+    for (i <- 0 until n) {
+      fb.put(i, rand.nextFloat)
+    }
+
+    /* Get write link */
+    val writeLink = platform.linkBetween(hostBuf, inBuf) match {
+      case None => throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
+      case Some(l) => l
+    }
+
+    /* Create views */
+    val hostView = BufferView1D(hostBuf, 0, n * 4L)
+    val hostOutView = BufferView1D(hostOutBuf, 0, n * 4L)
+    val inView = BufferView1D(inBuf, 0, n * 4L)
+    val outView = BufferView1D(outBuf, 0, n * 4L)
+
+    /* Copy data from host memory to device memory */
+    val writeEvent = writeLink.copy(hostView,inView)
+    writeEvent.syncWait
+
+    /* Create a dummy kernel */
+    val kernel = new DummyKernel
+
+    /* Kernel parameters */
+    val params = Seq(LongKernelParameter(n), BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor))
+
+    /* Execute kernel */
+    val event = try {
+      proc.execute(kernel,params)
     }
     catch {
-      case e@OpenCLBuildProgramException(err,program,devices) =>
+      case e@OpenCLBuildProgramException(err,program,devices) => {
         devices.foreach(dev => println(e.buildInfo(dev).log))
+        throw e
+      }
+      case e => throw e
     }
+
+    /* Wait for kernel completion */
+    event.syncWait
+
+    /* Get read link */
+    val readLink = platform.linkBetween(outBuf, hostOutBuf) match {
+      case None => throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
+      case Some(l) => l
+    }
+
+    /* Copy data from device memory to host memory */
+    val readEvent = readLink.copy(outView,hostOutView)
+    readEvent.syncWait
+
+    /* Check data */
+    val fbout = hostOutBuf.byteBuffer.asFloatBuffer; 
+
+    var check = true
+    for (i <- 0 until n) {
+      val a = factor * fb.get(i)
+      val b = fbout.get(i)
+      if (a - b > 0.001) {
+        println("Invalid value computed: %f vs %f".format(a,b))
+        check = false
+      }
+    }
+
+    if (!check)
+      throw new Exception("Test failure: invalid values")
   }
 
 }

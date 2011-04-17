@@ -25,9 +25,7 @@ class OpenCLMemoryNode(val device:OpenCLProcessor) extends MemoryNode {
 
   implicit def buffer2buffer(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
 
-  private var _availableMemory: Long = device.peer.globalMemSize
-
-  def availableMemory: Long = _availableMemory
+  def availableMemory: Long = device.peer.globalMemSize - buffers.map(_.size).sum
 
   /**
    * Allocate a OpenCL buffer on this memory node
@@ -36,10 +34,14 @@ class OpenCLMemoryNode(val device:OpenCLProcessor) extends MemoryNode {
    */
   override def allocate(size:Long): OpenCLBuffer = {
     val peer = cl.Buffer.create(device.context, size)
-    _availableMemory -= size
     val b = new OpenCLBuffer(size, peer, this)
     buffers += b
     b
+  }
+
+  override def equals(a:Any):Boolean = a match {
+    case a:OpenCLMemoryNode if a.device == device => true
+    case _ => false
   }
 }
 

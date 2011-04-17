@@ -17,10 +17,17 @@ package fr.hsyl20.vipervm.platform
  * A processor can execute programs to transform data that are stored in some memories
  */
 abstract class Processor {
+  type MemoryNodeType <: MemoryNode
+
   /**
    * Memories in which the processor can work
    */
-  def memories:Seq[MemoryNode]
+  def memories:Seq[MemoryNodeType]
+
+  /**
+   * Default memory for this processor 
+   */
+  def memory:MemoryNodeType = memories.head
 
   /**
    * Execute the kernel with the specified parameters

@@ -22,6 +22,8 @@ import com.sun.jna.ptr._
 /* OpenCL device */
 class OpenCLProcessor(val peer:cl.Device) extends Processor {
 
+  type MemoryNodeType = OpenCLMemoryNode
+
   implicit def ker2ker(k:Kernel):OpenCLKernel =
     k.asInstanceOf[OpenCLKernel]
 
@@ -42,10 +44,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
     new cl.CommandQueue(context, peer, outOfOrder=ooo, profiling=prof)
   }
 
-  /** Device memory */
-  val memory = new OpenCLMemoryNode(this)
-
-  val memories = Seq(memory)
+  val memories = Seq(new OpenCLMemoryNode(this))
 
   /**
    * Execute the kernel with the specified parameters

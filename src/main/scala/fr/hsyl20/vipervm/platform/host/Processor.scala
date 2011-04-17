@@ -15,7 +15,10 @@ package fr.hsyl20.vipervm.platform.host
 
 import fr.hsyl20.vipervm.platform._
 
-class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends Processor {
+class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends HostProcessor {
+
+  type MemoryNodeType = DefaultHostMemoryNode
+
   val memories = Seq(mem)
 
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {

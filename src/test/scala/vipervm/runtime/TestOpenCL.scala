@@ -43,31 +43,36 @@ class OpenCLKernelSpec extends FlatSpec with ShouldMatchers {
 
   "A OpenCL kernel" should "be instantiable" in {
 
-    val kernel = new DummyKernel
 
+    /* Initialize a platform using OpenCL */
     val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
 
-    platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption match {
-      case None => println("No OpenCL device available")
-      case Some(proc) => {
+    /* Create a dummy kernel */
+    val kernel = new DummyKernel
 
-        val mem = proc.memories.head
+    /* Select an OpenCL processor */
+    val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
+    val proc = device match {
+      case None => throw new Exception("No OpenCL device available")
+      case Some(proc) => proc
+    }
 
-        val n:Long = 100
-        val factor = 10
-        val in = mem.allocate(n * 4)
-        val out = mem.allocate(n * 4)
-        val params = Seq(LongKernelParameter(n), BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+    /* Select a memory in which the processor can compute */
+    val mem = proc.memories.head
 
-        try {
-          val event = proc.execute(kernel,params)
-          event.syncWait
-        }
-        catch {
-          case e@OpenCLBuildProgramException(err,program,devices) =>
-            devices.foreach(dev => println(e.buildInfo(dev).log))
-        }
-      }
+    val n:Long = 100
+    val factor = 10
+    val in = mem.allocate(n * 4)
+    val out = mem.allocate(n * 4)
+    val params = Seq(LongKernelParameter(n), BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+
+    try {
+      val event = proc.execute(kernel,params)
+      event.syncWait
+    }
+    catch {
+      case e@OpenCLBuildProgramException(err,program,devices) =>
+        devices.foreach(dev => println(e.buildInfo(dev).log))
     }
   }
 

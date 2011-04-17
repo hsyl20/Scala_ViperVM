@@ -25,4 +25,8 @@ abstract class Link {
 
   /** Target of the link */
   val target:MemoryNode
+
+  /** Start a copy using this link */
+  def copy(source:BufferView, target:BufferView):DataTransfer[BufferView] =
+    network.memoryCopier.copy(this, source, target)
 }

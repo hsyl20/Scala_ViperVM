@@ -15,6 +15,7 @@ package fr.hsyl20.vipervm.apps
 
 import fr.hsyl20.vipervm.platform.Platform
 import fr.hsyl20.vipervm.platform.opencl.OpenCLDriver
+import fr.hsyl20.vipervm.platform.host.DefaultHostDriver
 
 /**
  * Application showing informations about the platform (available devices, etc.)
@@ -22,7 +23,7 @@ import fr.hsyl20.vipervm.platform.opencl.OpenCLDriver
 object Info {
 
   def main(args:Array[String]): Unit = {
-    val p = new Platform(new OpenCLDriver)
+    val p = new Platform(new DefaultHostDriver, new OpenCLDriver)
 
     println("Processors:")
     p.processors.foreach(a => println(" - %s".format(a)))

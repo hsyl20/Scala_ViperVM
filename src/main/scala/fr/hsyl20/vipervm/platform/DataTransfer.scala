@@ -21,4 +21,4 @@ package fr.hsyl20.vipervm.platform
  * @param target  Target buffer view
  * @param event   Event indicating data transfer completion
  */
-class DataTransfer[+V <: BufferView](link:Link,source:V,target:V,event:Event)
+class DataTransfer[+V <: BufferView](link:Link,source:V,target:V,event:Event) extends BindedEvent(event)

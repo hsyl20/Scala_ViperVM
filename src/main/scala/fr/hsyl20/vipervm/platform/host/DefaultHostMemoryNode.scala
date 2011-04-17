@@ -34,7 +34,11 @@ class DefaultHostMemoryNode extends HostMemoryNode {
    *
    * @param size Size of the buffer (in bytes)
    */
-  def allocate(size:Long) = new DefaultHostBuffer(size,this)
+  def allocate(size:Long) = {
+    val b = new DefaultHostBuffer(size,this)
+    buffers += b
+    b
+  }
 
   def availableMemory:Long = {
     val bean = java.lang.management.ManagementFactory.getOperatingSystemMXBean

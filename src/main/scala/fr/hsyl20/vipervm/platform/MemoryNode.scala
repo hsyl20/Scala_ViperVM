@@ -35,6 +35,11 @@ abstract class MemoryNode {
   def allocate(size:Long): BufferType
 
   /**
+   * Free a buffer
+   */
+  def free(buffer:BufferType): Unit
+
+  /**
    * Returns the buffer with its real type if this memory node contains it.
    * Otherwise, an exception is thrown.
    */

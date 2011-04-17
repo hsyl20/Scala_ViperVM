@@ -20,10 +20,4 @@ import com.sun.jna.Memory
 /**
  * OpenCL buffer
  */
-class OpenCLBuffer(val size:Long, val peer:cl.Buffer, val memory:OpenCLMemoryNode) extends Buffer {
-
-  /**
-   * Free this buffer from the memory node
-   */
-  def free(): Unit = peer.release
-}
+class OpenCLBuffer(val size:Long, val peer:cl.Buffer, val memory:OpenCLMemoryNode) extends Buffer

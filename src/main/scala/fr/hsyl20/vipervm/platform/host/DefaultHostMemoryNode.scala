@@ -34,10 +34,14 @@ class DefaultHostMemoryNode extends HostMemoryNode {
    *
    * @param size Size of the buffer (in bytes)
    */
-  def allocate(size:Long) = {
+  def allocate(size:Long): DefaultHostBuffer = {
     val b = new DefaultHostBuffer(size,this)
     buffers += b
     b
+  }
+
+  def free(buffer:DefaultHostBuffer): Unit = {
+    //TODO: free memory effectively (call real C free)
   }
 
   def availableMemory:Long = {

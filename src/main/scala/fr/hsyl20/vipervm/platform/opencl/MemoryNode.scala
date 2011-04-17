@@ -39,6 +39,17 @@ class OpenCLMemoryNode(val device:OpenCLProcessor) extends MemoryNode {
     b
   }
 
+  /**
+   * Free a buffer from this memory node
+   */
+  def free(buffer:OpenCLBuffer): Unit = {
+    if (!buffers.contains(buffer))
+      throw new Exception("Trying to remoe a buffer from a memory that does not contain it")
+
+    buffers -= buffer
+    buffer.peer.release
+  }
+
   override def equals(a:Any):Boolean = a match {
     case a:OpenCLMemoryNode if a.device == device => true
     case _ => false

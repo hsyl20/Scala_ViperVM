@@ -61,7 +61,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
     val k = kernel.get(this)
 
     /* We need to synchronize as OpenCL kernels are not thread safe */
-    k.synchronized {
+    val e = k.synchronized {
 
       /* Set parameters */
       for ((a,idx) <- config.parameters.zipWithIndex) a match {
@@ -73,10 +73,10 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
       }
 
       /* Enqueue kernel */
-      val e = commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, Nil)
-
-      new KernelEvent(kernel, args, this, new OpenCLEvent(e))
+      commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, Nil)
     }
+
+    new KernelEvent(kernel, args, this, new OpenCLEvent(e))
   }
 
   override def toString = "%s - %s".format(peer.vendor, peer.name)

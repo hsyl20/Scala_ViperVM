@@ -76,7 +76,11 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
       commandQueue.enqueueKernel(k, config.globalWorkSize, config.localWorkSize, Nil)
     }
 
-    new KernelEvent(kernel, args, this, new OpenCLEvent(e))
+    /* Avoid entity GC until kernel completion */
+    val ev = new OpenCLEvent(e)
+    AsyncGC.add(ev, config.parameters)
+
+    new KernelEvent(kernel, args, this, ev)
   }
 
   override def toString = "OpenCL: %s - %s".format(peer.vendor, peer.name)

@@ -17,7 +17,7 @@ package fr.hsyl20.vipervm.platform
  * Event triggered when "event" is triggered
  */
 class BindedEvent(event:Event) extends Event {
-  event.addCallback(_ => complete)
+  event.willTrigger(complete)
 
   def syncWait:Unit = event.syncWait
 }

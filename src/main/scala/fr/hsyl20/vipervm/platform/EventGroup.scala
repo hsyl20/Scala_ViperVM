@@ -26,13 +26,13 @@ class EventGroup[E <: Event](val events:Seq[E]) extends Event {
   private val lock = new Lock
   
   for (e <- events) {
-    e.addCallback(_ => {
+    e willTrigger {
       val rem = lock.synchronized[Int] {
         remaining -= 1
         remaining
       }
       if (rem == 0) complete
-    })
+    }
   }
 
   def syncWait:Unit = events.foreach(_.syncWait)

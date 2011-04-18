@@ -26,7 +26,7 @@ object AsyncGC {
       table(event) = items.toList ::: table.getOrElse(event,Nil)
     }
 
-    event.addCallback(remove _)
+    event.willTrigger(remove _)
   }
 
   private def remove(event:Event): Unit = {

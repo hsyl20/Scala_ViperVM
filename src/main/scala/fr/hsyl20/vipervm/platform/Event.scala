@@ -40,7 +40,7 @@ abstract class Event {
    * Add an actor to the list of actors to notify when the event completes.
    * A message is sent immediately if event is already completed
    */
-  def addActor(actor:Actor): Unit = actors ::= actor
+  def willNotify(actor:Actor): Unit = actors ::= actor
 
   /**
    * Add a callback method that will be called when the event completes
@@ -48,7 +48,7 @@ abstract class Event {
    * Blocking or time-consuming callbacks should be avoided. Use actors
    * and notify method instead
    */
-  def addCallback(f:(this.type) => Unit): Unit = {
+  def willTrigger(f:(this.type) => Unit): Unit = {
     val perform = this.synchronized {
       if (!completed)
         callbacks ::= f
@@ -57,6 +57,10 @@ abstract class Event {
     
     if (perform)
       f(this)
+  }
+
+  def willTrigger(f: => Unit): Unit = {
+    willTrigger(_ => f)
   }
 
   /**

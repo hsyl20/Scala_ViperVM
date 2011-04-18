@@ -14,17 +14,18 @@
 package fr.hsyl20.vipervm.platform
 
 import scala.actors._
+import scala.concurrent.Lock
 
 /**
  * Events are handles on asynchronously executed commands
  *
  * Events can only be triggered once.
  */
-abstract class Event {
+trait Event {
 
   private var actors:List[Actor] = Nil
-  private var callbacks:List[this.type=>Unit] = Nil
   protected var completed:Boolean = false
+  private val lock = new Lock
 
   /**
    * Return true if this event completed
@@ -40,49 +41,43 @@ abstract class Event {
    * Add an actor to the list of actors to notify when the event completes.
    * A message is sent immediately if event is already completed
    */
-  def willNotify(actor:Actor): Unit = actors ::= actor
+  def willNotify(actor:Actor): Unit = {
+    lock.acquire
+
+    if (!completed)
+      actors ::= actor
+
+    val perform = completed
+    lock.release
+    
+    if (perform)
+      actor ! EventComplete(this)
+  }
 
   /**
    * Add a callback method that will be called when the event completes
-   *
-   * Blocking or time-consuming callbacks should be avoided. Use actors
-   * and notify method instead
    */
-  def willTrigger(f:(this.type) => Unit): Unit = {
-    val perform = this.synchronized {
-      if (!completed)
-        callbacks ::= f
-      completed
-    }
-    
-    if (perform)
-      f(this)
-  }
+  def willTrigger[T](f: => T) = new FutureEvent[T](this, f)
 
-  def willTrigger(f: => Unit): Unit = {
-    willTrigger(_ => f)
-  }
+  def fold[T](f: => FutureEvent[T]): FutureEvent[T] = new FutureEvent[T](this, f.apply)
 
   /**
    * Implementations should call this method when the event completes
    */
   def complete: Unit = {
-
-    this.synchronized {
-      completed = true
-      this.notifyAll
-    }
+    lock.acquire
+    completed = true
+    lock.release
 
     for (a <- actors)
       a ! EventComplete(this)
 
-    for (c <- callbacks)
-      c(this)
+    actors = Nil
   }
 }
 
 /**
  * Message sent to registered actors when the event completes
  */
-case class EventComplete(event:Event)
+case class EventComplete[E<:Event](event:E)
 

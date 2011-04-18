@@ -34,6 +34,9 @@ class Event(val commandQueue:CommandQueue, val peer:Pointer) extends Entity with
    val profilingInfo = new ProfilingInfo(this)
 
    def syncWait:Unit = Event.waitFor(this)
+
+   /** Test if an event is completed */
+   def completed:Boolean = (executionStatus == ExecutionStatus.Complete)
 }
 
 

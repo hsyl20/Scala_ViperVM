@@ -21,7 +21,7 @@ object EventPollingThread {
   /** Indicate that the thread must stop */
   private var _stop:Boolean = false
 
-  var sleepTime:Long = 500
+  var sleepTime:Long = 50
 
 
   def monitorEvent(event:Event): Unit = thread.synchronized {
@@ -36,29 +36,33 @@ object EventPollingThread {
     }
   }
 
-  private lazy val thread = new Thread {
-    override def run: Unit = {
-      val ev = this.synchronized {
-        val ev = events
-        events = Nil
-        ev
+  private lazy val thread = {
+    val t = new Thread {
+      override def run: Unit = {
+        val ev = this.synchronized {
+          val ev = events
+          events = Nil
+          ev
+        }
+
+        val (finished, running) = ev.span(_.test)
+
+        finished.foreach(_.complete)
+
+        val ev2 = this.synchronized {
+          events = running ::: events
+          if (events.isEmpty && !_stop)
+            this.wait
+          events
+        }
+
+        Thread.sleep(sleepTime)
+
+        if (!ev2.isEmpty || !_stop)
+          run
       }
-
-      val (finished, running) = ev.span(_.test)
-
-      finished.foreach(_.complete)
-
-      val ev2 = this.synchronized {
-        events = running ::: events
-        if (events.isEmpty && !_stop)
-          this.wait
-        events
-      }
-
-      Thread.sleep(sleepTime)
-
-      if (!ev2.isEmpty || !_stop)
-        run
     }
+    t.start
+    t
   }
 }

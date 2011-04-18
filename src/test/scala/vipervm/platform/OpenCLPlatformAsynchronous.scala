@@ -26,17 +26,13 @@ import fr.hsyl20.vipervm.platform.FutureEvent._
 import java.util.Random
 
 
-class OpenCLPlatformSynchronous extends FeatureSpec with GivenWhenThen {
+class OpenCLPlatformAsynchronous extends FeatureSpec with GivenWhenThen {
 
   val n = 100
   val factor = 10
 
   feature("The user can transfer data to an OpenCL device's memory, execute a kernel on it and bring the data back. ") {
-
-    /*************************************************************
-     * Synchronous execution
-     *************************************************************/
-    scenario("A synchronous wait is inserted between each command (write, execute, read)") {
+    scenario("Each command (write, execute, read) asycnhronously triggers execution of waiting code") {
 
       given("a platform with the OpenCLDriver enabled")
       val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
@@ -83,64 +79,73 @@ class OpenCLPlatformSynchronous extends FeatureSpec with GivenWhenThen {
       and("a copy from host buffer to device buffer can be triggered")
       val writeEvent = writeLink.copy(hostView,inView)
 
-      and("copy completion can be synchronously waited for")
-      writeEvent.syncWait
+      and("copy completion event can asynchronously trigger code")
+      val check = writeEvent fold {
 
-      and("an OpenCL kernel object can be created")
-      val kernel = new DummyKernel
+        and("an OpenCL kernel object can be created")
+        val kernel = new DummyKernel
 
-      val params = Seq(LongKernelParameter(n), BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor))
+        val params = Seq(LongKernelParameter(n), BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor))
 
-      and("an OpenCL kernel object can be compiled and executed asynchonously")
-      val event = try {
-        proc.execute(kernel,params)
-      }
-      catch {
-        case e@OpenCLBuildProgramException(err,program,devices) => {
-          devices.foreach(dev => println(e.buildInfo(dev).log))
-          throw e
+        and("an OpenCL kernel object can be compiled and executed asynchonously")
+        val event = try {
+          proc.execute(kernel,params)
         }
-        case e => throw e
+        catch {
+          case e@OpenCLBuildProgramException(err,program,devices) => {
+            devices.foreach(dev => println(e.buildInfo(dev).log))
+            throw e
+          }
+          case e => throw e
+        }
+
+        and("kernel execution completion event can asynchronously trigger code")
+        event fold {
+
+          and("a link between a device buffer and an host buffer can be found")
+          val readLink = platform.linkBetween(outBuf, hostOutBuf) match {
+            case None => throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
+            case Some(l) => l
+          }
+
+          and("a copy from device buffer to host buffer can be triggered")
+          val readEvent = readLink.copy(outView,hostOutView)
+
+          and("copy completion can be synchronously waited for")
+          readEvent fold {
+
+            and("device buffers can be freed")
+            mem.free(inBuf)
+            mem.free(outBuf)
+
+            val fbout = hostOutBuf.byteBuffer.asFloatBuffer; 
+
+            var check = true 
+            for (i <- 0 until n) {
+              val a = factor * fb.get(i)
+              val b = fbout.get(i)
+              if (a - b > 0.001) {
+                println("Invalid value computed: %f vs %f".format(a,b))
+                check = false
+              }
+            }
+
+            and("host buffer can be freed")
+            hostMem.free(hostBuf)
+            hostMem.free(hostOutBuf)
+
+            check
+          }
+        }
       }
 
-      and("kernel execution completion can be synchronously waited for")
-      event.syncWait
-
-      and("a link between a device buffer and an host buffer can be found")
-      val readLink = platform.linkBetween(outBuf, hostOutBuf) match {
-        case None => throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
-        case Some(l) => l
-      }
-
-      and("a copy from device buffer to host buffer can be triggered")
-      val readEvent = readLink.copy(outView,hostOutView)
-
-      and("copy completion can be synchronously waited for")
-      readEvent.syncWait
-
-      and("device buffers can be freed")
-      mem.free(inBuf)
-      mem.free(outBuf)
-
+      val c = check()()()
       and("retrieved data should be correct")
-      val fbout = hostOutBuf.byteBuffer.asFloatBuffer; 
-
-      var check = true
-      for (i <- 0 until n) {
-        val a = factor * fb.get(i)
-        val b = fbout.get(i)
-        if (a - b > 0.001) {
-          println("Invalid value computed: %f vs %f".format(a,b))
-          check = false
-        }
-      }
-
-      if (!check)
+      if (!c)
         throw new Exception("Test failure: retrieved data invalid")
 
-      and("host buffer can be freed")
-      hostMem.free(hostBuf)
-      hostMem.free(hostOutBuf)
     }
   }
 }
+
+

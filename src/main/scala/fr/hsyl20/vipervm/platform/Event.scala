@@ -59,6 +59,9 @@ trait Event {
    */
   def willTrigger[T](f: => T) = new FutureEvent[T](this, f)
 
+  /**
+   * Like willTrigger but folds FutureEvent hierarchy
+   */
   def fold[T](f: => FutureEvent[T]): FutureEvent[T] = new FutureEvent[T](this, f.apply)
 
   /**

@@ -1,6 +1,6 @@
 import sbt._
 
-class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) {
+class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCompilerPlugins {
 
   /* Repositories */
   val javanet = "Java Net Repository" at "http://download.java.net/maven/2/"
@@ -11,6 +11,9 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) {
 
   /* GUI libs */
   val scala_swing = "org.scala-lang" % "scala-swing" % "2.8.1"
+
+  val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % "2.8.1")
+  override def compileOptions = CompileOption("-P:continuations:enable") :: super.compileOptions.toList
 
   /* Others */
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0-SNAPSHOT"

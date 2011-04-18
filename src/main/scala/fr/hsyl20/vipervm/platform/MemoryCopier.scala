@@ -48,13 +48,11 @@ trait Copy1DSupport extends MemoryCopier {
       case (src:BufferView1D,tgt:BufferView1D) => {
         if (src.size != tgt.size)
           throw new Exception("Invalid copy: different view sizes (%d,%d)".format(src.size,tgt.size))
-        copy1D(link,src,tgt)
-      }
-      case _ => {
-        val ev = super.copy(link,source,target)
+        val ev = copy1D(link,src,tgt)
         AsyncGC.add(ev, source, target)
         ev
       }
+      case _ => super.copy(link,source,target)
     }
   }
 }
@@ -83,13 +81,11 @@ trait Copy2DSupport extends MemoryCopier {
           throw new Exception("Invalid copy: different widths (%d,%d)".format(src.width,tgt.width))
         if (src.height != tgt.height)
           throw new Exception("Invalid copy: different heights (%d,%d)".format(src.height,tgt.height))
-        copy2D(link,src,tgt)
-      }
-      case _ => {
-        val ev = super.copy(link,source,target)
+        val ev = copy2D(link,src,tgt)
         AsyncGC.add(ev, source, target)
         ev
       }
+      case _ => super.copy(link,source,target)
     }
   }
 }
@@ -120,13 +116,11 @@ trait Copy3DSupport extends MemoryCopier {
           throw new Exception("Invalid copy: different heights (%d,%d)".format(src.height,tgt.height))
         if (src.depth != tgt.depth)
           throw new Exception("Invalid copy: different depths (%d,%d)".format(src.depth,tgt.depth))
-        copy3D(link,src,tgt)
-      }
-      case _ => {
-        val ev = super.copy(link,source,target)
+        val ev = copy3D(link,src,tgt)
         AsyncGC.add(ev, source, target)
         ev
       }
+      case _ => super.copy(link,source,target)
     }
   }
 }

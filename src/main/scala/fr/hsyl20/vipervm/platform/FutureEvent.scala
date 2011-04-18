@@ -53,5 +53,7 @@ object FutureEvent {
     complete
   }
 
-  implicit def any2future[T](a:T):FutureEvent[T] = new FutureEvent[T](DummyEvent, a)
+  def constant[T](a:T):FutureEvent[T] = new FutureEvent[T](DummyEvent, a)
+
+  implicit def any2future[T](a:T):FutureEvent[T] = constant(a)
 }

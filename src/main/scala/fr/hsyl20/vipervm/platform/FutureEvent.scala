@@ -26,6 +26,7 @@ class FutureEvent[T](event:Event, f: =>T) extends Event with Function0[T] {
       fvalue = Some(f)
       waiters.foreach(_ ! fvalue.get)
       waiters = Nil
+      complete
     }
     case Wait => fvalue match {
       case None    => waiters ::= sender
@@ -35,6 +36,9 @@ class FutureEvent[T](event:Event, f: =>T) extends Event with Function0[T] {
 
   event.willNotify(myAct)
 
+  /**
+   * Wait for the value to be computed and return it
+   */
   def apply():T = (myAct !? Wait).asInstanceOf[T]
 
   def syncWait:Unit = (myAct !? Wait)

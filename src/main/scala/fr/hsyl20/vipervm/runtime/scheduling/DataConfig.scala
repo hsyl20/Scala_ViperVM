@@ -13,14 +13,17 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-/*/**
+import fr.hsyl20.vipervm.platform.MemoryNode
+import fr.hsyl20.vipervm.runtime.Data
+
+/**
  * Group of Data to access with the specified access mode.
  *
  * Support memory node constraints (include, exclude) and piorities
  *
  * @param data Data and their associated access modes
  */
-class DataConfig(val data:Seq[(Data,AccessMode)]) extends AbstractDataConfig {
+abstract class DataConfig {
 
   /**
    * if "included" is not Nil, the data configuration must only be
@@ -37,6 +40,13 @@ class DataConfig(val data:Seq[(Data,AccessMode)]) extends AbstractDataConfig {
   /**
    * Memory node priorities. 0 is default. Negative is lower priority and positive is higher priority
    */
-  val priorities: Map[MemoryNode, Int] = Map.empty
+  val priorities: Map[MemoryNode, Float] = Map.empty
+
+  /** 
+   * Required data
+   *  - Non existing data will be freshly allocated.   
+   *  - Existing data will be transferred
+   *  - Duplicated data will be duplicated if necessary
+   */
+  val dataSet:Seq[Data]
 }
-*/

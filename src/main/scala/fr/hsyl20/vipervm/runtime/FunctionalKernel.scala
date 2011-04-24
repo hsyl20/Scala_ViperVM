@@ -43,12 +43,12 @@ abstract class FunctionalKernel(kernel:Kernel) {
   /**
    * Create output data
    */
-  def createOutputData:Seq[Data]
+  def createOutputData:List[Data]
 
   /**
    * Create an instance of this kernel
    */
-  def createInstance(input:Seq[Data]) = new FunctionalKernelInstance(this, input, createOutputData)
+  def createInstance(input:List[Data]) = new FunctionalKernelInstance(this, input, createOutputData)
 }
 
 

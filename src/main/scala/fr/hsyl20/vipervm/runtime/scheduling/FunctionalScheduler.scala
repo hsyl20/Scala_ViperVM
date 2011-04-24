@@ -27,7 +27,7 @@ trait FunctionalScheduler {
    * @param input Kernel inputs
    * @return kernel outputs
    */
-  def schedule(f:FunctionalKernel, input:Seq[Data]):Seq[Data] = {
+  def schedule(f:FunctionalKernel, input:List[Data]):List[Data] = {
     /* Create kernel instance */
     val instance = f.createInstance(input)
 

@@ -37,6 +37,9 @@ class DefaultFunctionalScheduler extends ActorFunctionalScheduler {
 
     /* Make the data configuration on some node that can execute at least one of the kernels */
     //TODO
+    val dataConfig = new DataConfig {
+      val dataSet = instance.input ::: instance.output
+    }
   }
 
   def onDataConfigReady(instance:FunctionalKernelInstance,configs:Seq[DataConfigInstance]): Unit = {

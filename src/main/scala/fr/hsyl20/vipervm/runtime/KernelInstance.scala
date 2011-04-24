@@ -18,4 +18,4 @@ import fr.hsyl20.vipervm.platform.Kernel
 /**
  * A kernel with its arguments, ready to be scheduled
  */
-case class FunctionalKernelInstance(kernel:FunctionalKernel, input:Seq[Data], output:Seq[Data])
+case class FunctionalKernelInstance(kernel:FunctionalKernel, input:List[Data], output:List[Data])

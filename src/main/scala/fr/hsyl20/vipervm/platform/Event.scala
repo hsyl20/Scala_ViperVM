@@ -76,6 +76,9 @@ trait Event {
       a ! EventComplete(this)
 
     actors = Nil
+
+    // Hint to the GC
+    System.gc()
   }
 }
 

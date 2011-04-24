@@ -13,16 +13,9 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.platform.BufferView
+import fr.hsyl20.vipervm.platform.Event
 
-class Data {
-  type ViewType <: BufferView
-
-  var views = ViewSet.empty[ViewType]
-
-  /** Indicate whether this data has been computed */
-  def exists:Boolean = !views.isEmpty
-
-  /** Event triggered when this data is computed */
-  val computedEvent:ComputedDataEvent = new ComputedDataEvent(this)
+class ComputedDataEvent(data:Data) extends Event {
+  def setComputed = complete
 }
+

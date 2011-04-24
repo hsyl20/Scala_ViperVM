@@ -13,7 +13,8 @@
 
 package fr.hsyl20.vipervm.platform
 
-import scala.concurrent.Lock
+import scala.actors.Actor
+import scala.actors.Actor._
 
 /**
  * An event that completes when all events it contains have completed
@@ -22,20 +23,21 @@ import scala.concurrent.Lock
  */
 class EventGroup[E <: Event](val events:Seq[E]) extends Event {
 
-  private var remaining: Int = events.size
-  private val lock = new Lock
-  
-  for (e <- events) {
-    e willTrigger {
-      val rem = lock.synchronized[Int] {
-        remaining -= 1
-        remaining
+  private var remaining: Set[Any] = events.toSet
+
+  private val myAct = actor {
+    loopWhile(!events.isEmpty) {
+      react {
+        case EventComplete(event) => {
+          remaining -= event
+          if (events.isEmpty)
+            complete
+        }
       }
-      if (rem == 0) complete
     }
   }
 
-  override def syncWait:Unit = events.foreach(_.syncWait)
+  events.foreach(_ willNotify myAct)
 }
 
 object EventGroup {

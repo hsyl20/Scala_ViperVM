@@ -19,5 +19,5 @@ package fr.hsyl20.vipervm.platform
 class BindedEvent(event:Event) extends Event {
   event.willTrigger(complete)
 
-  def syncWait:Unit = event.syncWait
+  override def syncWait:Unit = event.syncWait
 }

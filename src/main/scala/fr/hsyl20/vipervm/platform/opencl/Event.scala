@@ -17,7 +17,7 @@ import fr.hsyl20.vipervm.platform.{Event,EventPollingThread}
 import fr.hsyl20.{opencl => cl}
 
 class OpenCLEvent(val peer:cl.Event) extends Event {
-  def syncWait: Unit = peer.syncWait
+  override def syncWait: Unit = peer.syncWait
 
   override def test:Boolean = {
     if (peer.completed)

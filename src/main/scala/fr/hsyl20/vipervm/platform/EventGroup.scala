@@ -35,8 +35,7 @@ class EventGroup[E <: Event](val events:Seq[E]) extends Event {
     }
   }
 
-  def syncWait:Unit = events.foreach(_.syncWait)
-
+  override def syncWait:Unit = events.foreach(_.syncWait)
 }
 
 object EventGroup {

@@ -41,15 +41,13 @@ class FutureEvent[T](event:Event, f: =>T) extends Event with Function0[T] {
    */
   def apply():T = (myAct !? Wait).asInstanceOf[T]
 
-  def syncWait:Unit = (myAct !? Wait)
+  override def syncWait:Unit = (myAct !? Wait)
 
   case object Wait
 }
 
 object FutureEvent {
   object DummyEvent extends Event {
-    def syncWait:Unit = ()
-
     complete
   }
 

@@ -25,8 +25,4 @@ class UserEvent extends Event {
    */
   def trigger:Unit = complete
 
-  def syncWait:Unit = this.synchronized {
-    if (!completed)
-      this.wait
-  }
 }

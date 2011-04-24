@@ -35,7 +35,12 @@ trait Event {
   /**
    * Synchronously wait for an event to complete
    */
-  def syncWait: Unit
+  def syncWait: Unit = {
+    lock.acquire
+    while(!completed)
+      lock.wait
+    lock.release
+  }
 
   /**
    * Add an actor to the list of actors to notify when the event completes.

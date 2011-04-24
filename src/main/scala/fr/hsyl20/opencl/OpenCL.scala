@@ -13,26 +13,27 @@
 
 package fr.hsyl20.opencl
 
+import grizzled.slf4j.Logging
 import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 
-object OpenCL {
+object OpenCL extends Logging {
    import Wrapper._
 
   /* Enable protected mode */
   com.sun.jna.Native.setProtected(true)
   if (com.sun.jna.Native.isProtected)
-    println("JNA protected mode: enabled")
+    info("JNA protected mode: enabled")
   else 
-    println("JNA protected mode: disabled")
+    info("JNA protected mode: disabled")
 
   /* Check for libjsig.so */
   val checkjsig = Option(System.getenv().get("LD_PRELOAD")).map(_.contains("libjsig")).getOrElse(false)
   if (!checkjsig)
-    println("If you encounter JVM crash, use the following command:\n  export LD_PRELOAD=/path/to/your/jvm/lib/yourarch/libjsig.so")
+    warn("If you encounter JVM crash, use the following command:\n  export LD_PRELOAD=/path/to/your/jvm/lib/yourarch/libjsig.so")
 
 
    val CL_FALSE = 0

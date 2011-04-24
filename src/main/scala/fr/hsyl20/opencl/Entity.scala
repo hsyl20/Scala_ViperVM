@@ -13,6 +13,7 @@
 
 package fr.hsyl20.opencl
 
+import grizzled.slf4j.Logging
 import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
@@ -79,7 +80,7 @@ trait Info {
    }
 }
 
-trait Retainable extends Entity {
+trait Retainable extends Entity with Logging {
    import OpenCL.checkError
 
    protected val retainFunc: (Pointer) => Int
@@ -90,7 +91,9 @@ trait Retainable extends Entity {
 
    override protected def finalize: Unit = {
       try {
+         info("Releasing %s".format(this))
          release
+         info("%s released".format(this))
       } catch {
          case e:OpenCLException => ()
       }

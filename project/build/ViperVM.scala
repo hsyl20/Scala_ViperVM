@@ -12,8 +12,21 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCo
   /* GUI libs */
   val scala_swing = "org.scala-lang" % "scala-swing" % "2.8.1"
 
+  /* Continuation plugin */
   val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % "2.8.1")
   override def compileOptions = CompileOption("-P:continuations:enable") :: super.compileOptions.toList
+
+  /* Logging (SLF4J through grizzled) */
+  val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.4"
+
+  /* Logging configuration :
+   * - Simple: Output logs to System.err
+   * - NOP: Discard logging 
+   * - log4j 
+   */
+  val slf4jsimple = "org.slf4j" % "slf4j-simple" % "1.6.1"
+  //val slf4jnop = "org.slf4j" % "slf4j-nop" % "1.6.1"
+  //val slf4jlog4j = "org.slf4j" % "slf4j-log4j12" % "1.6.1"
 
   /* Others */
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0-SNAPSHOT"

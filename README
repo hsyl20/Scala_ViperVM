@@ -22,14 +22,13 @@ This project uses SBT (simple build tool).
 
 Developers
 ----------
-Sylvain HENRY - sylvain.henry@inria.fr
+Sylvain HENRY - hsyl20@gmail.com
 
 
 Packages
 --------
 
 fr.hsyl20.opencl - OpenCL binding (using SNA and JNA)
+fr.hsyl20.vipervm.platform - Backends and abstract platform
 fr.hsyl20.vipervm.runtime - Runtime system
-fr.hsyl20.vipervm.runtime.schedulers - Available schedulers for the runtime system
-fr.hsyl20.vipervm.runtime.opencl - OpenCL backend for the runtime system
 

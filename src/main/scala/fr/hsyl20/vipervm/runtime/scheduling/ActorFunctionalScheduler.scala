@@ -44,15 +44,27 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
    * Called when an instance has been enqueued
    */
   def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit
+
+  /**
+   * Called when input data are ready
+   */
   def onInputDataReady(instance:FunctionalKernelInstance): Unit
+
+  /**
+   * Called when data configuration for this kernel is available in at least one memory
+   */
   def onDataConfigReady(instance:FunctionalKernelInstance,configs:Seq[DataConfigInstance]): Unit
+
+  /**
+   * Called when kernel execution has completed using the specified data configuration
+   */
   def onInstanceExecuted(instance:FunctionalKernelInstance,config:DataConfigInstance): Unit
 
   /** Actor messages */
-  private case class InstanceEnqueued(instance:FunctionalKernelInstance)
-  private case class InputDataReady(instance:FunctionalKernelInstance)
-  private case class DataConfigReady(instance:FunctionalKernelInstance, configs:Seq[DataConfigInstance])
-  private case class InstanceExecuted(instance:FunctionalKernelInstance, config:DataConfigInstance)
+  protected case class InstanceEnqueued(instance:FunctionalKernelInstance)
+  protected case class InputDataReady(instance:FunctionalKernelInstance)
+  protected case class DataConfigReady(instance:FunctionalKernelInstance, configs:Seq[DataConfigInstance])
+  protected case class InstanceExecuted(instance:FunctionalKernelInstance, config:DataConfigInstance)
 }
 
 

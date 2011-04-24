@@ -14,6 +14,7 @@
 package fr.hsyl20.vipervm.runtime.scheduling
 
 import fr.hsyl20.vipervm.runtime.FunctionalKernelInstance
+import fr.hsyl20.vipervm.platform.EventGroup
 
 /**
  * Default implementation for functional scheduler
@@ -23,7 +24,10 @@ class DefaultFunctionalScheduler extends ActorFunctionalScheduler {
   def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit = {
 
     /* Wait for input data to be ready */
-    //TODO
+    val evGrp = new EventGroup(instance.input.map(_.computedEvent))
+    evGrp willTrigger {
+      this ! InputDataReady(instance)
+    }
   }
 
   def onInputDataReady(instance:FunctionalKernelInstance): Unit = {

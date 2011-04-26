@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export LD_PRELOAD=/opt/java/jre/lib/amd64/libjsig.so:/opt/java/jre/lib/amd64/server/libjsig.so
+export LD_PRELOAD=$JAVA_HOME/jre/lib/amd64/libjsig.so:$JAVA_HOME/jre/lib/amd64/server/libjsig.so
 sbt

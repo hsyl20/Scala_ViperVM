@@ -37,12 +37,17 @@ class Platform(val peer:Pointer) extends Entity with Info {
 
    def devices(deviceType: Int = Device.CL_DEVICE_TYPE_ALL): Seq[Device] = {
       val num = new IntByReference
-      checkError(clGetDeviceIDs(peer, deviceType, 0, NULL, num.getPointer))
-      
-      val mem = new Memory(Pointer.SIZE * num.getValue)
-      checkError(clGetDeviceIDs(peer, deviceType, num.getValue, mem, NULL))
+      val err = clGetDeviceIDs(peer, deviceType, 0, NULL, num.getPointer)
+      if (err != OpenCLException.CL_DEVICE_NOT_FOUND && err != OpenCLException.CL_SUCCESS)
+        checkError(err)
 
-      mem.getPointerArray(0, num.getValue).toList.map(new Device(this, _))
+      if (num.getValue != 0) {
+        val mem = new Memory(Pointer.SIZE * num.getValue)
+        checkError(clGetDeviceIDs(peer, deviceType, num.getValue, mem, NULL))
+
+        mem.getPointerArray(0, num.getValue).toList.map(new Device(this, _))
+      }
+      else Nil
    }
 }
 

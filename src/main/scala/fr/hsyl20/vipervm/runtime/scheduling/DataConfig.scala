@@ -48,5 +48,5 @@ abstract class DataConfig {
    *  - Existing data will be transferred
    *  - Duplicated data will be duplicated if necessary
    */
-  val dataSet:Seq[Data]
+  val dataSet:Set[Data]
 }

@@ -25,7 +25,7 @@ import fr.hsyl20.{opencl => cl}
  */
 class OpenCLDriver(
     enableGPUs:Boolean = true,
-    enableCPUs:Boolean = false,
+    enableCPUs:Boolean = true,
     enableAccelerators:Boolean = true)
   extends Driver {
 

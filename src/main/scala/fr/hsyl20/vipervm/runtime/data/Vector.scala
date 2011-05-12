@@ -13,9 +13,14 @@
 
 package fr.hsyl20.vipervm.runtime.data
 
-import fr.hsyl20.vipervm.platform.BufferView1D
+import fr.hsyl20.vipervm.platform.{BufferView1D,MemoryNode}
 import fr.hsyl20.vipervm.runtime.Data
 
-class Vector extends Data {
+class Vector(size:Long) extends Data {
   type ViewType = BufferView1D
+
+  def allocate(memory:MemoryNode):BufferView1D = {
+    val buffer = memory.allocate(size)
+    new BufferView1D(buffer, 0, size)
+  }
 }

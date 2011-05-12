@@ -13,9 +13,9 @@
 
 package fr.hsyl20.vipervm.runtime
 
-import fr.hsyl20.vipervm.platform.BufferView
+import fr.hsyl20.vipervm.platform.{BufferView,MemoryNode}
 
-class Data {
+abstract class Data {
   type ViewType <: BufferView
 
   var views = ViewSet.empty[ViewType]
@@ -25,4 +25,8 @@ class Data {
 
   /** Event triggered when this data is computed */
   val computedEvent:ComputedDataEvent = new ComputedDataEvent(this)
+
+  def viewIn(memory:MemoryNode):Option[ViewType] = views.get(memory)
+
+  def allocate(memory:MemoryNode):ViewType
 }

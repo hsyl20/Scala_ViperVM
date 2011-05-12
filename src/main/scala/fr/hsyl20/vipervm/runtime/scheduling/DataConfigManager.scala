@@ -34,14 +34,14 @@ class DataConfigManager {
    * Unregister a data configuration
    */
   def unregister(config:DataConfig):Unit =
-    configs.remove(_ == config)
+    configs.filterNot(_ == config)
 
   /**
    * Indicate that a data has been stored in a memory node
    */
   def put(data:Data,memory:MemoryNode):Unit = {
     val ds = mems.getOrElse(memory, Set.empty)
-    mems.update(memory, ds + data)
+    mems = mems.updated(memory, ds + data)
   }
 
   /**
@@ -49,18 +49,18 @@ class DataConfigManager {
    */
   def remove(data:Data,memory:MemoryNode):Unit = {
     val ds = mems.getOrElse(memory, Set.empty)
-    mems.update(memory, ds - data)
+    mems = mems.updated(memory, ds - data)
   }
 
   /**
    * Get active data configs (i.e. data configs that are valid on the node)
    */
-  def activeConfigs(memory:MemoryNode):Seq[DataConfig] = {
+  def activeConfigs(memory:MemoryNode):Set[DataConfig] = {
     val ds = mems.getOrElse(memory, Set.empty)
     configs.filter(config =>
       !config.excluded.contains(memory) &&
       (config.included.isEmpty || config.included.contains(memory)) &&
-      config.dataSet.subsetOf(ds))
+      config.dataSet.subsetOf(ds)).toSet
   }
 
   /**

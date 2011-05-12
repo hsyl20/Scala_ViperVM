@@ -50,19 +50,32 @@ class Platform(val drivers:Driver*) {
    */
   def processors: Seq[Processor] = drivers.flatMap(_.processors)
 
-  /** Direct links between two memory nodes, if any */
+  /**
+   * Processors that can work in the given memory
+   */
+  def processorsThatCanWorkIn(memory:MemoryNode) = processors.filter(_.memories contains memory)
+
+  /**
+   * Direct links between two memory nodes, if any
+   */
   def linksBetween(source:MemoryNode,target:MemoryNode):Seq[Link] = 
     networks.flatMap(_.link(source,target))
 
-  /** Direct links between two buffers, if any */
+  /**
+   * Direct links between two buffers, if any
+   */
   def linksBetween(source:Buffer,target:Buffer):Seq[Link] = 
     linksBetween(source.memory, target.memory)
 
-  /** First direct link between two memory nodes, if any */
+  /**
+   * First direct link between two memory nodes, if any
+   */
   def linkBetween(source:MemoryNode,target:MemoryNode):Option[Link] = 
     linksBetween(source,target).headOption
 
-  /** First direct link between two buffers, if any */
+  /**
+   * First direct link between two buffers, if any
+   */
   def linkBetween(source:Buffer,target:Buffer):Option[Link] = 
     linksBetween(source,target).headOption
 }

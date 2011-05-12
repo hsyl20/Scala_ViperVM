@@ -27,7 +27,7 @@ import fr.hsyl20.vipervm.platform.Kernel
  *
  * @param kernel Kernel decorated by this class
  */
-abstract class FunctionalKernel(kernel:Kernel) {
+abstract class FunctionalKernel(val kernel:Kernel) {
   /**
    * Prepare parameters for a kernel
    *  - Allocate data
@@ -50,5 +50,3 @@ abstract class FunctionalKernel(kernel:Kernel) {
    */
   def createInstance(input:List[Data]) = new FunctionalKernelInstance(this, input, createOutputData)
 }
-
-

@@ -1,10 +1,12 @@
 \chapter{Runtime System}
 
-\section{Drivers}
+\section{Platform}
+
+\subsection{Drivers}
 Drivers manage computing devices, memory nodes and networks.
 
 
-\section{Memory node}
+\subsection{Memory node}
 A memory node contains data.
 It may also contain compiled programs as some device require explicit management of those (CELL).
 
@@ -13,28 +15,94 @@ It may also contain compiled programs as some device require explicit management
   \item[buffers] List of buffers on this memory node
 \end{description}
 
-
-\section{Buffer}
-A contiguous memory space in a memory node
-
-\begin{description}
-  \item[free] Free this buffer
-  \item[memoryNode] Associated memory node
-\end{description}
-
-
-\section{Network}
+\subsection{Network}
 A network links different memory nodes together.
 Some networks are in fact DMA controllers + bus, other use a computing unit to transfer data (NUMA), other are really NIC+network. 
 Some networks can perform different transfers (up to a certain number) at the same time. Some can't.
 
 
-\section{Link}
+\subsubsection{Link}
 A link is a virtual one-way channel between two memory nodes. Each link is associated to a single network.
 
 
-\section{Computing device}
-A computing device can execute programs. These programs may need to be stored in some specific memory (CELL, GPU kernels (hidden to programmer)).
+\subsection{Processor}
+A processor can execute programs. These programs may need to be stored in some specific memory (CELL, GPU kernels (hidden to programmer)).
 Programs work on data. These data are stored in buffers on specific memory.
 
 
+\section{Data Management}
+
+\subsection{Buffers}
+A buffer is a contiguous memory space in a memory node.
+It cannot be used directly. 
+Views are used to access buffer contents.
+
+\subsection{Buffer Views}
+A buffer view is a region of a buffer.
+There are different kind of views: contiguous (1D), 2D, 3D\ldots
+Views are used as sources and targets for data copy operations.
+
+\subsection{Data}
+A Data is a set of buffer views.
+These buffer views are usually on different memory nodes.
+It is possible to add or remove views from a Data.
+
+There are different types of Data.
+Each data type is backed by a buffer view type.
+For instance, 2D Matrix data type is backed by 2D buffer views.
+
+\subsection{Data Configuration}
+A data configuration is a set of data.
+Data configurations are used for kernel execution requirements:
+all kernel parameters are stored in a data configuration and the runtime system must set up this data configuration on a memory node for the kernel to be executed.
+
+Data configurations support constraints:
+\begin{itemize}
+  \item Memory nodes that shouldn't be used
+  \item Memory nodes that may be used
+  \item Memory node affinity rank (i.e. priorities)
+\end{itemize}
+
+
+\section{Schedulers}
+
+Schedulers are at the core of ViperVM.
+They have to make important decisions that could improve or degrade performances.
+
+\subsection{Data affinity}
+When a kernel is to be scheduled, the scheduler must set up the data configuration composed of the kernel parameters on a memory node.
+To avoid superfluous transfers, memory nodes can be ranked depending on the amount of data they already contain.
+Moreover, transfer speed may also be taken into account to improve the ranking.
+If data have to be evicted for the data configuration to be set up, the rank should take this into account.
+
+Let $D_i (0 \le i \le n)$ be the data required by the kernel.
+Let $R_i$ be the $D_i$ accessed in read-only mode and $W_i$ the ones accessed in read-write mode.
+Each $W_i$ must be either duplicated or the scheduler must ensure that the data is not needed anymore.
+
+Basic algorithm:
+
+\begin{lstlisting}[language=scala]
+def affinities(config:DataConfiguration): Seq[MemoryNode, Int] = {
+  val ms = memoryNodes.filterNot(config.excluded.contains(_))
+  for (m <- ms) yield {
+
+    /* Get unavailable data on the node
+     * Available data include data being transferred (willContain)
+     */
+    val (avail,unavail) = config.data.map(d => (d, m.willContain(d))).split(_._2)
+
+    /* Get required memory */
+    val mallocsize = unavail.map(_.sizeOn(m)).sum
+    
+    /* Get data that need to be initialized */
+    val toinit = unavail.filter(_.initialized)
+
+    /* Get transfer size */
+    val toinit_size = toinit.map(_.sizeOn(m)).sum
+
+
+    /* Return rank */
+    (m, rank)
+  }
+}
+\end{lstlisting}

@@ -80,6 +80,18 @@
 
 \newtheorem{mydef}{Definition}
 
+\lstdefinelanguage{Scala}{
+    morekeywords={%
+        abstract,case,catch,class,def,do,else,extends,%
+        false,final,finally,for,forSome,if,implicit,import,lazy,%
+        match,new,null,object,override,package,private,protected,%
+        return,sealed,super,this,throw,trait,true,try,type,%
+        val,var,while,with,yield},%
+    sensitive,%
+    morecomment=[l]//,%
+    morecomment=[s]{/*}{*/},%
+}[keywords,comments]%
+
 \title{ViperVM}
 \author{Sylvain HENRY\\\url{sylvain.henry@labri.fr}}
 \date{February 2011}

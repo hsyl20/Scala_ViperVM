@@ -16,6 +16,6 @@ package fr.hsyl20.vipervm.runtime
 import fr.hsyl20.vipervm.platform.Kernel
 
 /**
- * A kernel with its arguments, ready to be scheduled
+ * A functional kernel with its arguments, ready to be scheduled
  */
-case class FunctionalKernelInstance(kernel:FunctionalKernel, input:List[Data], output:List[Data])
+case class Task(kernel:FunctionalKernel, input:List[Data], output:List[Data])

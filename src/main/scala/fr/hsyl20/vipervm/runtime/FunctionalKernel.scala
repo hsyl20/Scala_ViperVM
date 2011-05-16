@@ -46,7 +46,7 @@ abstract class FunctionalKernel(val kernel:Kernel) {
   def createOutputData:List[Data]
 
   /**
-   * Create an instance of this kernel
+   * Create a task from this kernel
    */
-  def createInstance(input:List[Data]) = new FunctionalKernelInstance(this, input, createOutputData)
+  def createTask(input:List[Data]) = new Task(this, input, createOutputData)
 }

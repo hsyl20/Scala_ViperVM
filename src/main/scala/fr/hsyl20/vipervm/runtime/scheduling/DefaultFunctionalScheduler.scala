@@ -13,8 +13,8 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.runtime.FunctionalKernelInstance
-import fr.hsyl20.vipervm.platform.{EventGroup,Platform,MemoryNode}
+import fr.hsyl20.vipervm.runtime.Task
+import fr.hsyl20.vipervm.platform.{EventGroup,Platform,MemoryNode,Processor}
 
 import scala.collection.mutable.Map
 
@@ -23,18 +23,28 @@ import scala.collection.mutable.Map
  */
 class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler {
 
-  protected val configs:Map[DataConfig,List[FunctionalKernelInstance]] = Map.empty
+  protected val configs:Map[DataConfig,List[Task]] = Map.empty
+  protected val confManager:DataConfigManager = new DataConfigManager
 
-  def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit = {
+  override def onTaskSubmitted(task:Task): Unit = {
 
     /* Wait for input data to be ready */
-    val evGrp = new EventGroup(instance.input.map(_.computedEvent))
+    /*val evGrp = new EventGroup(task.input.map(_.computedEvent))
     evGrp willTrigger {
-      this ! InputDataReady(instance)
-    }
+      this ! InputDataReady(task)
+    }*/
   }
 
-  def onInputDataReady(instance:FunctionalKernelInstance): Unit = {
+  override def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {
+    /* Set output data after execution */
+    //TODO
+
+    /* Release data configuration task */
+    //TODO
+  }
+
+
+  def onInputDataReady(task:Task): Unit = {
 
     /* Select kernels that can handle the input data */
     //TODO
@@ -44,11 +54,11 @@ class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalSched
 
     /* Make the data configuration on some node that can execute at least one of the kernels */
     val dataConfig = new DataConfig {
-      val dataSet = instance.input.toSet | instance.output.toSet
+      val dataSet = task.input.toSet | task.output.toSet
     }
 
-    /* store and require this dataconfig for this instance */
-    storeDataConfig(dataConfig, instance)
+    /* store and require this dataconfig for this task */
+    storeDataConfig(dataConfig, task)
   }
 
   def onDataConfigReady(config:DataConfig,memory:MemoryNode): Unit = {
@@ -69,17 +79,9 @@ class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalSched
     //TODO
   }
 
-  def onInstanceExecuted(instance:FunctionalKernelInstance,config:DataConfig,memory:MemoryNode): Unit = {
-    /* Set output data after execution */
-    //TODO
-
-    /* Release data configuration instance */
-    //TODO
-  }
-
-  def storeDataConfig(config:DataConfig,instance:FunctionalKernelInstance): Unit = {
+  def storeDataConfig(config:DataConfig,task:Task): Unit = {
     val old = configs.getOrElse(config, Nil)
-    configs.update(config, instance :: old)
+    configs.update(config, task :: old)
 
     //TODO: require dataconfig
   }

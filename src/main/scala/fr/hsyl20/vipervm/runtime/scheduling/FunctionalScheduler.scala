@@ -13,7 +13,7 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.runtime.{FunctionalKernel,Data,FunctionalKernelInstance}
+import fr.hsyl20.vipervm.runtime.{FunctionalKernel,Data,Task}
 
 /**
  * Schedule functional kernels
@@ -28,18 +28,18 @@ trait FunctionalScheduler {
    * @return kernel outputs
    */
   def schedule(f:FunctionalKernel, input:List[Data]):List[Data] = {
-    /* Create kernel instance */
-    val instance = f.createInstance(input)
+    /* Create a task from the kernel and its parameters */
+    val task = f.createTask(input)
 
     /* Put instance into run queue */
-    enqueue(instance)
+    submit(task)
 
     /* Return output data */
-    instance.output
+    task.output
   }
 
   /**
-   * Enqueue an instance to be executed
+   * Submit a task to be executed
    */
-  protected def enqueue(instance:FunctionalKernelInstance): Unit
+  protected def submit(task:Task): Unit
 }

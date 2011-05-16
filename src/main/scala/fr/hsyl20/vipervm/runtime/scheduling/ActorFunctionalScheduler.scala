@@ -13,7 +13,8 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
-import fr.hsyl20.vipervm.runtime.FunctionalKernelInstance
+import fr.hsyl20.vipervm.runtime.{Task,Data}
+import fr.hsyl20.vipervm.platform.{MemoryNode,Processor,DataTransfer,BufferView}
 import scala.actors.Actor
 import scala.actors.Actor._
 
@@ -23,48 +24,56 @@ import scala.actors.Actor._
 abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
 
   /**
-   * Signal to the scheduler that an instance has been enqueued
+   * Signal to the scheduler that an task has been enqueued
    */
-  override def enqueue(instance:FunctionalKernelInstance): Unit = {
-    this ! InstanceEnqueued(instance)
-  }
-
-  def act() {
-    loop {
-      react {
-        case InstanceEnqueued(instance) => onInstanceEnqueued(instance)
-        case InputDataReady(instance) => onInputDataReady(instance)
-        case DataConfigReady(instance,configs) => onDataConfigReady(instance,configs)
-        case InstanceExecuted(instance,config) => onInstanceExecuted(instance,config)
-      }
-    }
+  override def submit(task:Task): Unit = {
+    this ! TaskSubmitted(task)
   }
 
   /**
-   * Called when an instance has been enqueued
+   * Dispatch events to methods that can be overloaded
    */
-  def onInstanceEnqueued(instance:FunctionalKernelInstance): Unit
+  protected val dispatch: PartialFunction[Any,Unit] = {
+    case TaskSubmitted(task) => onTaskSubmitted(task)
+    case TaskCompleted(task,proc,memory) => onTaskCompleted(task,proc,memory)
+    case DataAvailable(data) => onDataAvailable(data)
+    case DataDiscard(data) => onDataDiscard(data)
+    case DataTransferCompleted(transfer) => onDataTransferCompleted(transfer)
+  }
+
+  def act() { loop { react { dispatch } } }
 
   /**
-   * Called when input data are ready
+   * Called when an task has been enqueued
    */
-  def onInputDataReady(instance:FunctionalKernelInstance): Unit
+  def onTaskSubmitted(task:Task): Unit = {}
 
   /**
-   * Called when data configuration for this kernel is available in at least one memory
+   * Called when an task has completed execution
    */
-  def onDataConfigReady(instance:FunctionalKernelInstance,configs:Seq[DataConfigInstance]): Unit
+  def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
 
   /**
-   * Called when kernel execution has completed using the specified data configuration
+   * Indicate that a data is now available
    */
-  def onInstanceExecuted(instance:FunctionalKernelInstance,config:DataConfigInstance): Unit
+  def onDataAvailable(data:Data): Unit = {}
+
+  /**
+   * Indicate that a data won't be used anymore by future submitted tasks
+   */
+  def onDataDiscard(data:Data): Unit = {}
+
+  /**
+   * Called when a data transfer has completed
+   */
+  def onDataTransferCompleted[V <: BufferView](transfer:DataTransfer[V]): Unit = {}
 
   /** Actor messages */
-  protected case class InstanceEnqueued(instance:FunctionalKernelInstance)
-  protected case class InputDataReady(instance:FunctionalKernelInstance)
-  protected case class DataConfigReady(instance:FunctionalKernelInstance, configs:Seq[DataConfigInstance])
-  protected case class InstanceExecuted(instance:FunctionalKernelInstance, config:DataConfigInstance)
+  protected case class TaskSubmitted(task:Task)
+  protected case class TaskCompleted(task:Task, proc:Processor, memory:MemoryNode)
+  protected case class DataAvailable(data:Data)
+  protected case class DataDiscard(data:Data)
+  protected case class DataTransferCompleted[V <: BufferView](transfer:DataTransfer[V])
 }
 
 

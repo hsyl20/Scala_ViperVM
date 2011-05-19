@@ -13,8 +13,9 @@
 
 package fr.hsyl20.vipervm.runtime.scheduling
 
+import fr.hsyl20.vipervm.platform.MemoryNode
+
 /**
  * A data configuration that exists on a memory node
  */
-class DataConfigInstance {
-}
+class DataConfigInstance(val config:DataConfig, val memoryNode:MemoryNode)

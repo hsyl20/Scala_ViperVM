@@ -1,0 +1,143 @@
+\chapter{Schedulers}
+
+Schedulers are at the core of the runtime system.
+Given 
+
+
+\section{Functional scheduler}
+Schedulers are responsible for task placement, task scheduling, data allocation/deallocation and data transfer scheduling.
+A functional scheduler is an active object (i.e. an actor) that reacts to the following events:
+\begin{itemize}
+  \item TaskSubmitted(task)
+  \item TaskCompleted(task)
+  \item DataAvailable(data)
+  \item DataTransferCompleted(data,mem)
+  \item DataDiscarded(data)
+  \item SubmitAndDiscard(tasks, datas): submit and discard data atomically.
+\end{itemize}
+
+The parent class provides the following protected helper methods:
+\begin{itemize}
+  \item monitor(taskEvent): emit TaskCompleted and DataAvailable events when taskEvent completes.
+  \item monitor(dataTransferEvent): emit DataTransferCompleted when dataTransferEvent completes.
+  \item execute(task,proc,mem) to indicate that a task should be executed by a given processor on a given memory. This method emits TaskExecute(task,proc,mem).
+\end{itemize}
+It also provides some public methods:
+\begin{itemize}
+  \item submit(task): emit TaskSubmitted(task) instantly
+  \item discard(data) : the frontend ensures that data won't be used anymore by tasks that will be submitted afterwards. Emit DataDiscarded instantly.
+\end{itemize}
+
+When TaskSubmitted(task) is received, task is added to Tasks set.
+When TaskCompleted(task) is received, task is removed from Tasks set.
+
+\subsection{Dependency trait}
+When a task is submitted to the scheduler, the latter has to wait for task's input data to be produced before it can schedule it.
+The Dependency trait splits submitted tasks in two categories:
+\begin{itemize}
+  \item InputReadyTasks: tasks for which input data have been produced
+  \item InputWaitingTasks : tasks that still need some input data to be produced
+\end{itemize}
+
+When TaskSubmitted(task) is received, this trait selects the appropriate category for the task.
+When DataAvailable(data) is received, it moves tasks from InputWaitingTasks to InputReadyTasks when applicable and it emits TaskDataReady(task) for each moved task.
+
+\subsection{Garbage collector trait}
+Data should be discarded as soon as they are not necessary anymore as it may avoid superfluous transfers and may allow in-place data modifications.
+When DataDiscarded(data) is received, this trait sets a flag Discarded(data) indicating that the data has been discarded.
+If Tasks set contains no task using this data, the data is freed as well as Discarded(data).
+When TaskCompleted(task) is received, if Discarded(data) is set and Tasks set doesn't contain any task using this data, the data is freed as well as Discarded(data).
+
+
+\subsection{Task queues trait}
+This trait associates a priority queue taskQueue(proc) to each processor.
+When TaskExecute(task,proc,mem) is received, TaskQueuePush(task,queue) is emitted.
+When TaskQueuePop(task,queue) is received, it removes task from queue.
+It emits TaskQueueEmpty(queue) when a task queue becomes empty.
+
+\subsubsection{Data transfer queues trait}
+This trait manages priority queues of data that need to be transferred on a memory.
+It associates a priority queue transferQueue(mem) to each memory.
+
+\subsection{Default functional scheduler}
+DataSynced(d) indicates that data d is available on host mem.
+
+DataOn(m) : data present in memory m
+IsOn(d,m) : indicate that d is on m
+FutureDataOn(m)  : data currently being transferred to m
+Refs(d,m) : number of tasks in RunQueue depending on d in m
+FutureRefs(d,m) : number of tasks in SubmittedQueue depending on d in m
+
+
+For every T in SubmittedQueue:
+let ds be T's data set.
+For every d in ds, increase FutureRefs(d,m)
+
+If SubmittedQueue is not empty, pick a task T in it.
+Select a proc p and a memory m.
+Let ds be the task data set.
+For every d in ds that is not in DataOn(m) U FutureDataOn(m), try to allocate a buffer and schedule data transfer if necessary
+If there is not enough space available, let the task in the SubmittedQueue and execute cleaning(m,T).
+For every d in ds, increase Refs(d,m) and decrease FutureRefs(d,m)
+Otherwise, remove the task from the SubmittedQueue and put it in the RunQueue.
+
+When a transfer of d is completed in m.
+Select tasks Ts in RunQueue that can be executed.
+Execute them, remove them from RunQueue and put them in RunningQueue.
+Decrease Refs(d,m)
+
+When a task T is completed.
+Remove it from RunningQueue.
+Let ds be the task data set.
+For every d in ds, decrease Refs(d,m)
+
+Cleaning(m,T)
+Let required = {d in T's data set, not IsOn(d,m)}
+Let present = {d in T's data set, IsOn(d,m)}
+Let size be the size of T's data set intersection DataOn(m).
+Let ds = {d in DataOn(m), DataSynced(d) is true}
+Free data from ds in m up to size.
+Let size2 be the remaining required memory size.
+If size2 is zero, continue submission of T, otherwise postpone it and continue.
+Schedule data transfers of data in DataOn(m)/present to host such as at least size2 data is transferred.
+Increase Refs(d,m) for data transferred.
+Select those with smaller Refs(d,m) and smaller FutureRefs(d,m)
+
+
+\section{Data affinity}
+When a kernel is to be scheduled, the scheduler must set up the data configuration composed of the kernel parameters on a memory node.
+To avoid superfluous transfers, memory nodes can be ranked depending on the amount of data they already contain.
+Moreover, transfer speed may also be taken into account to improve the ranking.
+If data have to be evicted for the data configuration to be set up, the rank should take this into account.
+
+Let $D_i (0 \le i \le n)$ be the data required by the kernel.
+Let $R_i$ be the $D_i$ accessed in read-only mode and $W_i$ the ones accessed in read-write mode.
+Each $W_i$ must be either duplicated or the scheduler must ensure that the data is not needed anymore.
+
+Basic algorithm:
+
+\begin{lstlisting}[language=scala]
+def affinities(config:DataConfiguration): Seq[MemoryNode, Int] = {
+  val ms = memoryNodes.filterNot(config.excluded.contains(_))
+  for (m <- ms) yield {
+
+    /* Get unavailable data on the node
+     * Available data include data being transferred (willContain)
+     */
+    val (avail,unavail) = config.data.map(d => (d, m.willContain(d))).split(_._2)
+
+    /* Get required memory */
+    val mallocsize = unavail.map(_.sizeOn(m)).sum
+    
+    /* Get data that need to be initialized */
+    val toinit = unavail.filter(_.initialized)
+
+    /* Get transfer size */
+    val toinit_size = toinit.map(_.sizeOn(m)).sum
+
+
+    /* Return rank */
+    (m, rank)
+  }
+}
+\end{lstlisting}

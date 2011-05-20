@@ -31,13 +31,19 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
   }
 
   /**
+   * Signal to the scheduler that some data have been discarded
+   */
+  override def discard(data:Data*): Unit = {
+    this ! DataDiscarded(data.toList)
+  }
+
+  /**
    * Dispatch events to methods that can be overloaded
    */
   protected val dispatch: PartialFunction[Any,Unit] = {
     case TaskSubmitted(task) => onTaskSubmitted(task)
     case TaskCompleted(task,proc,memory) => onTaskCompleted(task,proc,memory)
-    case DataAvailable(data) => onDataAvailable(data)
-    case DataDiscard(data) => onDataDiscard(data)
+    case DataDiscarded(data) => onDataDiscarded(data)
     case DataTransferCompleted(transfer) => onDataTransferCompleted(transfer)
   }
 
@@ -54,14 +60,9 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
   def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
 
   /**
-   * Indicate that a data is now available
-   */
-  def onDataAvailable(data:Data): Unit = {}
-
-  /**
    * Indicate that a data won't be used anymore by future submitted tasks
    */
-  def onDataDiscard(data:Data): Unit = {}
+  def onDataDiscarded(data:Seq[Data]): Unit = {}
 
   /**
    * Called when a data transfer has completed
@@ -71,8 +72,7 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
   /** Actor messages */
   protected case class TaskSubmitted(task:Task)
   protected case class TaskCompleted(task:Task, proc:Processor, memory:MemoryNode)
-  protected case class DataAvailable(data:Data)
-  protected case class DataDiscard(data:Data)
+  protected case class DataDiscarded(data:Seq[Data])
   protected case class DataTransferCompleted[V <: BufferView](transfer:DataTransfer[V])
 }
 

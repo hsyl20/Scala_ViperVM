@@ -39,7 +39,16 @@ trait FunctionalScheduler {
   }
 
   /**
+   * Discard some data
+   *
+   * Discarded data mustn't be used by functions submitted afterwards
+   */
+  def discard(ds:Data*): Unit
+
+  /**
    * Submit a task to be executed
    */
   protected def submit(task:Task): Unit
+
+
 }

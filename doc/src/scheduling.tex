@@ -1,35 +1,35 @@
 \chapter{Schedulers}
 
 Schedulers are at the core of the runtime system.
-Given 
+They are responsible for task placement, task scheduling, data allocation/deallocation and data transfer scheduling.
 
+\section{Functional Scheduler}
+A functional scheduler supports functional kernels.
+It allows applications to submit functional kernels with their parameters and to discard data that are no longer necessary.
 
-\section{Functional scheduler}
-Schedulers are responsible for task placement, task scheduling, data allocation/deallocation and data transfer scheduling.
-A functional scheduler is an active object (i.e. an actor) that reacts to the following events:
+\subsection{ActorFunctionalScheduler trait}
+ActorFunctionalScheduler trait extends a functional scheduler to make it use the actor library to deal with asynchronous events.
+It is based on the following messages:
 \begin{itemize}
-  \item TaskSubmitted(task)
-  \item TaskCompleted(task)
-  \item DataAvailable(data)
-  \item DataTransferCompleted(data,mem)
-  \item DataDiscarded(data)
-  \item SubmitAndDiscard(tasks, datas): submit and discard data atomically.
+  \item TaskSubmitted(task): a task has been submitted by the application
+  \item DataDiscarded(data*): some data have been discarded by the application
+  \item TaskCompleted(task): a task has completed its execution
+  \item DataTransferCompleted(data,mem): a data transfer has completed
 \end{itemize}
 
-The parent class provides the following protected helper methods:
+It provides the following protected helper methods:
 \begin{itemize}
-  \item monitor(taskEvent): emit TaskCompleted and DataAvailable events when taskEvent completes.
+  \item monitor(taskEvent): emit TaskCompleted when taskEvent completes.
   \item monitor(dataTransferEvent): emit DataTransferCompleted when dataTransferEvent completes.
   \item execute(task,proc,mem) to indicate that a task should be executed by a given processor on a given memory. This method emits TaskExecute(task,proc,mem).
 \end{itemize}
-It also provides some public methods:
-\begin{itemize}
-  \item submit(task): emit TaskSubmitted(task) instantly
-  \item discard(data) : the frontend ensures that data won't be used anymore by tasks that will be submitted afterwards. Emit DataDiscarded instantly.
-\end{itemize}
 
-When TaskSubmitted(task) is received, task is added to Tasks set.
-When TaskCompleted(task) is received, task is removed from Tasks set.
+\subsection{Data transfers}
+There are different kinds of data transfers that can occur:
+\begin{itemize}
+  \item A data doesn't exist in a memory node: a data copy from another memory node is necessary.
+  \item A data already exists in a memory node but a duplicate is necessary 
+\end{itemize}
 
 \subsection{Dependency trait}
 When a task is submitted to the scheduler, the latter has to wait for task's input data to be produced before it can schedule it.

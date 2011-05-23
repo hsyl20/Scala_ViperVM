@@ -49,6 +49,4 @@ trait FunctionalScheduler {
    * Submit a task to be executed
    */
   protected def submit(task:Task): Unit
-
-
 }

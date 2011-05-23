@@ -40,7 +40,7 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
   /**
    * Dispatch events to methods that can be overloaded
    */
-  protected val dispatch: PartialFunction[Any,Unit] = {
+  protected def dispatch: PartialFunction[Any,Unit] = {
     case TaskSubmitted(task) => onTaskSubmitted(task)
     case TaskCompleted(task,proc,memory) => onTaskCompleted(task,proc,memory)
     case DataDiscarded(data) => onDataDiscarded(data)

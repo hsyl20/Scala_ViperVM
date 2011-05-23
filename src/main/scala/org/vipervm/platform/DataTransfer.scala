@@ -14,7 +14,7 @@
 package org.vipervm.platform
 
 /**
- * Data transfer for contiguous memory
+ * Data transfer
  *
  * @param link    Link handling the transfer
  * @param source  Source buffer view

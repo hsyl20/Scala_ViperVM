@@ -14,26 +14,18 @@
 package org.vipervm.runtime.scheduling
 
 import org.vipervm.runtime.Task
-import org.vipervm.platform.{EventGroup,Platform,MemoryNode,Processor}
+import org.vipervm.platform.{Platform,MemoryNode,Processor}
 
 import scala.collection.mutable.Map
 
 /**
  * Default implementation for functional scheduler
  */
-class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler {
+class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler with TaskDataWait {
 
   protected val configs:Map[DataConfig,List[Task]] = Map.empty
   protected val confManager:DataConfigManager = new DataConfigManager
 
-  override def onTaskSubmitted(task:Task): Unit = {
-
-    /* Wait for input data to be ready */
-    /*val evGrp = new EventGroup(task.input.map(_.computedEvent))
-    evGrp willTrigger {
-      this ! InputDataReady(task)
-    }*/
-  }
 
   override def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {
     /* Set output data after execution */

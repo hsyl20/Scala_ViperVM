@@ -44,7 +44,6 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
     case TaskSubmitted(task) => onTaskSubmitted(task)
     case TaskCompleted(task,proc,memory) => onTaskCompleted(task,proc,memory)
     case DataDiscarded(data) => onDataDiscarded(data)
-    case DataTransferCompleted(transfer) => onDataTransferCompleted(transfer)
   }
 
   def act() { loop { react { dispatch } } }
@@ -64,16 +63,10 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
    */
   def onDataDiscarded(data:Seq[Data]): Unit = {}
 
-  /**
-   * Called when a data transfer has completed
-   */
-  def onDataTransferCompleted[V <: BufferView](transfer:DataTransfer[V]): Unit = {}
-
   /** Actor messages */
   protected case class TaskSubmitted(task:Task)
   protected case class TaskCompleted(task:Task, proc:Processor, memory:MemoryNode)
   protected case class DataDiscarded(data:Seq[Data])
-  protected case class DataTransferCompleted[V <: BufferView](transfer:DataTransfer[V])
 }
 
 

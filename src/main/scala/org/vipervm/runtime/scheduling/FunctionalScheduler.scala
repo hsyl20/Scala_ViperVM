@@ -14,6 +14,7 @@
 package org.vipervm.runtime.scheduling
 
 import org.vipervm.runtime.{FunctionalKernel,Data,Task}
+import org.vipervm.platform.{Processor,MemoryNode}
 
 /**
  * Schedule functional kernels
@@ -27,7 +28,7 @@ trait FunctionalScheduler {
    * @param input Kernel inputs
    * @return kernel outputs
    */
-  def schedule(f:FunctionalKernel, input:List[Data]):List[Data] = {
+  def submit(f:FunctionalKernel, input:List[Data]):List[Data] = {
     /* Create a task from the kernel and its parameters */
     val task = f.createTask(input)
 
@@ -49,4 +50,10 @@ trait FunctionalScheduler {
    * Submit a task to be executed
    */
   protected def submit(task:Task): Unit
+
+  /**
+   * Schedule a task on a given processor and memory
+   * Required data must be present in memory
+   */
+  protected def schedule(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
 }

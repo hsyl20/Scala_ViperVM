@@ -21,10 +21,9 @@ import scala.collection.mutable.Map
 /**
  * Default implementation for functional scheduler
  */
-class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler with TaskDataWait {
+class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler with TaskDataWait with DataManager {
 
   protected val configs:Map[DataConfig,List[Task]] = Map.empty
-  protected val confManager:DataConfigManager = new DataConfigManager
 
 
   override def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {
@@ -44,13 +43,7 @@ class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalSched
     /* Select nodes that can execute these kernels */
     //TODO
 
-    /* Make the data configuration on some node that can execute at least one of the kernels */
-    val dataConfig = new DataConfig {
-      val dataSet = task.input.toSet | task.output.toSet
-    }
-
     /* store and require this dataconfig for this task */
-    storeDataConfig(dataConfig, task)
   }
 
   def onDataConfigReady(config:DataConfig,memory:MemoryNode): Unit = {
@@ -71,10 +64,4 @@ class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalSched
     //TODO
   }
 
-  def storeDataConfig(config:DataConfig,task:Task): Unit = {
-    val old = configs.getOrElse(config, Nil)
-    configs.update(config, task :: old)
-
-    //TODO: require dataconfig
-  }
 }

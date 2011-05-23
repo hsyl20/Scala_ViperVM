@@ -14,8 +14,8 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import fr.hsyl20.vipervm.compilers._
-import fr.hsyl20.vipervm.compilers.ast._
+import org.vipervm.compilers._
+import org.vipervm.compilers.ast._
 
 class SymbolTableSpec extends FlatSpec with ShouldMatchers {
 

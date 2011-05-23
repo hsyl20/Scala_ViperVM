@@ -12,7 +12,7 @@
 \*                                                  */
 
 import org.junit._
-import fr.hsyl20.vipervm._
+import org.vipervm._
 
 /*class TestScheduler {
    @Test def scheduler {

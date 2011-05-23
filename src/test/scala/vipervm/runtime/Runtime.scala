@@ -14,10 +14,10 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-/*import fr.hsyl20.vipervm.runtime._
-import fr.hsyl20.vipervm.runtime.opencl.OpenCLDriver
-import fr.hsyl20.vipervm.runtime.schedulers.SingleDeviceScheduler
-import fr.hsyl20.vipervm.runtime.dataschedulers.DefaultDataScheduler
+/*import org.vipervm.runtime._
+import org.vipervm.runtime.opencl.OpenCLDriver
+import org.vipervm.runtime.schedulers.SingleDeviceScheduler
+import org.vipervm.runtime.dataschedulers.DefaultDataScheduler
 
 class RuntimeSpec extends FlatSpec with ShouldMatchers {
 

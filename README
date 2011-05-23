@@ -28,7 +28,7 @@ Sylvain HENRY - hsyl20@gmail.com
 Packages
 --------
 
-fr.hsyl20.opencl - OpenCL binding (using SNA and JNA)
-fr.hsyl20.vipervm.platform - Backends and abstract platform
-fr.hsyl20.vipervm.runtime - Runtime system
+org.vipervm.bindings.opencl - OpenCL binding (using SNA and JNA)
+org.vipervm.platform - Backends and abstract platform
+org.vipervm.runtime - Runtime system
 

@@ -14,9 +14,9 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import fr.hsyl20.vipervm.runtime.DefaultRuntime
-import fr.hsyl20.vipervm.dsl.linearalgebra._
-import fr.hsyl20.vipervm.data._
+import org.vipervm.runtime.DefaultRuntime
+import org.vipervm.dsl.linearalgebra._
+import org.vipervm.data._
 
 class DSLSpec extends FlatSpec with ShouldMatchers {
 

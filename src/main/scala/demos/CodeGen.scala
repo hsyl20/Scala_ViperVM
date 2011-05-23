@@ -13,7 +13,7 @@
 
 package demos.codegen
 
-import fr.hsyl20.vipervm.codegen.opencl._
+import org.vipervm.codegen.opencl._
 
 class CodeGen {
    val code = new CLCode {

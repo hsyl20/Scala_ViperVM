@@ -11,12 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package fr.hsyl20.vipervm.tests.platform
+package org.vipervm.tests.platform
 
-import fr.hsyl20.vipervm.platform.opencl._
-import fr.hsyl20.vipervm.platform.host._
-import fr.hsyl20.vipervm.platform._
-import fr.hsyl20.opencl.OpenCLBuildProgramException
+import org.vipervm.platform.opencl._
+import org.vipervm.platform.host._
+import org.vipervm.platform._
+import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
 private[platform] class DummyKernel extends OpenCLKernel {
   val source = """__kernel void dummy(__global float * in, __global float * out, int a) {

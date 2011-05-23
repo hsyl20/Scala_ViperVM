@@ -14,7 +14,7 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import fr.hsyl20.vipervm._
+import org.vipervm._
 
 /*class ComponentsSpec extends FlatSpec with ShouldMatchers {
 

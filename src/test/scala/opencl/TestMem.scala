@@ -1,4 +1,4 @@
-import fr.hsyl20.opencl._
+import org.vipervm.bindings.opencl._
 
 import org.junit._
 

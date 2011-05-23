@@ -12,8 +12,8 @@
 \*                                                  */
 
 /*import org.junit._
-import fr.hsyl20.vipervm._
-import fr.hsyl20.opencl._
+import org.vipervm._
+import org.vipervm.bindings.opencl._
 
 class TestLanguage {
    @Test def language {

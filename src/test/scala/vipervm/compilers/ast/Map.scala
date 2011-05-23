@@ -13,7 +13,7 @@
 
 import org.junit._
 import org.scalatest.junit.JUnitSuite
-import fr.hsyl20.vipervm.compilers.ast._
+import org.vipervm.compilers.ast._
 import java.io.PrintWriter
 
 class TestAstMap extends JUnitSuite with TreeDSL {

@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import fr.hsyl20.vipervm.compilers.ast._
+import org.vipervm.compilers.ast._
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

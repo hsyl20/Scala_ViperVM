@@ -14,7 +14,7 @@
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import fr.hsyl20.vipervm.codegen.opencl._
+import org.vipervm.codegen.opencl._
 
 class MapSpec extends FlatSpec with ShouldMatchers {
 

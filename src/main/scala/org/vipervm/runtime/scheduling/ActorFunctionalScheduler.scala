@@ -51,17 +51,17 @@ abstract class ActorFunctionalScheduler extends Actor with FunctionalScheduler {
   /**
    * Called when an task has been enqueued
    */
-  def onTaskSubmitted(task:Task): Unit = {}
+  protected def onTaskSubmitted(task:Task): Unit = {}
 
   /**
    * Called when an task has completed execution
    */
-  def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
+  protected def onTaskCompleted(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
 
   /**
    * Indicate that a data won't be used anymore by future submitted tasks
    */
-  def onDataDiscarded(data:Seq[Data]): Unit = {}
+  protected def onDataDiscarded(data:Seq[Data]): Unit = {}
 
   /** Actor messages */
   protected case class TaskSubmitted(task:Task)

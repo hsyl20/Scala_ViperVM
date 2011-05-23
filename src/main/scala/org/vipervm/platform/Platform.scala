@@ -78,4 +78,10 @@ class Platform(val drivers:Driver*) {
    */
   def linkBetween(source:Buffer,target:Buffer):Option[Link] = 
     linksBetween(source,target).headOption
+
+  /**
+   * First direct link between two views, if any
+   */
+  def linkBetween(source:BufferView,target:BufferView):Option[Link] = 
+    linksBetween(source.buffer,target.buffer).headOption
 }

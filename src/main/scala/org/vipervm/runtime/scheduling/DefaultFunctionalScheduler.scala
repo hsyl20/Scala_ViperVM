@@ -21,7 +21,7 @@ import scala.collection.mutable.Map
 /**
  * Default implementation for functional scheduler
  */
-class DefaultFunctionalScheduler(platform:Platform) extends ActorFunctionalScheduler with TaskDataWait with DataManager {
+class DefaultFunctionalScheduler(override val platform:Platform) extends ActorFunctionalScheduler with TaskDataWait with DataManager {
 
   protected val configs:Map[DataConfig,List[Task]] = Map.empty
 

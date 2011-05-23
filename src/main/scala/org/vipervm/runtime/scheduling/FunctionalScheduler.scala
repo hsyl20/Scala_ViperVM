@@ -14,7 +14,7 @@
 package org.vipervm.runtime.scheduling
 
 import org.vipervm.runtime.{FunctionalKernel,Data,Task}
-import org.vipervm.platform.{Processor,MemoryNode}
+import org.vipervm.platform.{Processor,MemoryNode,Platform}
 
 /**
  * Schedule functional kernels
@@ -56,4 +56,9 @@ trait FunctionalScheduler {
    * Required data must be present in memory
    */
   protected def schedule(task:Task,proc:Processor,memory:MemoryNode): Unit = {}
+
+  /**
+   * Platform 
+   */
+  val platform:Platform
 }

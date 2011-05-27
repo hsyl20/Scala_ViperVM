@@ -13,7 +13,7 @@
 
 package org.vipervm.data.morphisms
 
-import org.vipervm.data.Type
+import org.vipervm.data._
 
 /**
  * A morphism between two categories
@@ -21,4 +21,6 @@ import org.vipervm.data.Type
 trait Morphism {
   val domain:Type
   val codomain:Type
+
+  val f:Expr => Expr
 }

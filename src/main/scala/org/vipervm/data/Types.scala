@@ -13,11 +13,14 @@
 
 package org.vipervm.data
 
-sealed abstract class PrimitiveType
-case object DoublePrimitive extends PrimitiveType
-case object FloatPrimitive  extends PrimitiveType
-case object Int32Primitive  extends PrimitiveType
-case object Int64Primitive  extends PrimitiveType
-case object Int16Primitive  extends PrimitiveType
-case object BytePrimitive   extends PrimitiveType
-case class  StructurePrimitive(fields:Seq[PrimitiveType]) extends PrimitiveType
+sealed abstract class Type
+
+case object DoubleType extends Type
+case object FloatType  extends Type
+case object Int32Type  extends Type
+case object Int64Type  extends Type
+case object Int16Type  extends Type
+case object ByteType   extends Type
+case class  StructureType(fields:Seq[Type]) extends Type
+
+

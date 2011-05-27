@@ -15,5 +15,4 @@ package org.vipervm.data
 
 import org.vipervm.data.domains.RegularDenseDomain
 
-class RegularDenseMatrix(val elementType:PrimitiveType, domain:RegularDenseDomain) {
-}
+class RegularDenseMatrix(val elementType:Type, val domain:RegularDenseDomain)

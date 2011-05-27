@@ -13,7 +13,7 @@
 
 package org.vipervm.data
 
-trait Matrix[A <: PrimitiveType] {
-  val width:Long
-  val height:Long
+import org.vipervm.data.domains.RegularDenseDomain
+
+class RegularDenseMatrix(val elementType:PrimitiveType, domain:RegularDenseDomain) {
 }

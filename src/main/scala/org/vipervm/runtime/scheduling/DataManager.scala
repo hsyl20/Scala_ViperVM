@@ -68,7 +68,13 @@ trait DataManager extends ActorFunctionalScheduler {
     //TODO: check that no transfer is already running
 
     val link = platform.linkBetween(source, target)
-    val dt = link.copy(source,target)
+    val dt = link match {
+      case Some(l) => l.copy(source,target)
+      case None => {
+        /* TODO: Use host mem for intermediate data transfer */
+        error("todo")
+      }
+    }
 
     val memTransfers = dataTransfers.getOrElse(target.buffer.memory, Map.empty)
     val newTransfers = memTransfers.updated(data, dt)

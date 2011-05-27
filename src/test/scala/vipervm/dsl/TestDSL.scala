@@ -7,7 +7,7 @@
 **                                                  **
 **       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
 **                                                  **
-**         http://www.hsyl20.fr/vipervm             **
+**            http://www.vipervm.org                **
 **                     GPLv3                        **
 \*                                                  */
 /*

@@ -72,7 +72,7 @@ trait DataManager extends ActorFunctionalScheduler {
       case Some(l) => l.copy(source,target)
       case None => {
         /* TODO: Use host mem for intermediate data transfer */
-        error("todo")
+        sys.error("todo")
       }
     }
 

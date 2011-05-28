@@ -10,14 +10,14 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCo
   val jna = "net.java.dev.jna" % "jna" % "3.2.7"
 
   /* GUI libs */
-  val scala_swing = "org.scala-lang" % "scala-swing" % "2.8.1"
+  val scala_swing = "org.scala-lang" % "scala-swing" % "2.9.0"
 
   /* Continuation plugin */
-  val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % "2.8.1")
-  override def compileOptions = CompileOption("-P:continuations:enable") :: super.compileOptions.toList
+  val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0")
+  override def compileOptions = super.compileOptions ++ compileOptions("-P:continuations:enable") ++ Seq(Unchecked)
 
   /* Logging (SLF4J through grizzled) */
-  val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.4"
+  val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.5"
 
   /* Logging configuration :
    * - Simple: Output logs to System.err
@@ -32,7 +32,7 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCo
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0-SNAPSHOT"
 
   /* Test libs */
-  val scalatest = "org.scalatest" % "scalatest" % "1.2"
+  val scalatest = "org.scalatest" %% "scalatest" % "1.4.1"
   val junit = "junit" % "junit" % "4.8.2"
 
   /* Runs */

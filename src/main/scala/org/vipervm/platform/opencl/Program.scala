@@ -43,7 +43,7 @@ class OpenCLProgram(val source:String) {
   def compileFor(device:OpenCLProcessor): Program = {
     val t = isCompatibleWith(device).getOrElse(true)
     if (!t)
-      error("This program isn't compatible with the specified device")
+      sys.error("This program isn't compatible with the specified device")
 
     try {
       val p = new Program(device.context, source)

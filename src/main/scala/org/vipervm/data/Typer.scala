@@ -21,7 +21,7 @@ object Typer {
     case ValLong(_)   => TypedExpr(e, Int64Type)
     case ValFloat(_)  => TypedExpr(e, FloatType)
     case ValDouble(_) => TypedExpr(e, DoubleType)
-    case Var(_)       => error("Unknown expression type")
+    case Var(_)       => sys.error("Unknown expression type")
     case Add(l,r)     => mustEquals(l,r, Add(_,_))
     case Sub(l,r)     => mustEquals(l,r, Sub(_,_))
     case Mul(l,r)     => mustEquals(l,r, Mul(_,_))
@@ -31,6 +31,6 @@ object Typer {
   def mustEquals(e1:Expr,e2:Expr,f:(Expr,Expr) => Expr):TypedExpr = {
     val t1 = apply(e1)
     val t2 = apply(e2)
-    if (t1.typ != t2.typ) error("Types must be the same") else TypedExpr(f(t1,t2), t1.typ)
+    if (t1.typ != t2.typ) sys.error("Types must be the same") else TypedExpr(f(t1,t2), t1.typ)
   }
 }

@@ -40,7 +40,7 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCo
   
   val run_demo_codegen = runTask(Some("demos.codegen.Main"), testClasspath) dependsOn(testCompile) describedAs "C code generation demo"
 
-  val run_profiler = runTask(Some("fr.hsyl20.vipervm.apps.Profiler"), testClasspath) dependsOn(compile) describedAs "Profiling GUI"
-  val run_info = runTask(Some("fr.hsyl20.vipervm.apps.Info"), testClasspath) dependsOn(compile) describedAs "Platform information"
+  val run_profiler = runTask(Some("org.vipervm.apps.Profiler"), testClasspath) dependsOn(compile) describedAs "Profiling GUI"
+  val run_info = runTask(Some("org.vipervm.apps.Info"), testClasspath) dependsOn(compile) describedAs "Platform information"
 }
 

@@ -14,5 +14,6 @@
 package org.vipervm.data
 
 import org.vipervm.data.domains.RegularDenseDomain
+import org.vipervm.data.storage.RegularDenseStorage
 
-class RegularDenseMatrix(val elementType:Type, val domain:RegularDenseDomain)
+case class RegularDenseMatrix(elementType:Type, domain:RegularDenseDomain, storage:RegularDenseStorage)

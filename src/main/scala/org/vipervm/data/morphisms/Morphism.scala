@@ -22,5 +22,7 @@ trait Morphism {
   val domain:Type
   val codomain:Type
 
-  val f:Expr => Expr
+  val f:PartialFunction[Expr,Expr]
+
+  def apply(e:Expr) = f.apply(e)
 }

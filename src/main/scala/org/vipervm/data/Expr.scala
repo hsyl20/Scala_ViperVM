@@ -33,4 +33,7 @@ case class Sub(left:Expr, right:Expr) extends Expr
 case class Mul(left:Expr, right:Expr) extends Expr
 case class Div(left:Expr, right:Expr) extends Expr
 
+case class Tuple(elems:Vector[Expr]) extends Expr
+case class TupleExtractor(tuple:Tuple, index:Int) extends Expr
+
 case class TypedExpr(e:Expr, typ:Type) extends Expr

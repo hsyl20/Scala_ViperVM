@@ -13,14 +13,18 @@
 
 package org.vipervm.runtime.data
 
-import org.vipervm.platform.{BufferView1D,MemoryNode}
+import org.vipervm.platform.{BufferView2D,MemoryNode}
 import org.vipervm.runtime.Data
 
-class Vector(size:Long) extends Data {
-  type ViewType = BufferView1D
+/**
+ * Strided 2D raw data
+ */
+class Strided2DRawData(width:Long,height:Long) extends Data {
+  type ViewType = BufferView2D
 
-  def allocate(memory:MemoryNode):BufferView1D = {
-    val buffer = memory.allocate(size)
-    new BufferView1D(buffer, 0, size)
+  def allocate(memory:MemoryNode):BufferView2D = {
+    //TODO: manage padding correctly
+    val buffer = memory.allocate(width*height)
+    new BufferView2D(buffer, 0, width, height, 0)
   }
 }

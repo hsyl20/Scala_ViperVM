@@ -36,7 +36,7 @@ class RegularDenseStorage {
     val dom = domain
 
     new Morphism {
-      val domain = TupleType(dom.ndims, Int64Type)
+      val domain = TupleType(dom.ndims, Seq(Int64Type))
       val codomain = Int64Type
       val f:PartialFunction[Expr,Expr] = {
         case Tuple(elems) => indexExpr(dom,elems)

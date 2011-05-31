@@ -22,6 +22,6 @@ case object Int64Type  extends Type
 case object Int16Type  extends Type
 case object ByteType   extends Type
 case class  RecordType(fields:Seq[Type]) extends Type
-case class  TupleType(n:Int, typ:Type) extends Type
+case class  TupleType(n:Int, typs:Seq[Type]) extends Type
 
 

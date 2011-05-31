@@ -26,6 +26,14 @@ object Typer {
     case Sub(l,r)     => mustEquals(l,r, Sub(_,_))
     case Mul(l,r)     => mustEquals(l,r, Mul(_,_))
     case Div(l,r)     => mustEquals(l,r, Div(_,_))
+    case Tuple(elems) => {
+      val ne = elems.map(apply)
+      TypedExpr(Tuple(ne), TupleType(elems.size, ne.map(_.typ)))
+    }
+    case TupleExtractor(t,i) => {
+      val tt = apply(t)
+      TypedExpr(TupleExtractor(tt,i), tt.e.asInstanceOf[Tuple].elems(i).asInstanceOf[TypedExpr].typ)
+    }
   }
 
   def mustEquals(e1:Expr,e2:Expr,f:(Expr,Expr) => Expr):TypedExpr = {

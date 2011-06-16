@@ -6,14 +6,19 @@ class ViperVMProject(info: ProjectInfo) extends DefaultProject(info) with AutoCo
   val javanet = "Java Net Repository" at "http://download.java.net/maven/2/"
   val scala_tools_snapshots = "Scala-Tools Snapshots" at "http://scala-tools.org/repo-snapshots"
 
+  val scala_version = "2.9.0"
+
+  /* JLine for the REPL */
+  val jline = "org.scala-lang" % "jline" % scala_version
+
   /* Runtime libs */
   val jna = "net.java.dev.jna" % "jna" % "3.2.7"
 
   /* GUI libs */
-  val scala_swing = "org.scala-lang" % "scala-swing" % "2.9.0"
+  val scala_swing = "org.scala-lang" % "scala-swing" % scala_version
 
   /* Continuation plugin */
-  val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0")
+  val continuations = compilerPlugin("org.scala-lang.plugins" % "continuations" % scala_version)
   override def compileOptions = super.compileOptions ++ compileOptions("-P:continuations:enable") ++ Seq(Unchecked)
 
   /* Logging (SLF4J through grizzled) */

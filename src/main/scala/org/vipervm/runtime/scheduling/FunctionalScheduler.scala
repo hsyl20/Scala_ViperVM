@@ -36,7 +36,9 @@ trait FunctionalScheduler {
     submit(task)
 
     /* Return output data */
-    task.output
+    //FIXME
+    //task.output
+    task.input
   }
 
   /**

@@ -16,6 +16,6 @@ package org.vipervm.runtime
 import org.vipervm.platform.Kernel
 
 /**
- * A functional kernel with its arguments, ready to be scheduled
+ * A functional kernel with its parameters
  */
-case class Task(kernel:FunctionalKernel, input:List[Data], output:List[Data])
+case class Task(kernel:FunctionalKernel, input:List[Data])

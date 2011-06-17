@@ -33,20 +33,15 @@ abstract class FunctionalKernel(val kernel:Kernel) {
    *  - Allocate data
    *  - Set order of kernel parameters
    */
-  def pre(ks:Seq[KernelParameter]):Seq[KernelParameter]
+  def pre(ks:List[Data]):Seq[KernelParameter]
 
   /**
    * Get function's outputs from kernel parameters
    */
-  def post(ks:Seq[KernelParameter]):Seq[KernelParameter]
-
-  /**
-   * Create output data
-   */
-  def createOutputData:List[Data]
+  def post(ks:Seq[KernelParameter]):List[Data]
 
   /**
    * Create a task from this kernel
    */
-  def createTask(input:List[Data]) = new Task(this, input, createOutputData)
+  def createTask(input:List[Data]) = new Task(this, input)
 }

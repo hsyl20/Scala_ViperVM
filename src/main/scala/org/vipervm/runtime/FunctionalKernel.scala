@@ -28,20 +28,28 @@ import org.vipervm.platform.Kernel
  * @param kernel Kernel decorated by this class
  */
 abstract class FunctionalKernel(val kernel:Kernel) {
+  /** Number of arguments */
+  val paramCount:Int
+
   /**
    * Prepare parameters for a kernel
    *  - Allocate data
    *  - Set order of kernel parameters
    */
-  def pre(ks:List[Data]):Seq[KernelParameter]
+  def pre(input:List[Data],output:Data):Seq[KernelParameter]
 
   /**
-   * Get function's outputs from kernel parameters
+   * Set function's output from kernel parameters
    */
-  def post(ks:Seq[KernelParameter]):List[Data]
+  def post(ks:Seq[KernelParameter],output:Data):Unit
+
+  /**
+   * Create output data
+   */
+  protected def createOutput(input:List[Data]):Data
 
   /**
    * Create a task from this kernel
    */
-  def createTask(input:List[Data]) = new Task(this, input)
+  def createTask(input:List[Data]) = new Task(this, input, createOutput(input))
 }

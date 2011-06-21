@@ -11,11 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.evaluator
 
-import org.vipervm.platform.Kernel
+import org.vipervm.runtime.Data
+import org.vipervm.runtime.FunctionalKernel
 
-/**
- * A functional kernel with its parameters
- */
-case class Task(kernel:FunctionalKernel, input:List[Data], output:Data)
+sealed abstract class Term
+case class DataTerm(data:Data) extends Term
+case class KernelApply(kernel:FunctionalKernel,args:List[Term]) extends Term

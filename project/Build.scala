@@ -118,8 +118,9 @@ object ViperVMBuild extends Build {
   lazy val vipervm = Project (
     "vipervm",
     file ("."),
-    settings = buildSettings ++ Seq (resolvers := allResolvers,
-                                    libraryDependencies := commonDeps)
+    settings = buildSettings ++ Seq (scalacOptions := Seq("-deprecation", "-unchecked"),
+                                     resolvers := allResolvers,
+                                     libraryDependencies := commonDeps)
                              ++ Tasks.all
   )
 

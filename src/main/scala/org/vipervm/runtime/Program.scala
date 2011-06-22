@@ -13,18 +13,15 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.Platform
-import org.vipervm.runtime.ast._
+import org.vipervm.runtime.ast.Term
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
+ * A program
  */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) {
+class Program(source:String) {
 
-  def call(f:Term, args:Term*):Term = new Application(f, args.toList)
+  def apply(name:String)(implicit runtime:Runtime):Term = {
+    //TODO
+    throw new Exception("Not implemented")
+  }
 }
-

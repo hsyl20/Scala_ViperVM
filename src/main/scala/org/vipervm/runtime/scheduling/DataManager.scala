@@ -36,13 +36,12 @@ trait DataManager extends ActorFunctionalScheduler {
   override protected def schedule(task:Task,proc:Processor,mem:MemoryNode):Unit = {
     //TODO: check that data are present in memory
 
-  //FIXME
 /*    for (d <- task.input union task.output) {
       val old = dataLocks.getOrElse((mem,d), 0)
       dataLocks = dataLocks.updated((mem,d), old + 1)
-    }
+    }*/
 
-    super.schedule(task,proc,mem)*/
+    super.schedule(task,proc,mem)
   }
 
 
@@ -50,7 +49,6 @@ trait DataManager extends ActorFunctionalScheduler {
    * Remove locks on data used by the completed task
    */
   override protected def onTaskCompleted(task:Task,proc:Processor,mem:MemoryNode):Unit = {
-    //FIXME
 /*    for (d <- task.input union task.output) {
       val old = dataLocks((mem,d))
       if (old - 1 == 0)

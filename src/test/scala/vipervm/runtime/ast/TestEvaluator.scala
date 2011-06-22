@@ -14,11 +14,11 @@
 import org.scalatest.FunSuite
 
 import org.vipervm.runtime.data.RawData
-import org.vipervm.runtime.evaluator._
+import org.vipervm.runtime.ast._
 import org.vipervm.runtime.{FunctionalKernel,Data,KernelParameter}
 import org.vipervm.platform.{Kernel,ReadOnly,ReadWrite,Processor,AccessMode}
 
-class TestEvaluator extends FunSuite {
+class TestAstEvaluator extends FunSuite {
 
   test("Data are returned as-is") {
     val d = new RawData(1024)
@@ -31,7 +31,7 @@ class TestEvaluator extends FunSuite {
     val k = new DummyFunctionalKernel(new DummyKernel)
     val d1 = DataTerm(new RawData(1024))
     val d2 = DataTerm(new RawData(512))
-    val prog = KernelApply(k,List(d1,d2))
+    val prog = Application(KernelTerm(k),List(d1,d2))
     val evaluator = new Evaluator
     assert( evaluator.eval(prog).isInstanceOf[DataTerm] )
   }

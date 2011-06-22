@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.evaluator
+package org.vipervm.runtime.ast
 
 import org.vipervm.runtime.Data
 
@@ -20,8 +20,10 @@ import org.vipervm.runtime.Data
  */
 class Evaluator {
   def eval(term:Term):Term = term match {
+
     case DataTerm(_) => term
-    case KernelApply(k,as) => {
+
+    case Application(KernelTerm(k),as) => {
       if (k.paramCount < as.length) {
         throw new InvalidProgram("Too many parameter for kernel %s".format(k))
       }

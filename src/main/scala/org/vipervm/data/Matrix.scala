@@ -11,20 +11,22 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.data
 
-import org.vipervm.platform.Platform
+import org.vipervm.runtime.data.Matrix2D
 import org.vipervm.runtime.ast._
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) {
+object Matrix {
+  import Primitive._
 
-  def call(f:Term, args:Term*):Term = new Application(f, args.toList)
+  /**
+   * Generate a random matrix
+   */
+  def random[T](dims:Long*)(implicit prim:Primitive[T]): Term = {
+    val ndims = dims.length
+    ndims match {
+      case 2 => DataTerm(new Matrix2D(prim.size, dims(0), dims(1)))
+      case _ => throw new Exception("Not supported")
+    }
+  }
 }
-

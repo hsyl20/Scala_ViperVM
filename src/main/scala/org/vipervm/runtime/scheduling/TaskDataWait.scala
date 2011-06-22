@@ -17,7 +17,7 @@ import org.vipervm.runtime.Task
 import org.vipervm.platform.{EventGroup,Platform,MemoryNode,Processor}
 
 /**
- * Trait that notify the scheduler when a task has its input data ready
+ * Trait that notifies the scheduler when a task has its input data ready
  */
 trait TaskDataWait extends ActorFunctionalScheduler {
   

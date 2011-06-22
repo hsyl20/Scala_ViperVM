@@ -11,20 +11,29 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
-
-import org.vipervm.platform.Platform
-import org.vipervm.runtime.ast._
+package org.vipervm.data
 
 /**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
+ * Primitive type description
  */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) {
+trait Primitive[T] {
 
-  def call(f:Term, args:Term*):Term = new Application(f, args.toList)
+  /** Size in bytes */
+  def size:Int
+
 }
 
+
+object Primitive {
+  implicit val primitiveFloat = new Primitive[Float] {
+    def size = 4
+  }
+
+  implicit val primitiveInt = new Primitive[Int] {
+    def size = 4
+  }
+
+  implicit val primitiveLong = new Primitive[Long] {
+    def size = 8
+  }
+}

@@ -11,11 +11,20 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.evaluator
+package org.vipervm.runtime.data
 
+import org.vipervm.platform.{BufferView2D,MemoryNode}
 import org.vipervm.runtime.Data
-import org.vipervm.runtime.FunctionalKernel
 
-sealed abstract class Term
-case class DataTerm(data:Data) extends Term
-case class KernelApply(kernel:FunctionalKernel,args:List[Term]) extends Term
+/**
+ * 2D matrix
+ */
+class Matrix2D(elemSize:Int,width:Long,height:Long) extends Data {
+  type ViewType = BufferView2D
+
+  def allocate(memory:MemoryNode):BufferView2D = {
+    //TODO: manage padding correctly
+    val buffer = memory.allocate(elemSize*width*height)
+    new BufferView2D(buffer, 0, elemSize*width, height, 0)
+  }
+}

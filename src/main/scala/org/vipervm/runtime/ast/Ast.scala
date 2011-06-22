@@ -11,20 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.ast
 
-import org.vipervm.platform.Platform
-import org.vipervm.runtime.ast._
+import org.vipervm.runtime.Data
+import org.vipervm.runtime.FunctionalKernel
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) {
-
-  def call(f:Term, args:Term*):Term = new Application(f, args.toList)
-}
-
+sealed abstract class Term
+case class DataTerm(data:Data) extends Term
+case class KernelTerm(kernel:FunctionalKernel) extends Term
+case class Application(f:Term, args:List[Term]) extends Term

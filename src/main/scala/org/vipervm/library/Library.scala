@@ -19,8 +19,10 @@ import org.vipervm.runtime.FunctionalKernel
  * Kernel library
  */
 class Library {
-  /** Try to retrieve from its name */
+
+  /** Try to retrieve a kernel from its name */
   def retrieve(name:String): Option[FunctionalKernel] = {
     throw new Exception("Not implemented")
   }
+
 }

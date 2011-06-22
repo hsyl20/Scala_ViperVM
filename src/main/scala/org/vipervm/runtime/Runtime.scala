@@ -23,8 +23,4 @@ import org.vipervm.runtime.ast._
  *  - a platform
  *  - a task scheduler
  */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) {
-
-  def call(f:Term, args:Term*):Term = new Application(f, args.toList)
-}
-
+class Runtime(platform:Platform /*, scheduler:Scheduler */ ) 

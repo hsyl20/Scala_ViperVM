@@ -43,7 +43,7 @@ object Sample0 {
     
     val my_op = program("my_operation")
     
-    val d3 = runtime.call(my_op,d0,d1,d2)
+    val d3 = my_op(d0,d1,d2)
 
   }
 }

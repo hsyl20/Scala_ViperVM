@@ -13,11 +13,7 @@
 
 package org.vipervm.apps.samples
 
-import org.vipervm.platform.Platform
-import org.vipervm.platform.opencl.OpenCLDriver
-import org.vipervm.platform.host.DefaultHostDriver
-
-import org.vipervm.runtime.Runtime
+import org.vipervm.runtime.DefaultRuntime
 import org.vipervm.runtime.Program
 import org.vipervm.runtime.Data
 
@@ -36,8 +32,7 @@ object Sample0 {
 
     val source = "def my_operation(m:Matrix, n:Matrix, f:Matrix): Matrix = (m + n) * f"
 
-    val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
-    implicit val runtime = new Runtime(platform)
+    implicit val runtime = new DefaultRuntime
 
     val program = new Program(source)
     
@@ -45,5 +40,6 @@ object Sample0 {
     
     val d3 = my_op(d0,d1,d2)
 
+    
   }
 }

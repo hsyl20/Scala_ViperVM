@@ -24,7 +24,7 @@ class TestAstEvaluator extends FunSuite {
     val d = new RawData(1024)
     val prog = DataTerm(d)
     val evaluator = new Evaluator
-    assert( evaluator.eval(prog) == prog )
+    assert( evaluator.evalc(prog) == prog )
   }
 
   test("Kernel applications return data") {
@@ -33,7 +33,7 @@ class TestAstEvaluator extends FunSuite {
     val d2 = DataTerm(new RawData(512))
     val prog = AppTerm(AppTerm(KernelTerm(k),d1),d2)
     val evaluator = new Evaluator
-    assert( evaluator.eval(prog).isInstanceOf[DataTerm] )
+    assert( evaluator.evalc(prog).isInstanceOf[DataTerm] )
   }
 }
 

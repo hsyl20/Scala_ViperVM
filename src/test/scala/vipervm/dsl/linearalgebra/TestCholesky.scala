@@ -15,7 +15,7 @@ import org.scalatest.FunSuite
 
 import org.vipervm.dsl.linearalgebra._
 
-class TestAstEvaluator extends FunSuite {
+class TestDslLinearAlgebra extends FunSuite {
 
   test("Cholesky is typable") {
   }

@@ -13,17 +13,16 @@
 
 package org.vipervm.dsl.linearalgebra
 
-class Matrix[A] {
-
+class LowerTriangularMatrix[A] {
   /**
    * Drop some columns (on the left)
    */
-  def dropColumn(n:Int): Matrix[A] = sys.error("undefined")
+  def dropColumn(n:Int): LowerTriangularMatrix[A] = sys.error("undefined")
 
   /**
    * Take some columns (on the left)
    */
-  def takeColumn(n:Int): Matrix[A] = sys.error("undefined")
+  def takeColumn(n:Int): List[Vector[A]] = sys.error("undefined")
 
   /**
    * Take the first column
@@ -33,30 +32,26 @@ class Matrix[A] {
   /**
    * Return an even blocking of the matrix
    */
-  def blocking: Matrix[Matrix[A]] = sys.error("undefined")
+  def blocking: LowerTriangularMatrix[Matrix[A]] = sys.error("undefined")
 
   /**
    * Apply f to every element of the matrix
    */
-  def map[B](f:A=>B): Matrix[B] = sys.error("undefined")
+  def map[B](f:A=>B): LowerTriangularMatrix[B] = sys.error("undefined")
 
   /**
    * Zip this matrix with another
    */
-  def zip[B](m:Matrix[B]): Matrix[(A,B)] = sys.error("undefined")
-
-  /**
-   * Extract the lower-triangular matrix
-   */
-  def lowerTriangular: LowerTriangularMatrix[A] = sys.error("undefined")
+  def zip[B](m:LowerTriangularMatrix[B]): LowerTriangularMatrix[(A,B)] = sys.error("undefined")
 
   /**
    * Concat a column on the left
    */
-  def ::(v:Vector[A]): Matrix[A] = sys.error("undefined")
+  def ::(v:Vector[A]): LowerTriangularMatrix[A] = sys.error("undefined")
 
   /**
-   * Concat a matrix on the left
+   * Full matrix
    */
-  def :::(v:Matrix[A]): Matrix[A] = sys.error("undefined")
+  def toMatrix: Matrix[A] = sys.error("udnefined")
 }
+

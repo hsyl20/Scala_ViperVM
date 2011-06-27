@@ -23,27 +23,18 @@ class Evaluator {
 
     case DataTerm(_) => term
 
-    case Application(KernelTerm(k),as) => {
-      if (k.paramCount < as.length) {
-        throw new InvalidProgram("Too many parameter for kernel %s".format(k))
-      }
-      else if (k.paramCount != as.length) {
-        //TODO: currying
-        throw new InvalidProgram("Currying for kernel %s isn't supported yet".format(k))
-      }
-      else {
-        val eas = as.map(eval _)
-        if (eas.exists(a => !isData(a))) throw new InvalidProgram("Evaluation of kernel parameter to something other than a data")
-        val datas = eas.map(asData _)
+    case AppTerm(KernelTerm(k),as) => {
+      val eas = eval(as)
+      if (!isData(eas)) throw new InvalidProgram("Evaluation of kernel parameter to something other than a data")
+      val data = asData(eas)
 
+      //FIXME: multi-arg kernels
+      val task = k.createTask(List(data))
 
-        val task = k.createTask(datas)
+      //TODO
+      println("Scheduling execution %s = %s(%s)".format(task.output,k,task.input.mkString(",")))
 
-        //TODO
-        println("Scheduling execution %s = %s(%s)".format(task.output,k,task.input.mkString(",")))
-
-        DataTerm(task.output)
-      }
+      DataTerm(task.output)
     }
   }
 

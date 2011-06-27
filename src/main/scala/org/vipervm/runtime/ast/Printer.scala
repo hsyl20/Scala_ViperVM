@@ -13,27 +13,25 @@
 
 package org.vipervm.runtime.ast
 
-import org.vipervm.runtime.Data
-import org.vipervm.runtime.FunctionalKernel
-
-sealed abstract class Term {
-  def apply(ts:Term*) = (this /: ts.toList)(AppTerm(_,_))
+object Printer {
+  def print(ctx:Context, t:Term, out:java.io.PrintStream = System.out): Unit = t match {
+    case AbsTerm(body,name) => {
+      val (ctx2, name2) = ctx.pickFreshName(name)
+      out.print("(λ" + name2 + ". ")
+      print(ctx2,body)
+      out.print(")")
+    }
+    case AppTerm(left,right) => {
+      out.print("(")
+      print(ctx, left)
+      out.print(" ")
+      print(ctx, right)
+      out.print(")")
+    }
+    case VarTerm(idx,n) => {
+      out.print(
+        if (ctx.length == n) ctx.indexToName(idx) else "[bad index]"
+      )
+    }
+  }
 }
-
-/**
- * A variable with its de Bruijn index
- * ctxSize is used to check that context size is coherent
- */
-case class VarTerm(idx:Int,ctxSize:Int) extends Term
-
-/**
- * An abstraction with its content
- * name field can be used to store the variable name
- */
-case class AbsTerm(body:Term, name:String = "") extends Term
-
-/** An application */
-case class AppTerm(left:Term, right:Term) extends Term
-
-case class DataTerm(data:Data) extends Term
-case class KernelTerm(kernel:FunctionalKernel) extends Term

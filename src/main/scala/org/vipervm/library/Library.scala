@@ -17,12 +17,21 @@ import org.vipervm.runtime.FunctionalKernel
 
 /**
  * Kernel library
+ *
+ * TODO: support packages
  */
 class Library {
 
-  /** Try to retrieve a kernel from its name */
+  private var functions: Map[String,FunctionalKernel] = Map.empty
+
+  /** Try to retrieve a kernel by name */
   def retrieve(name:String): Option[FunctionalKernel] = {
-    throw new Exception("Not implemented")
+    functions.get(name)
+  }
+
+  /** Add a kernel to the library */
+  def add(name:String, kernel:FunctionalKernel): Unit = {
+    functions += name -> kernel
   }
 
 }

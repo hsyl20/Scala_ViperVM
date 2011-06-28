@@ -14,37 +14,23 @@
 package org.vipervm.dsl
 
 package object linearalgebra {
-  implicit def ltmltm[A](m:LowerTriangularMatrix[Matrix[A]]) = new {
-    /**
-     * Flatten blocks of the matrix
-     */
-    def flatten:LowerTriangularMatrix[A] = sys.error("undefined")
-  }
 
-  implicit def mm[A](m:Matrix[Matrix[A]]) = new {
-    /**
-     * Flatten blocks of the matrix
-     */
-    def flatten:Matrix[A] = sys.error("undefined")
-  }
+  implicit def wrappedInt[A<:AnyVal](v:A) = new Value[A](v)
 
-  implicit def vm[A](m:Vector[Matrix[A]]) = new {
-    /**
-     * Flatten blocks of the matrix
-     */
-    def flatten:Matrix[A] = sys.error("undefined")
-  }
+  implicit def wrappedNum[A](e:Expr[Num[A]]) = new WrappedNum[A](e)
+  implicit def wrappedMN[A](e:Expr[Matrix[Num[A]]]) = new WrappedMN[A](e)
 
-  implicit def matadd[A<:Addable[A]](m:Matrix[A]) = new {
-    def -(a:Matrix[A]):Matrix[A] = (m zip a) map (x => x._1 - x._2)
-    def +(a:Matrix[A]):Matrix[A] = (m zip a) map (x => x._1 + x._2)
-  }
+  implicit def wrappedM[A](e:Expr[Matrix[A]]) = new WrappedM[A](e)
+  implicit def wrappedLTM[A](e:Expr[LowerTriangularMatrix[A]]) = new WrappedLTM[A](e)
+  implicit def wrappedLTMM[A](e:Expr[LowerTriangularMatrix[Matrix[A]]]) = new WrappedLTMM[A](e)
+  implicit def wrappedMM[A](e:Expr[Matrix[Matrix[A]]]) = new WrappedMM[A](e)
+  implicit def wrappedV[A](e:Expr[Vector[A]]) = new WrappedV[A](e)
+  implicit def wrappedVM[A](e:Expr[Vector[Matrix[A]]]) = new WrappedVM[A](e)
 
-  implicit def matmul[A <:Addable[A] with Multipliable[A]](m:Matrix[A]) = new {
-    def *(a:Matrix[A]):Matrix[A] = sys.error("undefined")
-  }
+  implicit def wrappedTuple2[A,B](e:Expr[(A,B)]) = new WrappedTuple2(e)
 
-  implicit def num[A](num:A) = new {
-    def sqrt:A = sys.error("undefined")
-  }
+  implicit def wrappedFun1[A,B](f:Expr[A]=>Expr[B]) = new ExprFun1(f)
+
+  
+
 }

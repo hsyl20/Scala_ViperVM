@@ -23,5 +23,5 @@ object Blas {
    *
    *     op( A ) = A   or   op( A ) = A**T.
    */
-  def trsm[A](a:LowerTriangularMatrix[A],b:Matrix[A]): Matrix[A] = sys.error("undefined")
+  def trsm[A](a:Expr[LowerTriangularMatrix[Num[A]]],b:Expr[Matrix[Num[A]]]) = FunCall[Matrix[Num[A]]]("trsm", a, b)
 }

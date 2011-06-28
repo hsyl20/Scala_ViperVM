@@ -11,17 +11,18 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FunSuite
+package org.vipervm.dsl.linearalgebra
 
-import org.vipervm.library.linearalgebra._
-import org.vipervm.dsl.linearalgebra._
+object Printer {
 
-class TestDslLinearAlgebra extends FunSuite {
-
-  test("Cholesky is typable") {
-    val m = LowerTriangularMatrix[Num[Int]](100L)
-    //val x = m.dropColumn(2)
-    val x = (new Cholesky).cholesky(m)
-    println(Printer.print(x))
+  def print[A](e:Expr[A]): String = e match {
+    case FunCall(name, as@_*) => "%s(%s)".format(name, as.mkString(","))
+    case MethodCall(self, name, as@_*) => {
+      val as2 = for (a <- as) yield print(a)
+      "%s.%s(%s)".format(print(self),name,as2.mkString(","))
+    }
+    case Value(v) => v.toString
+    case ExprFun1(f) => f.toString
+    case Choice(cs@_*) => cs.toString
   }
 }

@@ -1,14 +1,17 @@
 package org.vipervm.dsl.linearalgebra
 
-trait Addable[A] {
-  def -(a:A):A
-  def +(a:A):A
+class Num[A]
+
+class WrappedNum[A](expr:Expr[Num[A]]) {
+  def sqrt = MethodCall[Num[A]](expr, "sqrt")
+  def -(a:Expr[Num[A]]) = MethodCall[Num[A]](expr, "-", a)
+  def +(a:Expr[Num[A]]) = MethodCall[Num[A]](expr, "+", a)
+  def *(a:Expr[Num[A]]) = MethodCall[Num[A]](expr, "*", a)
+  def /(a:Expr[Num[A]]) = MethodCall[Num[A]](expr, "/", a)
 }
 
-trait Multipliable[A] {
-  def *(a:A):A
-}
-
-trait Divisable[A] {
-  def /(a:A):A
+class WrappedMN[A](expr:Expr[Matrix[Num[A]]]) {
+  def -(a:Expr[Matrix[Num[A]]]) = (expr zip a) map (x => x._1 - x._2)
+  def +(a:Expr[Matrix[Num[A]]]) = (expr zip a) map (x => x._1 + x._2)
+  def *(a:Expr[Matrix[Num[A]]]) = MethodCall[Matrix[Num[A]]](expr, "*", a)
 }

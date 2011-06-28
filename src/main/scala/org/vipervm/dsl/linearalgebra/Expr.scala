@@ -11,17 +11,19 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FunSuite
+package org.vipervm.dsl.linearalgebra
 
-import org.vipervm.library.linearalgebra._
-import org.vipervm.dsl.linearalgebra._
-
-class TestDslLinearAlgebra extends FunSuite {
-
-  test("Cholesky is typable") {
-    val m = LowerTriangularMatrix[Num[Int]](100L)
-    //val x = m.dropColumn(2)
-    val x = (new Cholesky).cholesky(m)
-    println(Printer.print(x))
-  }
+sealed abstract class Expr[A] {
+  def | (e:Expr[A]) = Choice(this,e)
 }
+
+case class FunCall[A](name:String, args:Expr[_]*) extends Expr[A]
+case class ClosureCall[A,B](f:ExprFun1[A,B],a:Expr[A]) extends Expr[B]
+case class MethodCall[A](self:Expr[_], name:String, args:Expr[_]*) extends Expr[A]
+case class Value[A](v:AnyVal) extends Expr[A]
+
+case class ExprFun1[A,B](f:Expr[A]=>Expr[B]) extends Expr[A=>B] {
+  def apply(a:Expr[A]) = ClosureCall[A,B](this,a)
+}
+
+case class Choice[A](cs:Expr[A]*) extends Expr[A]

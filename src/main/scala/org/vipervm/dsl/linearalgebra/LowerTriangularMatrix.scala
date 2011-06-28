@@ -13,45 +13,61 @@
 
 package org.vipervm.dsl.linearalgebra
 
-class LowerTriangularMatrix[A] {
+
+class LowerTriangularMatrix[A]
+
+object LowerTriangularMatrix {
+  def apply[A](width:Expr[Long]) = FunCall[LowerTriangularMatrix[A]]("LowerTriangularMatrix.empty", width)
+}
+
+class WrappedLTM[A](expr:Expr[LowerTriangularMatrix[A]]) {
   /**
    * Drop some columns (on the left)
    */
-  def dropColumn(n:Int): LowerTriangularMatrix[A] = sys.error("undefined")
-
-  /**
-   * Take some columns (on the left)
-   */
-  def takeColumn(n:Int): List[Vector[A]] = sys.error("undefined")
+  def dropColumn(n:Expr[Int]) = MethodCall[LowerTriangularMatrix[A]](expr, "dropColumn", n)
 
   /**
    * Take the first column
    */
-  def firstColumn: Vector[A] = sys.error("undefined")
+  def firstColumn = MethodCall[Vector[A]](expr, "firstColumn")
 
   /**
    * Return an even blocking of the matrix
    */
-  def blocking: LowerTriangularMatrix[Matrix[A]] = sys.error("undefined")
+  def blocking = MethodCall[LowerTriangularMatrix[Matrix[A]]](expr, "blocking")
 
   /**
    * Apply f to every element of the matrix
    */
-  def map[B](f:A=>B): LowerTriangularMatrix[B] = sys.error("undefined")
+  def map[B](f:Expr[A]=>Expr[B]) = MethodCall[LowerTriangularMatrix[B]](expr, "map", ExprFun1(f))
+  def map[B](f:ExprFun1[A,B]) = MethodCall[LowerTriangularMatrix[B]](expr, "map", f)
 
   /**
    * Zip this matrix with another
    */
-  def zip[B](m:LowerTriangularMatrix[B]): LowerTriangularMatrix[(A,B)] = sys.error("undefined")
+  def zip[B](m:Expr[LowerTriangularMatrix[B]]) = MethodCall[LowerTriangularMatrix[(A,B)]](expr, "zip", m)
 
   /**
    * Concat a column on the left
    */
-  def ::(v:Vector[A]): LowerTriangularMatrix[A] = sys.error("undefined")
+  def ::(v:Expr[Vector[A]]) = MethodCall[LowerTriangularMatrix[A]](expr, "::", v)
 
   /**
    * Full matrix
    */
-  def toMatrix: Matrix[A] = sys.error("udnefined")
+  def toMatrix = MethodCall[Matrix[A]](expr, "toMatrix")
 }
 
+class WrappedLTMM[A](expr:Expr[LowerTriangularMatrix[Matrix[A]]]) {
+  /**
+   * Flatten blocks of the matrix
+   */
+  def flatten = MethodCall[LowerTriangularMatrix[A]](expr, "flatten")
+}
+
+class WrappedMM[A](expr:Expr[Matrix[Matrix[A]]]) {
+  /**
+   * Flatten blocks of the matrix
+   */
+  def flatten = MethodCall[Matrix[A]](expr, "flatten")
+}

@@ -23,7 +23,9 @@ case class MethodCall[A](self:Expr[_], name:String, args:Expr[_]*) extends Expr[
 case class Value[A](v:AnyVal) extends Expr[A]
 
 case class ExprFun1[A,B](f:Expr[A]=>Expr[B]) extends Expr[A=>B] {
-  def apply(a:Expr[A]) = ClosureCall[A,B](this,a)
+  def call(a:Expr[A]) = ClosureCall[A,B](this,a)
 }
 
-case class Choice[A](cs:Expr[A]*) extends Expr[A]
+case class Choice[A](cs:Expr[A]*) extends Expr[A] 
+
+case class Dummy[A](id:Int = 0) extends Expr[A]

@@ -29,7 +29,7 @@ package object linearalgebra {
 
   implicit def wrappedTuple2[A,B](e:Expr[(A,B)]) = new WrappedTuple2(e)
 
-  implicit def wrappedFun1[A,B](f:Expr[A]=>Expr[B]) = new ExprFun1(f)
+  //implicit def wrappedFun1[A,B](f:Expr[A]=>Expr[B]) = new ExprFun1(f)
 
   
 

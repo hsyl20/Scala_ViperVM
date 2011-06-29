@@ -103,4 +103,8 @@ class TestParser extends FunSuite {
       def test(x) = a
     }""" )
   }
+
+  test("Infix notation") {
+    parse( "def test(n) = x add n")
+  }
 }

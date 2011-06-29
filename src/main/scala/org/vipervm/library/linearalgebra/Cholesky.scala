@@ -27,8 +27,7 @@ class Cholesky[A] {
     val l11 = a11.first.sqrt
     val l21 = a21.map(x => x/l11)
     val l22b = (l21 × l21).map(a => a._1 * a._2).lowerTriangular.zip(a22).map(a => a._2 - a._1)
-    //val l22 = cholesky.call(l22b)
-    val l22 = l22b //TODELETE
+    val l22 = cholesky.call(l22b)
 
     (l11 :: l21) :: l22
   }
@@ -45,8 +44,7 @@ class Cholesky[A] {
     val l21 = a21.map(x => Blas.trsm(l11,x))
     val l22b = (l21 × l21).map(a => a._1 * a._2).lowerTriangular.zip(a22).map(a => a._2 - a._1)
 
-    //val l22 = cholesky_blocked.call(l22b) | cholesky_fusion.call(l22b)
-    val l22 = l22b.flatten //TODELETE
+    val l22 = cholesky_blocked.call(l22b) | cholesky_fusion.call(l22b)
 
     ((l11.toMatrix :: l21) :: l22.blocking).flatten
   }

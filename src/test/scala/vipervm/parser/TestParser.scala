@@ -56,8 +56,51 @@ class TestParser extends FunSuite {
     }""" )
   }
 
-
   test("Closure") {
     parse( "def test(m,n) = a.map(x => y) " )
+  }
+
+  test("Closure with complex body") {
+    parse( """def test(m,n) = a.map(x => {
+      y.remove(x.first, w.top(n))
+    }) """ )
+  }
+
+  test("Nested closures") {
+    parse( "def test(m,n) = a.map(x => y => x.add(y)) " )
+  }
+
+  test("Package definition") {
+    parse( """package test.brol {
+      def test(m,n) = a.map(x => y => x.add(y))
+    }""" )
+  }
+
+  test("Import in body") {
+    parse( """def test(x) = {
+      import test.brol
+    }""" )
+  }
+
+  test("Import in body with wildcard") {
+    parse( """def test(x) = {
+      import test.brol._
+    }""" )
+  }
+
+  test("Import in complex body") {
+    parse( """def test(x) = {
+      import test.brol._;
+      a.map(x=>y);
+      import test.chmol;
+      x.check(w)
+    }""" )
+  }
+
+  test("Import in module") {
+    parse( """package test.brol {
+      import test.brol;
+      def test(x) = a
+    }""" )
   }
 }

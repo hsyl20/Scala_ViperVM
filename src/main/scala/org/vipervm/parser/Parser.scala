@@ -19,14 +19,20 @@ case class MethodCall(self:String, name:String, args:List[Any])
 case class FunDef(name:String, params:List[String], body:Any)
 case class ValDef(name:String, body:Any)
 case class Closure(params:List[String],body:Any)
+case class Module(qname:List[String], body:Any)
+case class Import(qname:List[String])
 
 object Parser extends StandardTokenParsers {
 
-  lexical.reserved += ("def", "val")
+  lexical.reserved += ("def", "val", "package", "import")
 
   lexical.delimiters += ("{", "}", "(", ")", ",", "=", ".", ";", "=>")
 
-  lazy val unit: Parser[Any] = fundef
+  lazy val unit: Parser[Any] = rep (
+      module
+    | imports<~opt(";")
+    | fundef
+  )
 
   lazy val fundef: Parser[Any] = "def"~>(ident<~"(")~(repsep(ident,",")<~")"<~"=")~body ^^ {
     case name~params~body => FunDef(name,params,body)
@@ -34,6 +40,7 @@ object Parser extends StandardTokenParsers {
 
   lazy val body: Parser[Any] = (
       block
+    | imports
     | valdef
     | closure
     | (ident<~".")~ident~opt("("~>repsep(body,",")<~")") ^^ {
@@ -54,6 +61,14 @@ object Parser extends StandardTokenParsers {
       case params~body => Closure(params,body)
     }
   )
+
+  lazy val module: Parser[Any] = "package"~>repsep(ident,".")~("{"~>unit<~"}") ^^ {
+    case qname~body => Module(qname,body)
+  }
+
+  lazy val imports: Parser[Any] = "import"~>repsep(ident, ".") ^^ {
+    case qname => Import(qname)
+  }
 
   def parse(s:String) = {
     val tokens = new lexical.Scanner(s)

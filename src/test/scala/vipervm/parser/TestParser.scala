@@ -21,7 +21,9 @@ class TestParser extends FunSuite {
 
   private def parse(s:String) = {
     val res = Parser.parse(s)
-    if (displayResult) println(res)
+    if (displayResult) {
+      if (res.successful) println(Printer.print(res.get)) else println(res)
+    }
     assert(res.successful)
   }
 

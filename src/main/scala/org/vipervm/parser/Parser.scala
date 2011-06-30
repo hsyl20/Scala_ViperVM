@@ -16,28 +16,16 @@ package org.vipervm.parser
 import scala.util.parsing.combinator.syntactical._
 import scala.util.parsing.combinator.RegexParsers
 
-case class QName(path:String*) {
-  override def toString = path.mkString(".")
-}
-case class MethodCall(self:String, name:String, args:List[Any]) {
-  override def toString = self+"."+name+args.mkString("(",",",")")
-}
-case class FunDef(name:String, params:List[String], body:Any) {
-  override def toString = "def "+name+params.mkString("(",",",")")+" = "+body
-}
-case class ValDef(name:String, body:Any) {
-  override def toString = "val "+name+" = "+body
-}
-case class Closure(params:List[String],body:Any) {
-  override def toString = params.mkString("(",",",")") + "=>" + body.toString
-}
-case class Module(qname:QName, body:Any) {
-  override def toString = "package "+qname+" { "+body+" } "
-}
-case class Import(qname:QName)
-case class Block(statements:Any*) {
-  override def toString = statements.mkString("{","; ","}")
-}
+sealed abstract class Token
+case class QName(path:String*) extends Token
+case class MethodCall(self:String, name:String, args:List[Token]) extends Token
+case class FunDef(name:String, params:List[String], body:Token) extends Token
+case class ValDef(name:String, body:Token) extends Token
+case class Closure(params:List[String],body:Token) extends Token
+case class Module(qname:QName, body:Token*) extends Token
+case class Import(qname:QName) extends Token
+case class Block(statements:Token*) extends Token
+case class Ident(name:String) extends Token
 
 
 object Parser extends StandardTokenParsers {
@@ -47,10 +35,10 @@ object Parser extends StandardTokenParsers {
   lexical.delimiters += ("{", "}", "(", ")", ",", "=", ".", ";", "=>")
 
   lazy val root: Parser[Module] = unit ^^ {
-    case ss => Module(QName("__root__"), ss)
+    case ss => Module(QName("__root__"), ss:_*)
   }
 
-  lazy val unit: Parser[Any] = rep (
+  lazy val unit: Parser[List[Token]] = rep (
       module
     | imports<~opt(";")
     | fundef
@@ -60,7 +48,7 @@ object Parser extends StandardTokenParsers {
     case name~params~body => FunDef(name,params,body)
   }
 
-  lazy val body: Parser[Any] = (
+  lazy val body: Parser[Token] = (
       block
     | imports
     | valdef
@@ -70,10 +58,10 @@ object Parser extends StandardTokenParsers {
         case self~name~None       => MethodCall(self,name,Nil)
       }
     | app
-    | ident
+    | ident ^^ { case n => Ident(n) }
   )
 
-  lazy val block: Parser[Any] = "{"~>repsep(body,";")<~opt(";")<~"}" ^^ {
+  lazy val block: Parser[Block] = "{"~>repsep(body,";")<~opt(";")<~"}" ^^ {
     case ss => Block(ss:_*)
   }
 
@@ -88,7 +76,7 @@ object Parser extends StandardTokenParsers {
   )
 
   lazy val module: Parser[Module] = "package"~>repsep(ident,".")~("{"~>unit<~"}") ^^ {
-    case qname~body => Module(QName(qname:_*),body)
+    case qname~body => Module(QName(qname:_*),body:_*)
   }
 
   lazy val imports: Parser[Import] = "import"~>repsep(ident, ".") ^^ {

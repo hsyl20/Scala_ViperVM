@@ -14,7 +14,6 @@
 package org.vipervm.parser
 
 import scala.util.parsing.combinator.syntactical._
-import scala.util.parsing.combinator.RegexParsers
 
 sealed abstract class Token
 case class QName(path:String*) extends Token

@@ -1,10 +1,10 @@
-\documentclass[twoside]{book}
+\documentclass[twoside,justified]{tufte-book}
 
-\usepackage[cm]{fullpage}
+%\usepackage[cm]{fullpage}
 \usepackage[english]{babel}
-\usepackage[colorlinks,hyperindex,bookmarks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc} 
+%\usepackage[colorlinks,hyperindex,bookmarks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \usepackage{lmodern}
 \usepackage{color}
 \usepackage{amssymb}
@@ -25,19 +25,45 @@
 \usepackage{rotating}
 \usepackage{amsmath, amsthm, amssymb}
 
+\newcommand{\theauthor}{Sylvain Henry}
+\newcommand{\thetitle}{ViperVM Manual}
+\newcommand{\theedition}{\sffamily\textls[200]{\MakeTextUppercase{Alpha Edition}}\normalfont}
+\newcommand{\thepublisher}{September 2011}
+\title{\thetitle}
+\author{\theauthor}
+\date{September 2011}
 
-%two column float page must be 90% full
-\renewcommand\dblfloatpagefraction{.90}
-%two column top float can cover up to 80% of page
-\renewcommand\dbltopfraction{.80}
-%float page must be 90% full
-\renewcommand\floatpagefraction{.90}
-%top float can cover up to 80% of page
-\renewcommand\topfraction{.80}
-%bottom float can cover up to 80% of page
-\renewcommand\bottomfraction{.80}
-%at least 10% of a normal page must contain text
-\renewcommand\textfraction{.1}
+
+\titlecontents{part}%
+    [0pt]% distance from left margin
+    {\addvspace{0.25\baselineskip}}% above (global formatting of entry)
+    {\allcaps{Part~\thecontentslabel}\allcaps}% before w/ label (label = ``Part I'')
+    {\allcaps{Part~\thecontentslabel}\allcaps}% before w/o label
+    {}% filler and page (leaders and page num)
+    [\vspace*{0.5\baselineskip}]% after
+
+\titlecontents{chapter}%
+    [4em]% distance from left margin
+    {}% above (global formatting of entry)
+    {\contentslabel{2em}\textit}% before w/ label (label = ``Chapter 1'')
+    {\hspace{0em}\textit}% before w/o label
+    {\qquad\thecontentspage}% filler and page (leaders and page num)
+    [\vspace*{0.5\baselineskip}]% after
+
+\renewcommand{\maketitlepage}{
+\begin{titlepage}
+  \thispagestyle{empty}
+  \setlength{\parindent}{0pt}
+
+  \fontsize{24}{24}\selectfont\textit{\theauthor}
+
+  \vspace{1.75in}\fontsize{36}{54}\selectfont\thetitle
+
+  \vspace{0.5in}\fontsize{14}{14}\selectfont\theedition
+
+  \vfill\fontsize{14}{14}\selectfont\textit{\thepublisher} 
+\end{titlepage}
+}
 
 
 \definecolor{codeboxcolor}{rgb}{0.8,0.8,1}
@@ -71,8 +97,6 @@
    \end{shaded}
 }
 
-\setlength{\columnsep}{4em}
-
 \lstset{language=C,
         breaklines, breakatwhitespace,
         frame=shadowbox, rulesepcolor=\color{codeboxcolor},
@@ -92,13 +116,17 @@
     morecomment=[s]{/*}{*/},%
 }[keywords,comments]%
 
-\title{ViperVM}
-\author{Sylvain HENRY\\\url{sylvain.henry@labri.fr}}
-\date{February 2011}
-
 \begin{document}
+
+\frontmatter
+
 \maketitle
+
 \tableofcontents
+
+\input{intro}
+
+\mainmatter
 
 \input{layers}
 \input{runtime}

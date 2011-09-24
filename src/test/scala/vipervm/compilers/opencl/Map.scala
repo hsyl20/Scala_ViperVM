@@ -15,7 +15,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import org.vipervm.codegen.opencl._
-
+/*
 class MapSpec extends FlatSpec with ShouldMatchers {
 
   "A map" should "produce valid kernel" in {
@@ -30,4 +30,4 @@ class MapSpec extends FlatSpec with ShouldMatchers {
       println(code)
   }
 
-}
+}*/

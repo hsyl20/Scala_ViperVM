@@ -15,14 +15,22 @@ package org.vipervm.platform.jvm
 
 import org.vipervm.platform._
 
-/**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
- */
+object JVMMemoryNode extends MemoryNode {
+  type BufferType = JVMBuffer
 
-abstract class JVMKernel(val fun:Seq[Any] => Unit) extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc match {
-    case _:JVMProcessor => true
-    case _ => false
+  def availableMemory: Long = 10000000 //TODO
+
+  override def allocate(size:Long): JVMBuffer = {
+    if (size > Long.MaxValue)
+      throw new Exception("Trying to allocate with size too big")
+
+    val buf = new JVMBuffer(new Array[Byte](size.toInt))
+    buffers += buf
+    buf
+  }
+
+
+  def free(buffer:JVMBuffer): Unit = {
+    buffers -= buffer
   }
 }

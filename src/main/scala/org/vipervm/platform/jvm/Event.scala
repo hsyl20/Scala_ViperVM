@@ -13,16 +13,15 @@
 
 package org.vipervm.platform.jvm
 
-import org.vipervm.platform._
+import scala.actors._
+import org.vipervm.platform.Event
 
-/**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
- */
+class JVMEvent[T](peer:Future[T]) extends Event {
+  override def syncWait: Unit = peer.apply
 
-abstract class JVMKernel(val fun:Seq[Any] => Unit) extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc match {
-    case _:JVMProcessor => true
-    case _ => false
+  override def test:Boolean = {
+    if (peer.isSet)
+      complete
+    completed
   }
 }

@@ -16,13 +16,15 @@ package org.vipervm.platform.jvm
 import org.vipervm.platform._
 
 /**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
+ * JVM platform driver
+ *
  */
+class JVMDriver extends Driver {
 
-abstract class JVMKernel(val fun:Seq[Any] => Unit) extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc match {
-    case _:JVMProcessor => true
-    case _ => false
-  }
+  val processors:Seq[JVMProcessor] = Seq(new JVMProcessor)
+
+  val networks:Seq[JVMNetwork] = Seq(new JVMNetwork)
+
+  val memories:Seq[JVMMemoryNode.type] = Seq(JVMMemoryNode)
+
 }

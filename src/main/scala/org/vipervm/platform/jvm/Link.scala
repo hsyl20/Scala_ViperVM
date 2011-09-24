@@ -13,16 +13,12 @@
 
 package org.vipervm.platform.jvm
 
-import org.vipervm.platform._
+import org.vipervm.platform.{HostMemoryNode,Link}
 
-/**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
- */
+case class JVMReadLink( network:JVMNetwork, target:HostMemoryNode) extends Link {
+  val source = JVMMemoryNode
+}
 
-abstract class JVMKernel(val fun:Seq[Any] => Unit) extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc match {
-    case _:JVMProcessor => true
-    case _ => false
-  }
+case class JVMWriteLink( network:JVMNetwork, source:HostMemoryNode) extends Link {
+  val target = JVMMemoryNode
 }

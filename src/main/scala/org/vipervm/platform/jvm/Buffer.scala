@@ -18,6 +18,7 @@ import java.nio.ByteBuffer
 import org.vipervm.platform.Buffer
 
 /* JVM buffer */
-abstract class JVMBuffer extends Buffer {
-   val peer: ByteBuffer
+class JVMBuffer(val peer:Array[Byte]) extends Buffer {
+  val size:Long = peer.length
+  val memory = JVMMemoryNode
 }

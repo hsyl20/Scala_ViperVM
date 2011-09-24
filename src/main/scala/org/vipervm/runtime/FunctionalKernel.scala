@@ -13,10 +13,10 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.Kernel
+import org.vipervm.platform.{Kernel,KernelParameter}
 
 /**
- * Describe how to make a kernel pure
+ * A functional kernel
  *
  * A kernel can modify buffers passed as parameters. The runtime system
  * uses methods of this class to know if it has to duplicate data before
@@ -32,24 +32,21 @@ abstract class FunctionalKernel(val kernel:Kernel) {
   val paramCount:Int
 
   /**
-   * Prepare parameters for a kernel
+   * Prepare parameters for kernel execution
+   *  - Transform views into buffer + immediate values
+   */
+  def pre(input:Seq[FutureValue]):Seq[KernelParameter]
+
+  /**
+   * Select outputs from the whole kernel parameter list
+   */
+  def post(ks:Seq[FutureValue]):Seq[FutureValue]
+
+  /**
+   * Create kernel output parameters from inputs
    *  - Allocate data
-   *  - Set order of kernel parameters
+   * @return input and output parameters
    */
-  def pre(input:List[Data],output:Data):Seq[KernelParameter]
+  protected def createKernelParameters(input:List[Value]):List[FutureValue]
 
-  /**
-   * Set function's output from kernel parameters
-   */
-  def post(ks:Seq[KernelParameter],output:Data):Unit
-
-  /**
-   * Create output data
-   */
-  protected def createOutput(input:List[Data]):Data
-
-  /**
-   * Create a task from this kernel
-   */
-  def createTask(input:List[Data]) = new Task(this, input, createOutput(input))
 }

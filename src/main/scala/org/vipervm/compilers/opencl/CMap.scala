@@ -13,7 +13,7 @@
 
 package org.vipervm.codegen.opencl
 
-
+/*
 class CMap(f:CFunction, src:Variable, dest:Variable, size:Int) {
 
    if (f.arity != 1)
@@ -43,4 +43,4 @@ object CMap {
       new CMap(f, src, dest,size)
    }
 }
-
+*/

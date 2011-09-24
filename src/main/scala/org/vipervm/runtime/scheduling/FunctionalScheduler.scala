@@ -28,7 +28,7 @@ trait FunctionalScheduler {
    * @param input Kernel inputs
    * @return kernel outputs
    */
-  def submit(f:FunctionalKernel, input:List[Data]):Data = {
+ /* def submit(f:FunctionalKernel, input:List[Data]):Data = {
     /* Create a task from the kernel and its parameters */
     val task = f.createTask(input)
 
@@ -37,7 +37,7 @@ trait FunctionalScheduler {
 
     /* Return output data */
     task.output
-  }
+  }*/
 
   /**
    * Discard some data

@@ -11,22 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.scheduling
 
-sealed abstract class Value extends FutureValue {
-  def isAvailable = true
+import org.vipervm.platform._
+import org.vipervm.runtime.Data
 
-  def get = this
-}
-
-case class DoubleValue(value:Double) extends Value
-case class FloatValue(value:Float) extends Value
-case class IntValue(value:Int) extends Value
-case class DataValue(value:Data) extends Value
-
-
-trait FutureValue {
-  def isAvailable: Boolean
-
-  def get: Value
+/**
+ * A scheduler
+ */
+trait Scheduler {
+  def submit(kernel:Kernel, args:Seq[Data]):Event
 }

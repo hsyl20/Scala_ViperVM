@@ -15,6 +15,7 @@ package org.vipervm.runtime.ast
 
 import org.vipervm.runtime.Data
 
+/*
 /**
  * Evaluate a functional task graph (sequential)
  */
@@ -29,12 +30,12 @@ class Evaluator {
       val data = asData(eas)
 
       //FIXME: multi-arg kernels
-      val task = k.createTask(List(data))
+      //val task = k.createTask(List(data))
 
       //TODO
-      println("Scheduling execution %s = %s(%s)".format(task.output,k,task.input.mkString(",")))
+      //println("Scheduling execution %s = %s(%s)".format(task.output,k,task.input.mkString(",")))
 
-      DataTerm(task.output)
+      //DataTerm(task.output)
     }
   }
 
@@ -74,7 +75,7 @@ class Evaluator {
     case _ => false
   }
 }
-
+*/
 
 class InvalidProgram(str:String) extends Exception(str)
 object NoRuleApplies extends Exception

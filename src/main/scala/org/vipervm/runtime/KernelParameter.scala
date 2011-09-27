@@ -13,8 +13,20 @@
 
 package org.vipervm.runtime
 
-sealed abstract class KernelParameter
-case class DoubleParam(value:Double) extends KernelParameter
-case class FloatParam(value:Float) extends KernelParameter
-case class IntParam(value:Int) extends KernelParameter
-case class DataParam(value:Data) extends KernelParameter
+sealed abstract class Value extends FutureValue {
+  def isAvailable = true
+
+  def get = this
+}
+
+case class DoubleValue(value:Double) extends Value
+case class FloatValue(value:Float) extends Value
+case class IntValue(value:Int) extends Value
+case class DataValue(value:Data) extends Value
+
+
+trait FutureValue {
+  def isAvailable: Boolean
+
+  def get: Value
+}

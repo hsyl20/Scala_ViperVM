@@ -11,23 +11,26 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package org.vipervm.platform.jvm
 
-import org.vipervm.codegen.opencl._
-/*
-class MapSpec extends FlatSpec with ShouldMatchers {
+import org.vipervm.platform._
 
-  "A map" should "produce valid kernel" in {
-      val f = CFunction(CFloat, Variable(CFloat)) { case List(a) =>
-         a * a
-      }
+object JVMMemoryNode extends MemoryNode {
+  type BufferType = JVMBuffer
 
-      val src = Variable(CFloat*)
-      val dest = Variable(CFloat*)
+  def availableMemory: Long = 10000000 //TODO
 
-      val code = CMap(f, src, dest, 100)
-      println(code)
+  override def allocate(size:Long): JVMBuffer = {
+    if (size > Long.MaxValue)
+      throw new Exception("Trying to allocate with size too big")
+
+    val buf = new JVMBuffer(new Array[Byte](size.toInt))
+    buffers += buf
+    buf
   }
 
-}*/
+
+  def free(buffer:JVMBuffer): Unit = {
+    buffers -= buffer
+  }
+}

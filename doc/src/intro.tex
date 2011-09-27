@@ -1,0 +1,37 @@
+\chapter{Introduction}
+
+This document describes the ViperVM framework\marginnote{ViperVM initially
+stands for "Very High Performance Virtual Machine"}.  This framework allows
+high-performance applications to be written and to be executed on many-core
+clusters composed of homogeneous or heterogeneous nodes (many-core, GPGPU,
+Cell\ldots).  In its current state, it is mostly a research framework that
+allows researchers from different areas to work together.
+
+\begin{description}
+  \item[Programming languages] Programs that want to use this framework need to
+  use some of the proposed domain specific languages (DSL).  Researchers of the
+  programming language (PL) community may propose different DSL for different
+  domains.
+
+  \item[Scheduling] Different kinds of schedulers can be used to schedule both
+  data transfers and computations.  Different scheduling models are available
+  and new one could be proposed.
+
+  \item[Compiler] Programs written using high-level representations must be
+  compiled to native codes that can be executed by different kind of
+  architectures (CPU, GPU\ldots).  Different strategies and optimizations may be
+  used.
+
+  \item[Auto-tuning] Different auto-tuning strategies may be proposed in order
+  to get the best codes from compilers for each architecture
+
+  \item[Numerical analysis] Optimizations should not only be performance guided
+  but they should take accuracy into account too.  Numerical analysis methods
+  should be employed in order to let the framework only use safe strategies.
+
+  \item[System] System researchers may improve the architecture model used by
+  the framework and make it portable on new architectures.  They could also
+  improve the way the framework interacts with underlying hardware and operating
+  systems.
+
+\end{description}

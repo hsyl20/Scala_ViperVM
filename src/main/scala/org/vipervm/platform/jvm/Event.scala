@@ -11,23 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package org.vipervm.platform.jvm
 
-import org.vipervm.codegen.opencl._
-/*
-class MapSpec extends FlatSpec with ShouldMatchers {
+import scala.actors._
+import org.vipervm.platform.Event
 
-  "A map" should "produce valid kernel" in {
-      val f = CFunction(CFloat, Variable(CFloat)) { case List(a) =>
-         a * a
-      }
+class JVMEvent[T](peer:Future[T]) extends Event {
+  override def syncWait: Unit = peer.apply
 
-      val src = Variable(CFloat*)
-      val dest = Variable(CFloat*)
-
-      val code = CMap(f, src, dest, 100)
-      println(code)
+  override def test:Boolean = {
+    if (peer.isSet)
+      complete
+    completed
   }
-
-}*/
+}

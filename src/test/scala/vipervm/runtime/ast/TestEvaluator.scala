@@ -13,6 +13,7 @@
 
 import org.scalatest.FunSuite
 
+/*
 import org.vipervm.runtime.data.RawData
 import org.vipervm.runtime.ast._
 import org.vipervm.runtime.{FunctionalKernel,Data,KernelParameter}
@@ -52,4 +53,4 @@ class DummyKernel extends Kernel {
   def canExecuteOn(proc:Processor): Boolean = true
 
   val param_modes: Array[AccessMode] = Array(ReadOnly,ReadOnly,ReadWrite)
-}
+}*/

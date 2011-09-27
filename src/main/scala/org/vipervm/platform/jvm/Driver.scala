@@ -11,23 +11,20 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package org.vipervm.platform.jvm
 
-import org.vipervm.codegen.opencl._
-/*
-class MapSpec extends FlatSpec with ShouldMatchers {
+import org.vipervm.platform._
 
-  "A map" should "produce valid kernel" in {
-      val f = CFunction(CFloat, Variable(CFloat)) { case List(a) =>
-         a * a
-      }
+/**
+ * JVM platform driver
+ *
+ */
+class JVMDriver extends Driver {
 
-      val src = Variable(CFloat*)
-      val dest = Variable(CFloat*)
+  val processors:Seq[JVMProcessor] = Seq(new JVMProcessor)
 
-      val code = CMap(f, src, dest, 100)
-      println(code)
-  }
+  val networks:Seq[JVMNetwork] = Seq(new JVMNetwork)
 
-}*/
+  val memories:Seq[JVMMemoryNode.type] = Seq(JVMMemoryNode)
+
+}

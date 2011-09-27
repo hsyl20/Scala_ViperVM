@@ -11,23 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package org.vipervm.platform.jvm
 
-import org.vipervm.codegen.opencl._
-/*
-class MapSpec extends FlatSpec with ShouldMatchers {
+import org.vipervm.platform.{HostMemoryNode,Link}
 
-  "A map" should "produce valid kernel" in {
-      val f = CFunction(CFloat, Variable(CFloat)) { case List(a) =>
-         a * a
-      }
+case class JVMReadLink( network:JVMNetwork, target:HostMemoryNode) extends Link {
+  val source = JVMMemoryNode
+}
 
-      val src = Variable(CFloat*)
-      val dest = Variable(CFloat*)
-
-      val code = CMap(f, src, dest, 100)
-      println(code)
-  }
-
-}*/
+case class JVMWriteLink( network:JVMNetwork, source:HostMemoryNode) extends Link {
+  val target = JVMMemoryNode
+}

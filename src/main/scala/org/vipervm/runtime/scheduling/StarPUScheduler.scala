@@ -11,23 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+package org.vipervm.runtime.scheduling
 
-import org.vipervm.codegen.opencl._
-/*
-class MapSpec extends FlatSpec with ShouldMatchers {
-
-  "A map" should "produce valid kernel" in {
-      val f = CFunction(CFloat, Variable(CFloat)) { case List(a) =>
-         a * a
-      }
-
-      val src = Variable(CFloat*)
-      val dest = Variable(CFloat*)
-
-      val code = CMap(f, src, dest, 100)
-      println(code)
-  }
-
+/**
+ * This scheduler mimic the one found in StarPU Runtime System
+ *
+ * There is one queue per compute unit. When a task is submitted
+ * to the scheduler, it puts it in one of these queues. For each device,
+ * there is an associated thread that selects data that need to be
+ * transferred to a memory node associated to the device for some of
+ * the tasks to be executed.
+ */
+/*class StarPUScheduler extends Scheduler {
+  
 }*/

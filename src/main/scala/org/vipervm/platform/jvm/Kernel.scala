@@ -13,10 +13,16 @@
 
 package org.vipervm.platform.jvm
 
+import org.vipervm.platform._
 
 /**
  * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
  */
 
-/*abstract class JVMKernel extends Kernel {
-}*/
+abstract class JVMKernel(val fun:Seq[Any] => Unit) extends Kernel {
+  
+  def canExecuteOn(proc:Processor): Boolean = proc match {
+    case _:JVMProcessor => true
+    case _ => false
+  }
+}

@@ -5,7 +5,7 @@ object BuildSettings {
   val buildOrganization = "org.vipervm"
   val buildName         = "ViperVM"
   val buildVersion      = "0.1"
-  val buildScalaVersion = "2.9.0"
+  val buildScalaVersion = "2.9.1"
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := buildOrganization,
@@ -47,6 +47,8 @@ object Resolvers {
 
   val scala_tools_snapshots = "Scala-Tools Snapshots" at "http://scala-tools.org/repo-snapshots"
 
+  val  bridj = "nativelibs4java" at "http://nativelibs4java.sourceforge.net/maven/nativelibs4java"
+
   val allResolvers = Seq(sunrepo, oraclerepo, scala_tools_snapshots)
 }
 
@@ -57,28 +59,30 @@ object Dependencies {
   val jline = "org.scala-lang" % "jline" % buildScalaVersion
 
   /* Runtime libs */
-  val jna = "net.java.dev.jna" % "jna" % "3.2.7"
+  val jna = "net.java.dev.jna" % "jna" % "3.3.0"
 
   /* GUI libs */
   val scala_swing = "org.scala-lang" % "scala-swing" % buildScalaVersion
 
   /* Logging (SLF4J through grizzled) */
-  val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.5"
+  val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.6.6"
 
   /* Logging configuration :
    * - Simple: Output logs to System.err
    * - NOP: Discard logging 
    * - log4j 
    */
-  val slf4jsimple = "org.slf4j" % "slf4j-simple" % "1.6.1"
-  //val slf4jnop = "org.slf4j" % "slf4j-nop" % "1.6.1"
-  //val slf4jlog4j = "org.slf4j" % "slf4j-log4j12" % "1.6.1"
+  val slf4jsimple = "org.slf4j" % "slf4j-simple" % "1.6.2"
+  //val slf4jnop = "org.slf4j" % "slf4j-nop" % "1.6.2"
+  //val slf4jlog4j = "org.slf4j" % "slf4j-log4j12" % "1.6.2"
 
   /* Others */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "6.0-SNAPSHOT"
+  val scalaz = "org.scalaz" %% "scalaz-full" % "6.0.3"
+
+  val bridj = "com.nativelibs4java" % "bridj" % "0.5"
 
   /* Test libs */
-  val scalatest = "org.scalatest" %% "scalatest" % "1.4.1"
+  val scalatest = "org.scalatest" %% "scalatest" % "1.6.1"
   val junit = "junit" % "junit" % "4.8.2"
 }
 

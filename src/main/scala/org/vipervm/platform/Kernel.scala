@@ -25,12 +25,12 @@ trait Kernel {
    */
   def canExecuteOn(proc:Processor): Boolean
 
-  /**
-   * Access modes for kernel parameters
-   */
-  val param_modes: Array[AccessMode]
 }
 
 sealed abstract class AccessMode
 case object ReadOnly extends AccessMode
 case object ReadWrite extends AccessMode
+
+case class Param[A<:KernelParameter](position:Int,mode:AccessMode) {
+  def apply(s:Seq[KernelParameter]):A = s.drop(position).head.asInstanceOf[A]
+}

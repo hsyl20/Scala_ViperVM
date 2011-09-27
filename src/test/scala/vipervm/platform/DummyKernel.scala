@@ -18,6 +18,7 @@ import org.vipervm.platform.host._
 import org.vipervm.platform._
 import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
+
 private[platform] class DummyKernel extends OpenCLKernel {
   val source = """__kernel void dummy(__global float * in, __global float * out, int a) {
                     int i = get_global_id(0);
@@ -28,13 +29,16 @@ private[platform] class DummyKernel extends OpenCLKernel {
   val program = new OpenCLProgram(source)
   val name = "dummy"
 
-  val param_modes:Array[AccessMode] = Array(ReadOnly, ReadOnly, ReadWrite, ReadOnly)
+  val in = Param[BufferKernelParameter](0, ReadOnly)
+  val out = Param[BufferKernelParameter](1, ReadWrite)
+  val factor = Param[IntKernelParameter](2, ReadOnly)
+  val size = Param[LongKernelParameter](3, ReadOnly)
 
-  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = params match {
-    case LongKernelParameter(size) :: BufferKernelParameter(in) :: BufferKernelParameter(out) :: IntKernelParameter(factor) :: Nil => Some(new OpenCLKernelConfig {
-      val globalWorkSize = List(size, 1, 1)
-      val parameters = IndexedSeq(BufferKernelParameter(in), BufferKernelParameter(out), IntKernelParameter(factor))
+  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = {
+
+    Some(new OpenCLKernelConfig {
+        val globalWorkSize = List(size(params).value, 1, 1)
+        val parameters = IndexedSeq(in(params), out(params), factor(params))
     })
-    case _ => None
   }
 }

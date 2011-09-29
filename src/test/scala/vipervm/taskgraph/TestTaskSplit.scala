@@ -22,7 +22,6 @@ class TestTaskSplit extends FunSuite {
     val b = new InitialData("b")
     val c = new InitialData("c")
     val m = new MatmultTask(a,b,c)
-    println(m)
   }
 
   test("Matmult task can be split") {
@@ -32,6 +31,5 @@ class TestTaskSplit extends FunSuite {
     val m = new MatmultTask(a,b,c)
     val ms = m.split
     ms.exportDOT("matmult.dot")
-    println(ms)
   }
 }

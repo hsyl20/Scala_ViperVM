@@ -1,3 +1,16 @@
+/*                                                  *\
+** \ \     / _)                   \ \     /   \  |  **
+**  \ \   /   |  __ \    _ \   __| \ \   /   |\/ |  **
+**   \ \ /    |  |   |   __/  |     \ \ /    |   |  **
+**    \_/    _|  .__/  \___| _|      \_/    _|  _|  **
+**              _|                                  **
+**                                                  **
+**       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
+**                                                  **
+**            http://www.vipervm.org                **
+**                     GPLv3                        **
+\*                                                  */
+
 package org.vipervm.taskgraph
 
 import java.io._
@@ -8,11 +21,13 @@ abstract class Task(val name:String, val args:Seq[Data]) {
 
 class TaskGraph(tasks:Seq[Task], deps:Map[Task,Task]) {
 
-  private def dta(d:Data):(Int,String,Data) = d match {
-    case a@InitialData(name) => (a.hashCode,name,a)
-    case a@FilteredData(_,filter) => (a.hashCode,filter.name,a)
-    case a@DataSelect(_,id) => (a.hashCode,id.toString,a)
+  private def dataName(d:Data): String = d match {
+    case InitialData(name) => name
+    case FilteredData(_,filter) => filter.name
+    case DataSelect(_,id) => id.toString
   }
+
+  private def dta(d:Data):(Int,String,Data) = (d.hashCode, dataName(d), d)
 
   private def dataHierarchy(d:Data):List[(Int,String,Data)] = d match {
     case a@InitialData(_) => List(dta(a))
@@ -20,28 +35,29 @@ class TaskGraph(tasks:Seq[Task], deps:Map[Task,Task]) {
     case a@DataSelect(f,_) => dta(a) :: dataHierarchy(f)
   }
 
-  def exportDOT(filename:String) = {
+  /** Data used by tasks in this graph */
+  lazy val dataSet = tasks.flatMap(_.args).flatMap(dataHierarchy _).toSet
 
-    val dataSet = tasks.flatMap(_.args).flatMap(dataHierarchy _).toSet
-    val dataLinkSet = tasks.flatMap {
-      task => task.args.flatMap {
-        arg => (task.hashCode :: dataHierarchy(arg).map(_._1)).sliding(2).map(l => (l.head, l.drop(1).head))
-      }
-    }.toSet
-
-    val dataLinkMap = tasks.flatMap {
+  /** Associations between data (data + filters + filtered data) */
+  lazy val dataLinkMap = tasks.flatMap {
       task => task.args.flatMap {
         arg => dataHierarchy(arg).map(_._3).sliding(2).filter(_.length == 2).map(l => (l.drop(1).head, l.head))
       }
     }.groupBy(a => a._1).mapValues(_.unzip._2.toSet)
 
-    val initData = dataSet.filter {
+  /** Root data */
+  lazy val initData = dataSet.filter {
       case a@(hash,_,InitialData(_)) => true
       case _ => false
     }.map(_._3)
 
+  /**
+   * Export the task graph .dot format
+   */
+  def exportDOT(filename:String) = {
     val taskSet = tasks.map(t => (t.hashCode, t.name)).toSet
     val taskLinkSet = deps.map(t => (t._1.hashCode, t._2.hashCode)).toSet
+
 
     val f = new PrintWriter(new FileOutputStream(filename))
 
@@ -81,19 +97,6 @@ class TaskGraph(tasks:Seq[Task], deps:Map[Task,Task]) {
     for (t <- tasks; a <- t.args) {
       f.println("\t\"%s\" -> \"%s\"".format(t.hashCode,a.hashCode))
     }
-/*    dataSet foreach { d => {
-        val style = d._3 match {
-          case InitialData(_) => "shape=doublecircle"
-          case FilteredData(_,_) => "shape=diamond"
-          case DataSelect(_,_) => "shape=circle"
-        }
-        f.println("\t\"%s\" [label=\"%s\",%s]".format(d._1, d._2, style))
-      }
-    }
-
-    dataLinkSet foreach { d =>
-      f.println("\t%s -> %s".format(d._1,d._2))
-    }*/
 
     f.print("}\n")
     f.close
@@ -105,17 +108,3 @@ case class InitialData(name:String) extends Data
 case class FilteredData(source:Data, filter:Filter) extends Data
 case class DataSelect(src:FilteredData, id:Int) extends Data
 
-abstract class Filter {
-  def name:String
-}
-
-class LineSplit extends Filter {
-  val n = 10
-
-  def apply(d:Data) = {
-    val f = new FilteredData(d,this)
-    for (i <- 1 to n) yield new DataSelect(f,i)
-  }
-
-  def name = "LineSplit x"+n
-}

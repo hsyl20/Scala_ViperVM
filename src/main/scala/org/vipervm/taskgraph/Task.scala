@@ -15,11 +15,15 @@ package org.vipervm.taskgraph
 
 import java.io._
 
-abstract class Task(val name:String, val args:Seq[Data]) {
+abstract class Task(val name:String, val args:Seq[Data])
+
+trait Splittable extends Task {
   def split: TaskGraph
 }
 
-class TaskGraph(tasks:Seq[Task], deps:Map[Task,Task]) {
+class Marker extends Task("marker", Nil)
+
+class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
   private def dataName(d:Data): String = d match {
     case InitialData(name) => name
@@ -50,6 +54,22 @@ class TaskGraph(tasks:Seq[Task], deps:Map[Task,Task]) {
       case a@(hash,_,InitialData(_)) => true
       case _ => false
     }.map(_._3)
+
+
+  /**
+   * Replace one of the node by a task graph
+   */
+  def replace(task:Task, graph:TaskGraph):TaskGraph = {
+    val begin = new Marker
+    val end = new Marker
+    val beginDeps = deps filter (e => e._2 == task) map (e => (e._1,begin))
+    val endDeps = deps filter (e => e._1 == task) map (e => (end,e._2))
+    val oldDeps = deps filterNot(e => e._1 == task || e._2 == task) 
+    val newDeps = oldDeps ++ beginDeps ++ endDeps
+    val newNodes = graph.tasks ++ tasks.filterNot(_ == task)
+    new TaskGraph(newNodes,newDeps)
+  }
+
 
   /**
    * Export the task graph .dot format

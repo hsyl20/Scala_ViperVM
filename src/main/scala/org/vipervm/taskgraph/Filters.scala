@@ -23,8 +23,7 @@ abstract class Filter {
 /**
  * Matrix splitter: blocks of lines
  */
-class LineSplit extends Filter {
-  val n = 10
+class LineSplit(n:Int) extends Filter {
 
   def apply(d:Data) = {
     val f = new FilteredData(d,this)
@@ -32,4 +31,30 @@ class LineSplit extends Filter {
   }
 
   def name = "LineSplit x"+n
+}
+
+/**
+ * Matrix splitter: blocks of columns
+ */
+class ColumnSplit(n:Int) extends Filter {
+
+  def apply(d:Data) = {
+    val f = new FilteredData(d,this)
+    for (i <- 1 to n) yield new DataSelect(f,i)
+  }
+
+  def name = "ColumnSplit x"+n
+}
+
+/**
+ * Matrix splitter: blocks
+ */
+class BlockSplit(n:Int,m:Int) extends Filter {
+
+  def apply(d:Data) = {
+    val f = new FilteredData(d,this)
+    for (i <- 1 to n) yield (1 to m) map (j => new DataSelect(f,i,j))
+  }
+
+  def name = "BlockSplit (%d x %d)".format(n,m)
 }

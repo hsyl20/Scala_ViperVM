@@ -20,15 +20,17 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
   private def dataName(d:Data): String = d match {
     case InitialData(name) => name
     case FilteredData(_,filter) => filter.name
-    case DataSelect(_,id) => id.toString
+    case DataSelect(_,id@_*) => id.mkString(",")
+    case TemporaryData(id) => "tmp"+id
   }
 
   private def dta(d:Data):(Int,String,Data) = (d.hashCode, dataName(d), d)
 
   private def dataHierarchy(d:Data):List[(Int,String,Data)] = d match {
     case a@InitialData(_) => List(dta(a))
+    case a@TemporaryData(_) => List(dta(a))
     case a@FilteredData(src,_) => dta(a) :: dataHierarchy(src)
-    case a@DataSelect(f,_) => dta(a) :: dataHierarchy(f)
+    case a@DataSelect(f,_*) => dta(a) :: dataHierarchy(f)
   }
 
   /** Data used by tasks in this graph */
@@ -43,10 +45,15 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
   /** Root data */
   lazy val initData = dataSet.filter {
-      case a@(hash,_,InitialData(_)) => true
+      case a@(_,_,InitialData(_)) => true
       case _ => false
     }.map(_._3)
 
+  /** Temporary data */
+  lazy val temporaryData = dataSet.filter {
+      case a@(_,_,TemporaryData(_)) => true
+      case _ => false
+    }.map(_._3)
 
   /**
    * Replace one of the node by a task graph
@@ -73,7 +80,9 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
     val f = new PrintWriter(new FileOutputStream(filename))
 
-    f.print("digraph G{\n")
+    f.println("digraph G{")
+    f.println("\toverlap=false")
+    f.println("\tsplines=true")
 
     f.println("\tnode [shape=box]")
     taskSet foreach { t =>
@@ -89,7 +98,8 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       val style = data match {
         case InitialData(_) => "shape=doublecircle"
         case FilteredData(_,_) => "shape=diamond"
-        case DataSelect(_,_) => "shape=circle"
+        case DataSelect(_,_*) => "shape=circle"
+        case TemporaryData(_) => "shape=circle"
       }
       f.println("\t\t\"%s\" [label=\"%s\",%s]".format(hash, name, style))
 
@@ -105,6 +115,10 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       printDataTree(d)
       f.println("\t}")
     }
+
+    f.println("\tsubgraph  \"cluster_temporary\" {")
+    temporaryData.foreach(printDataTree _)
+    f.println("\t}")
 
     for (t <- tasks; a <- t.args) {
       f.println("\t\"%s\" -> \"%s\"".format(t.hashCode,a.hashCode))

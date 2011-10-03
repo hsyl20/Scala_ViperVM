@@ -13,7 +13,9 @@
 
 package org.vipervm.taskgraph
 
-abstract class Task(val name:String, val args:Seq[Data]) {
+abstract class Task {
+  val args:Seq[Data]
+  val name:String
   val splits:IndexedSeq[() => TaskGraph] = IndexedSeq.empty
 }
 

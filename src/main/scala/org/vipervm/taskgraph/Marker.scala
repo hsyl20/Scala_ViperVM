@@ -13,5 +13,15 @@
 
 package org.vipervm.taskgraph
 
-class Marker extends Task("marker", Nil)
+class Marker extends Task {
+  val name = "marker"
+  val args = Nil
+}
 
+class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task {
+  private val dummy = InitialData("dummy")
+
+  private val o = op(dummy,dummy,dummy)
+  val name = "Reduction(" + o.name+")"
+  val args = as :+ res
+}

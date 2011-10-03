@@ -1,19 +1,22 @@
+/*                                                  *\
+** \ \     / _)                   \ \     /   \  |  **
+**  \ \   /   |  __ \    _ \   __| \ \   /   |\/ |  **
+**   \ \ /    |  |   |   __/  |     \ \ /    |   |  **
+**    \_/    _|  .__/  \___| _|      \_/    _|  _|  **
+**              _|                                  **
+**                                                  **
+**       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
+**                                                  **
+**            http://www.vipervm.org                **
+**                     GPLv3                        **
+\*                                                  */
+
 package org.vipervm.tests
 
 import org.scalatest.FunSuite
 
 import org.vipervm.taskgraph._
 
-
-class MatmultTask(a:Data,b:Data,c:Data) extends Task("matmult", Seq(a,b,c)) with Splittable {
-  def split:TaskGraph = {
-    val ls = new LineSplit
-    val as = ls(a)
-    val cs = ls(c)
-    val tasks = (as zip cs) map (t => new MatmultTask(t._1, b, t._2))
-    new TaskGraph(tasks, Nil)
-  }
-}
 
 class TestTaskSplit extends FunSuite {
 
@@ -29,7 +32,7 @@ class TestTaskSplit extends FunSuite {
     val b = new InitialData("b")
     val c = new InitialData("c")
     val m = new MatmultTask(a,b,c)
-    val ms = m.split
+    val ms = m.splits(0).apply
     ms.exportDOT("matmult.dot")
   }
 
@@ -38,12 +41,12 @@ class TestTaskSplit extends FunSuite {
     val b = new InitialData("b")
     val c = new InitialData("c")
     val m = new MatmultTask(a,b,c)
-    val ms = m.split
+    val ms = m.splits(0).apply
     val task = ms.tasks.flatMap {
       case m:MatmultTask => Some(m)
       case _ => None
     }.head
-    val g = ms.replace(task, task.split)
-    g.exportDOT("matmult.dot")
+    val g = ms.replace(task, task.splits(0).apply)
+    g.exportDOT("matmult_replaced.dot")
   }
 }

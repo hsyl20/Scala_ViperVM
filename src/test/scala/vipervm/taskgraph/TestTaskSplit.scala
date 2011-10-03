@@ -42,7 +42,7 @@ class TestTaskSplit extends FunSuite {
     val task = ms.tasks.flatMap {
       case m:MatmultTask => Some(m)
       case _ => None
-    }.first
+    }.head
     val g = ms.replace(task, task.split)
     g.exportDOT("matmult.dot")
   }

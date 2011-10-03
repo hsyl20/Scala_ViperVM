@@ -13,10 +13,8 @@
 
 package org.vipervm.taskgraph
 
-abstract class Task(val name:String, val args:Seq[Data])
-
-trait Splittable extends Task {
-  def split: TaskGraph
-}
-
+sealed abstract class Data
+case class InitialData(name:String) extends Data
+case class FilteredData(source:Data, filter:Filter) extends Data
+case class DataSelect(src:FilteredData, id:Int) extends Data
 

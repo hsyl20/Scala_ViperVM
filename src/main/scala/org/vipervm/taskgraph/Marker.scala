@@ -13,10 +13,5 @@
 
 package org.vipervm.taskgraph
 
-abstract class Task(val name:String, val args:Seq[Data])
-
-trait Splittable extends Task {
-  def split: TaskGraph
-}
-
+class Marker extends Task("marker", Nil)
 

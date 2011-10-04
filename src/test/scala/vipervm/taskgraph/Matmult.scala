@@ -55,10 +55,10 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
     new TaskGraph(gs.flatMap(_.tasks), gs.flatMap(_.deps))
   }
 
-  override val splits = IndexedSeq(
-    lineSplit _,
-    columnSplit _,
-    blockSplit _
+  override val splits = Map(
+    'lines -> lineSplit _,
+    'columns -> columnSplit _,
+    'blocks -> blockSplit _
     )
 
 }

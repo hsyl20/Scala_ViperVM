@@ -110,8 +110,8 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     def printDataTree(d:Data):Unit = {
       val (hash,name,data) = dta(d)
       val style = data match {
-        case InitialData(_,_,_) => "shape=doublecircle" //TODO: different shape for different data types
-        case TemporaryData(_,_) => "shape=circle"     //TODO: idem
+        case InitialData(_,_,_) => "shape=doublecircle"
+        case TemporaryData(_,_) => "shape=circle"
         case FilteredData(_,_) => "shape=diamond"
         case DataSelect(_,_*) => "shape=circle"
       }
@@ -148,6 +148,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     def printlnt(s:String) = f.println("\t"+s)
     def printlntt(s:String) = f.println("\t\t"+s)
     def printlnttt(s:String) = f.println("\t\t\t"+s)
+    def printlntttt(s:String) = f.println("\t\t\t\t"+s)
     def tid(t:Object) = abs(t.hashCode)
 
     f.println("/* File automatically generated. Do not modify it or it may be overwritten */")
@@ -177,7 +178,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     }
 
     for (d <- initData) {
-      printlnt("%s * data_%d = (%1$s)malloc(%s);\t// \"%s\"".format(typ2c(elemType(d)), tid(d), dataSize(d), d.name))
+      printlnt("%s * data_%d = (%1$s *)malloc(%s);\t// \"%s\"".format(typ2c(elemType(d)), tid(d), dataSize(d), d.name))
     }
     f.println
 
@@ -190,9 +191,12 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
     def randomInit(d:Data): Unit = d.desc match {
       case MatrixDesc(m,n,typ) => {
-        printlnt("for (init_%d_y = 0; init_%1$d_y < %d; init_%1$d_y++) {".format(tid(d),n))
-        printlntt("for (init_%d_x = 0; init_%1$d_x < %d; init_%1$d_x++) {".format(tid(d),m))
-        printlnttt("data_%d[init_%1$d_y*%d+init_%1$d_x] = (%s)drand48();".format(tid(d), m, typ2c(typ)))
+        printlnt("{")
+        printlntt("int init_%d_y, init_%1$d_x;".format(tid(d)))
+        printlntt("for (init_%d_y = 0; init_%1$d_y < %d; init_%1$d_y++) {".format(tid(d),n))
+        printlnttt("for (init_%d_x = 0; init_%1$d_x < %d; init_%1$d_x++) {".format(tid(d),m))
+        printlntttt("data_%d[init_%1$d_y*%d+init_%1$d_x] = (%s)drand48();".format(tid(d), m, typ2c(typ)))
+        printlnttt("}")
         printlntt("}")
         printlnt("}")
       }
@@ -235,16 +239,18 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
     def defineFilter(filter:Filter): Unit = filter match {
       case ColumnSplit(n) => {
-        printlnt("struct starpu_data_filter fitler_%d_t{".format(tid(filter)))
+        printlnt("struct starpu_data_filter fitler_%d_t = {".format(tid(filter)))
         printlntt(".filter_func = starpu_vertical_block_filter_func,")
         printlntt(".nchildren = %d".format(n))
-        printlnt("} * filter_%d;".format(tid(filter)))
+        printlnt("};")
+        printlnt("struct starpu_data_filter * filter_%d = &filter_%1$d_t;".format(tid(filter)))
       }
       case LineSplit(n) => {
-        printlnt("struct starpu_data_filter filter_%d_t {".format(tid(filter)))
+        printlnt("struct starpu_data_filter filter_%d_t = {".format(tid(filter)))
         printlntt(".filter_func = starpu_block_filter_func,")
         printlntt(".nchildren = %d".format(n))
-        printlnt("} * filter_%d;".format(tid(filter)))
+        printlnt("};")
+        printlnt("struct starpu_data_filter * filter_%d = &filter_%1$d_t;".format(tid(filter)))
       }
       case BlockSplit(n,m) => {
         val lf = new LineSplit(n)
@@ -262,10 +268,15 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     printlnt("/* Apply filters */")
     for (d <- filteredData) {
       val filter = d.filter
+      d.source match {
+        case InitialData(_,_,_) => ()
+        //TODO FIXME: hierarchy of filters should be supported !!!
+        case _ => printlnt("/* FIXME : this filter won't work as hierarchy of filters are not supported yet!!! */")
+      }
       filter match {
-        case ColumnSplit(n) => printlnt("starpu_data_partition(handle_%d, filter_%d);".format(tid(d), tid(filter)))
-        case LineSplit(n) => printlnt("starpu_data_partition(handle_%d, filter_%d);".format(tid(d), tid(filter)))
-        case BlockSplit(n,m) => printlnt("starpu_data_map_filter(handle_%d, 2, filter_vert_%d, filter_horiz_%2$d);".format(tid(d), tid(filter)))
+        case ColumnSplit(n) => printlnt("starpu_data_partition(handle_%d, filter_%d);".format(tid(d.source), tid(filter)))
+        case LineSplit(n) => printlnt("starpu_data_partition(handle_%d, filter_%d);".format(tid(d.source), tid(filter)))
+        case BlockSplit(n,m) => printlnt("starpu_data_map_filter(handle_%d, 2, filter_vert_%d, filter_horiz_%2$d);".format(tid(d.source), tid(filter)))
       }
     }
     f.println

@@ -16,7 +16,7 @@ package org.vipervm.taskgraph
 sealed abstract class Data {
   val desc:DataDesc
 }
-case class InitialData(desc:DataDesc,name:String) extends Data
+case class InitialData(desc:DataDesc,init:DataInit,name:String) extends Data
 case class FilteredData(source:Data, filter:Filter) extends Data {
   val desc = filter.desc(source)
 }
@@ -45,3 +45,8 @@ case class ArrayDesc(dim:Int,sizes:Seq[Int],elem:DataDesc) extends DataDesc
 case class MatrixDesc(m:Int,n:Int,typ:DataType) extends DataDesc
 case class VectorDesc(n:Int,typ:DataType) extends DataDesc
 case object DummyDesc extends DataDesc
+
+sealed abstract class DataInit
+case object RandomInit extends DataInit
+case object ZeroInit extends DataInit
+case object NoInit extends DataInit

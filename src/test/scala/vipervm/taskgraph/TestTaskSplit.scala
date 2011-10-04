@@ -27,9 +27,9 @@ class TestTaskSplit extends FunSuite {
   val bdesc = MatrixDesc(z,x,typ)
   val cdesc = MatrixDesc(z,y,typ)
 
-  val a = new InitialData(adesc, "a")
-  val b = new InitialData(bdesc, "b")
-  val c = new InitialData(cdesc, "c")
+  val a = new InitialData(adesc, RandomInit, "a")
+  val b = new InitialData(bdesc, RandomInit, "b")
+  val c = new InitialData(cdesc, NoInit, "c")
 
   test("Matmult task can be created") {
     val m = new MatMul(a,b,c)
@@ -46,6 +46,7 @@ class TestTaskSplit extends FunSuite {
     val m = new MatMul(a,b,c)
     val ms = m.splits(1).apply
     ms.exportDOT("matmul_columns.dot")
+    ms.exportC("matmul_columns.c")
   }
 
   test("Matmult task can be split in blocks") {

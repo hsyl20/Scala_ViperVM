@@ -19,7 +19,7 @@ class Marker extends Task {
 }
 
 class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task {
-  private val dummy = InitialData(DummyDesc,"dummy")
+  private val dummy = InitialData(DummyDesc,NoInit,"dummy")
 
   private val o = op(dummy,dummy,dummy)
   val name = "reduction_" + o.name

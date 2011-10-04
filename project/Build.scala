@@ -92,8 +92,6 @@ object Tasks {
   val profilerTask = TaskKey[Unit]("run-profiler", "Profiler GUI")
   val infoTask = TaskKey[Unit]("run-platform-info", "Platform information")
 
-  fork in profilerTask := true
-
   val all = Seq(
     fullRunTask(demoCodegenTask, Test, "demos.codegen.Main"),
     fullRunTask(profilerTask, Test, "org.vipervm.apps.Profiler"),
@@ -106,6 +104,11 @@ object ViperVMBuild extends Build {
   import Resolvers._
   import Dependencies._
   import BuildSettings._
+
+  fork in Tasks.profilerTask := true
+
+  fork in run := true
+  javaOptions in (run) += "-Xrs"
 
   // Sub-project specific dependencies
   val commonDeps = Seq (

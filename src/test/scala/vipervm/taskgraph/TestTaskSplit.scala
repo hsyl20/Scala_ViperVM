@@ -34,6 +34,7 @@ class TestTaskSplit extends FunSuite {
     val m = new MatMul(a,b,c)
     val ms = m.splits(0).apply
     ms.exportDOT("matmul_lines.dot")
+    ms.exportC("matmul_lines.c")
   }
 
   test("Matmult task can be split in columns") {
@@ -52,6 +53,7 @@ class TestTaskSplit extends FunSuite {
     val m = new MatMul(a,b,c)
     val ms = m.splits(2).apply
     ms.exportDOT("matmul_blocks.dot")
+    ms.exportC("matmul_blocks.c")
   }
 
   test("A node in a task graph can be replaced by a task graph") {
@@ -66,5 +68,6 @@ class TestTaskSplit extends FunSuite {
     }.head
     val g = ms.replace(task, task.splits(0).apply)
     g.exportDOT("matmul_replaced.dot")
+    ms.exportC("matmul_replaced.c")
   }
 }

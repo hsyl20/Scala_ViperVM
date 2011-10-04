@@ -64,6 +64,6 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
 }
 
 class MatAdd(a:Data,b:Data,c:Data) extends Task {
-  val name = "MatAdd"
+  val name = "matadd"
   val args = Seq(a,b,c)
 }

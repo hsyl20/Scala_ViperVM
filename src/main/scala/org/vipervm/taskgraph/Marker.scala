@@ -22,6 +22,6 @@ class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task 
   private val dummy = InitialData("dummy")
 
   private val o = op(dummy,dummy,dummy)
-  val name = "Reduction(" + o.name+")"
+  val name = "reduction_" + o.name
   val args = as :+ res
 }

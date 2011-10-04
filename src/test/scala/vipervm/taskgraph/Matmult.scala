@@ -45,7 +45,7 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
     val cs = blocks(c)
     def red(as:Seq[Data],bs:Seq[Data],c:Data) = {
       val lc = as zip bs
-      val mulTasks = lc map (a => new MatMul(a._1,a._2, new TemporaryData))
+      val mulTasks = lc map (a => new MatMul(a._1,a._2, new TemporaryData(a._1.desc)))
       val red = new Reduction((a,b,c) => new MatAdd(a,b,c), mulTasks.map(_.c), c)
       val deps = mulTasks.map(t => (red,t))
       new TaskGraph(red +: mulTasks, deps)

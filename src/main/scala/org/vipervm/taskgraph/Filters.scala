@@ -18,6 +18,7 @@ package org.vipervm.taskgraph
  */
 abstract class Filter {
   def name:String
+  def desc(d:Data):ArrayDesc
 }
 
 /**
@@ -31,6 +32,11 @@ case class LineSplit(n:Int) extends Filter {
   }
 
   def name = "LineSplit x"+n
+
+  def desc(d:Data) = d.desc match {
+    case MatrixDesc(am,an,typ) => ArrayDesc(1,Seq(n),MatrixDesc(am,an/n,typ))
+    case _ => throw new Exception("Filter %s not applicable to this data type (%s)".format(this,d.desc))
+  }
 }
 
 /**
@@ -44,6 +50,11 @@ case class ColumnSplit(n:Int) extends Filter {
   }
 
   def name = "ColumnSplit x"+n
+
+  def desc(d:Data) = d.desc match {
+    case MatrixDesc(am,an,typ) => ArrayDesc(1,Seq(n),MatrixDesc(am/n,an,typ))
+    case _ => throw new Exception("Filter %s not applicable to this data type (%s)".format(this,d.desc))
+  }
 }
 
 /**
@@ -57,4 +68,9 @@ case class BlockSplit(n:Int,m:Int) extends Filter {
   }
 
   def name = "BlockSplit (%d x %d)".format(n,m)
+
+  def desc(d:Data) = d.desc match {
+    case MatrixDesc(am,an,typ) => ArrayDesc(2,Seq(n,m),MatrixDesc(am/n,an/m,typ))
+    case _ => throw new Exception("Filter %s not applicable to this data type (%s)".format(this,d.desc))
+  }
 }

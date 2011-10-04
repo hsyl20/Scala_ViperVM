@@ -19,17 +19,17 @@ import scala.math.abs
 class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
   private def dataName(d:Data): String = d match {
-    case InitialData(name) => name
+    case InitialData(_,name) => name
     case FilteredData(_,filter) => filter.name
     case DataSelect(_,id@_*) => id.mkString(",")
-    case TemporaryData(id) => "tmp"+id
+    case TemporaryData(_,id) => "tmp"+id
   }
 
   private def dta(d:Data):(Int,String,Data) = (d.hashCode, dataName(d), d)
 
   private def dataHierarchy(d:Data):List[(Int,String,Data)] = d match {
-    case a@InitialData(_) => List(dta(a))
-    case a@TemporaryData(_) => List(dta(a))
+    case a@InitialData(_,_) => List(dta(a))
+    case a@TemporaryData(_,_) => List(dta(a))
     case a@FilteredData(src,_) => dta(a) :: dataHierarchy(src)
     case a@DataSelect(f,_*) => dta(a) :: dataHierarchy(f)
   }
@@ -46,13 +46,13 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
   /** Root data */
   lazy val initData = dataSet.flatMap {
-    case (_,_,a@InitialData(_)) => Some(a)
+    case (_,_,a@InitialData(_,_)) => Some(a)
     case _ => None
   }
 
   /** Temporary data */
   lazy val temporaryData = dataSet.flatMap {
-    case (_,_,a@TemporaryData(_)) => Some(a)
+    case (_,_,a@TemporaryData(_,_)) => Some(a)
     case _ => None
   }
 
@@ -110,10 +110,10 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     def printDataTree(d:Data):Unit = {
       val (hash,name,data) = dta(d)
       val style = data match {
-        case InitialData(_) => "shape=doublecircle"
+        case InitialData(_,_) => "shape=doublecircle" //TODO: different shape for different data types
+        case TemporaryData(_,_) => "shape=circle"     //TODO: idem
         case FilteredData(_,_) => "shape=diamond"
         case DataSelect(_,_*) => "shape=circle"
-        case TemporaryData(_) => "shape=circle"
       }
       f.println("\t\t\"%s\" [label=\"%s\",color=goldenrod,%s]".format(hash, name, style))
 
@@ -170,18 +170,27 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     }
     f.println
 
-    printlnt("/* Create StarPU buffers */")
-    for (d <- initData) {
-      printlnt("starpu_data_handle * handle_%d;".format(tid(d)))
-      printlnt("starpu_data_matrix_register(&handle_%d, 0, (uintptr_t)data_%1$s, 100, 100, sizeof(float));".format(tid(d)))
+    def typ2c(dt:DataType) = dt match {
+      case FloatType => "float"
+      case DoubleType => "double"
     }
+
+    def registerData(d:Data,init:Boolean): Unit = {
+      val ptr = if (init) "(uintptr_t)data_%d".format(tid(d)) else "NULL"
+
+      printlnt("starpu_data_handle * handle_%d;".format(tid(d)))
+      d.desc match {
+        case MatrixDesc(m,n,typ) => printlnt("starpu_data_matrix_register(&handle_%d, 0, %s, %d, %d, sizeof(%s));".format(tid(d),ptr,m,n,typ2c(typ)))
+        case _ => throw new Exception("Data type not supported")
+      }
+    }
+
+    printlnt("/* Create StarPU buffers */")
+    initData.foreach(registerData(_,true))
     f.println
 
     printlnt("/* Lazily allocate temporary data */")
-    for (d <- temporaryData) {
-      printlnt("starpu_data_handle * handle_%d;".format(tid(d)))
-      printlnt("starpu_data_matrix_register(&handle_%d, 0, NULL, 100, 100, sizeof(float));".format(tid(d)))
-    }
+    temporaryData.foreach(registerData(_,false))
     f.println
 
     printlnt("/* Define filters */")
@@ -230,8 +239,8 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       printlnt("%s->cl = &codelet_%s;".format(task,t.name))
       for ((a,i) <- t.args.zipWithIndex) {
         a match {
-          case d@InitialData(_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
-          case d@TemporaryData(_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
+          case d@InitialData(_,_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
+          case d@TemporaryData(_,_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
           case DataSelect(src,idx@_*) => printlnt("%s->buffers[%d] = starpu_data_get_sub_data(handle_%d,%d,%s);".format(
             task,i,tid(src),idx.length,idx.mkString(",")
           ))

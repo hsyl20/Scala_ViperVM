@@ -143,13 +143,17 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     f.close
   }
 
-  def exportC(filename:String) = {
+  def exportC(filename:String,verbose:Boolean=true) = {
     val f = new PrintWriter(new FileOutputStream(filename))
 
     def printlnt(s:String) = f.println("\t"+s)
     def printlntt(s:String) = f.println("\t\t"+s)
     def printlnttt(s:String) = f.println("\t\t\t"+s)
     def printlntttt(s:String) = f.println("\t\t\t\t"+s)
+    def comm(s:String) = if (!verbose) ("/* " + s + "*/") else ("printf(\"<-- "+s+" -->\\n\");")
+    def comment(s:String) = f.println(comm(s))
+    def commentt(s:String) = f.println("\t"+comm(s))
+
     def tid(t:Object) = abs(t.hashCode)
 
     f.println("/* File automatically generated. Do not modify it or it may be overwritten */")
@@ -169,11 +173,11 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     f.println("int main(int argc, char **argv) {")
     f.println
 
-    printlnt("/* Initialize StarPU */")
+    commentt("Initialize StarPU")
     printlnt("starpu_init(NULL);")
     f.println
 
-    printlnt("/* Allocate initial data */")
+    commentt("Allocate initial data")
 
     def dataSize(d:Data) = d.desc match {
       case MatrixDesc(m,n,typ) => "sizeof(%s)*%d*%d".format(typ2c(typ),m,n)
@@ -190,7 +194,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     }
     f.println
 
-    printlnt("/* Initialize data */")
+    commentt("Initialize data")
 
     def zeroInit(d:Data): Unit = d.desc match {
       case MatrixDesc(m,n,typ) => printlnt("memset(data_%d, 0, %s);".format(tid(d), dataSize(d)))
@@ -235,15 +239,15 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       }
     }
 
-    printlnt("/* Create StarPU buffers */")
+    commentt("Create StarPU buffers")
     initData.foreach(registerData(_,true))
     f.println
 
-    printlnt("/* Lazily allocate temporary data */")
+    commentt("Lazily allocate temporary data")
     temporaryData.foreach(registerData(_,false))
     f.println
 
-    printlnt("/* Define filters */")
+    commentt("Define filters")
 
     def defineFilter(filter:Filter): Unit = filter match {
       case ColumnSplit(n) => {
@@ -273,7 +277,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     filters.foreach(defineFilter _)
     f.println
 
-    printlnt("/* Apply filters */")
+    commentt("Apply filters")
     for (d <- filteredData) {
       val filter = d.filter
       d.source match {
@@ -289,7 +293,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     }
     f.println
 
-    printlnt("/* Create tasks */")
+    commentt("Create tasks")
     for (t <- tasks) {
       val task = "task_%d".format(tid(t))
       printlnt("struct starpu_task * %s = starpu_task_create();".format(task))
@@ -311,7 +315,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       f.println
     }
 
-    printlnt("/* Set task dependencies */")
+    commentt("Set task dependencies")
     printlnt("{")
     for (t <- tasks) {
       val ds = deps.collect{ case (t1,t2) if t2 == t => t1 }
@@ -324,36 +328,37 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     printlnt("}")
     f.println
     
-    printlnt("/* Submit tasks */")
+    commentt("Submit tasks")
     for (t <- tasks) {
       printlnt("starpu_task_submit(task_%d);".format(tid(t)))
     }
     f.println
 
-    printlnt("/* Wait for tasks */")
+    commentt("Wait for tasks")
     printlnt("starpu_task_wait_for_all();")
     f.println
 
-
-    printlnt("/* Destroy tasks */")
+    /* Tasks are automatically destroyed...
+    commentt("Destroy tasks")
     for (t <- tasks) {
       printlnt("starpu_task_destroy(task_%d);".format(tid(t)))
     }
     f.println
+    */
 
-    printlnt("/* Unregister initial data */")
+    commentt("Unregister initial data")
     for (d <- initData) {
       printlnt("starpu_data_unregister(handle_%d);".format(tid(d)))
     }
     f.println
 
-    printlnt("/* Unregister temporary data */")
+    commentt("Unregister temporary data")
     for (d <- temporaryData) {
       printlnt("starpu_data_unregister(handle_%d);".format(tid(d)))
     }
     f.println
 
-    printlnt("/* Shutdown */")
+    commentt("Shutdown")
     printlnt("starpu_shutdown();")
     f.println
 

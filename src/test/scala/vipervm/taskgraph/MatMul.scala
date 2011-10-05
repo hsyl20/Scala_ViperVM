@@ -64,28 +64,28 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
     )
 
   val source = """
-static void cpu_mult(void *descr[], __attribute__((unused))  void *arg)
-{
-	float *subA = (float *)STARPU_MATRIX_GET_PTR(descr[0]);
-	float *subB = (float *)STARPU_MATRIX_GET_PTR(descr[1]);
-	float *subC = (float *)STARPU_MATRIX_GET_PTR(descr[2]);
+  static void cpu_mult(void *descr[], __attribute__((unused))  void *arg)
+  {
+    float *subA = (float *)STARPU_MATRIX_GET_PTR(descr[0]);
+    float *subB = (float *)STARPU_MATRIX_GET_PTR(descr[1]);
+    float *subC = (float *)STARPU_MATRIX_GET_PTR(descr[2]);
 
-	unsigned nxC = STARPU_MATRIX_GET_NX(descr[2]);
-	unsigned nyC = STARPU_MATRIX_GET_NY(descr[2]);
-	unsigned nyA = STARPU_MATRIX_GET_NY(descr[0]);
+    unsigned nxC = STARPU_MATRIX_GET_NX(descr[2]);
+    unsigned nyC = STARPU_MATRIX_GET_NY(descr[2]);
+    unsigned nyA = STARPU_MATRIX_GET_NY(descr[0]);
 
-	unsigned ldA = STARPU_MATRIX_GET_LD(descr[0]);
-	unsigned ldB = STARPU_MATRIX_GET_LD(descr[1]);
-	unsigned ldC = STARPU_MATRIX_GET_LD(descr[2]);
+    unsigned ldA = STARPU_MATRIX_GET_LD(descr[0]);
+    unsigned ldB = STARPU_MATRIX_GET_LD(descr[1]);
+    unsigned ldC = STARPU_MATRIX_GET_LD(descr[2]);
 
-//  CPU_GEMM("N", "N", nxC, nyC, nyA, (TYPE)1.0, subA, ldA, subB, ldB, (TYPE)0.0, subC, ldC);
-}
+  //  CPU_GEMM("N", "N", nxC, nyC, nyA, (TYPE)1.0, subA, ldA, subB, ldB, (TYPE)0.0, subC, ldC);
+  }
 
-static starpu_codelet codelet_matmul = {
-	.where = STARPU_CPU,
-	.cpu_func = cpu_mult,
-	.nbuffers = 3,
-};
+  static starpu_codelet codelet_matmul = {
+    .where = STARPU_CPU,
+    .cpu_func = cpu_mult,
+    .nbuffers = 3,
+  };
   """
 }
 

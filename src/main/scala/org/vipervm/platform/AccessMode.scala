@@ -13,20 +13,7 @@
 
 package org.vipervm.platform
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-trait Kernel {
+sealed abstract class AccessMode
+case object ReadOnly extends AccessMode
+case object ReadWrite extends AccessMode
 
-  /**
-   * Test if this kernel can be executed by the given processor
-   */
-  def canExecuteOn(proc:Processor): Boolean
-
-}
-
-case class Param[A<:KernelParameter](position:Int,mode:AccessMode) {
-  def apply(s:Seq[KernelParameter]):A = s.drop(position).head.asInstanceOf[A]
-}

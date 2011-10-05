@@ -13,6 +13,7 @@
 
 package org.vipervm.tests
 
+import org.vipervm.platform.{ReadOnly,ReadWrite}
 import org.vipervm.taskgraph._
 import scalaz._
 import Scalaz._
@@ -20,6 +21,7 @@ import Scalaz._
 class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
   val name = "matmul"
   val args = Seq(a,b,c)
+  val argModes = Seq(ReadOnly,ReadOnly,ReadWrite)
 
 
   def lineSplit = {
@@ -63,7 +65,3 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
 
 }
 
-class MatAdd(a:Data,b:Data,c:Data) extends Task {
-  val name = "matadd"
-  val args = Seq(a,b,c)
-}

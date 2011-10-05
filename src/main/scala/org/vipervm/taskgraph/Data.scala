@@ -20,8 +20,8 @@ case class InitialData(desc:DataDesc,init:DataInit,name:String) extends Data
 case class FilteredData(source:Data, filter:Filter) extends Data {
   val desc = filter.desc(source)
 }
-case class DataSelect(src:FilteredData, id:Int*) extends Data {
-  val desc = src.desc.elem
+case class DataSelect(source:FilteredData, id:Int*) extends Data {
+  val desc = source.desc.elem
 }
 case class TemporaryData(desc:DataDesc,id:Int) extends Data {
   def this(desc:DataDesc) = this(desc,TemporaryData.getId)

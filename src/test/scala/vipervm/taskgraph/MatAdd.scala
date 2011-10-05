@@ -11,22 +11,13 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.tests
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-trait Kernel {
+import org.vipervm.platform.{ReadOnly,ReadWrite}
+import org.vipervm.taskgraph._
 
-  /**
-   * Test if this kernel can be executed by the given processor
-   */
-  def canExecuteOn(proc:Processor): Boolean
-
-}
-
-case class Param[A<:KernelParameter](position:Int,mode:AccessMode) {
-  def apply(s:Seq[KernelParameter]):A = s.drop(position).head.asInstanceOf[A]
+class MatAdd(a:Data,b:Data,c:Data) extends Task {
+  val name = "matadd"
+  val args = Seq(a,b,c)
+  val argModes = Seq(ReadOnly,ReadOnly,ReadWrite)
 }

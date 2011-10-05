@@ -15,6 +15,7 @@ package org.vipervm.taskgraph
 
 import java.io._
 import scala.math.abs
+import org.vipervm.platform.{ReadOnly,ReadWrite}
 
 class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
@@ -220,7 +221,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     def registerData(d:Data,init:Boolean): Unit = {
       val ptr = if (init) "(uintptr_t)data_%d".format(tid(d)) else "NULL"
 
-      printlnt("starpu_data_handle * handle_%d;".format(tid(d)))
+      printlnt("starpu_data_handle handle_%d;".format(tid(d)))
       d.desc match {
         case MatrixDesc(m,n,typ) => printlnt("starpu_data_matrix_register(&handle_%d, 0, %s, %d, %d, sizeof(%s));".format(tid(d),ptr,m,n,typ2c(typ)))
         case _ => throw new Exception("Data type not supported")
@@ -286,18 +287,22 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
       val task = "task_%d".format(tid(t))
       printlnt("struct starpu_task * %s = starpu_task_create();".format(task))
       printlnt("%s->cl = &codelet_%s;".format(task,t.name))
-      for ((a,i) <- t.args.zipWithIndex) {
+      for (((a,mode),i) <- (t.args zip t.argModes).zipWithIndex) {
         a match {
-          case d@InitialData(_,_,_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
-          case d@TemporaryData(_,_) => printlnt("%s->buffers[%d] = handle_%d;".format(task,i,tid(d)))
-          case DataSelect(src,idx@_*) => printlnt("%s->buffers[%d] = starpu_data_get_sub_data(handle_%d,%d,%s);".format(
-            task,i,tid(src),idx.length,idx.mkString(",")
+          case d@InitialData(_,_,_) => printlnt("%s->buffers[%d].handle = handle_%d;".format(task,i,tid(d)))
+          case d@TemporaryData(_,_) => printlnt("%s->buffers[%d].handle = handle_%d;".format(task,i,tid(d)))
+          case DataSelect(src,idx@_*) => printlnt("%s->buffers[%d].handle = starpu_data_get_sub_data(handle_%d,%d,%s);".format(
+            task,i,tid(src.source),idx.length,idx.mkString(",")
           ))
           case _ => throw new Exception("Invalid data type for task parameter")
         }
+        mode match {
+          case ReadOnly => printlnt("%s->buffers[%d].mode = STARPU_R;".format(task,i))
+          case ReadWrite => printlnt("%s->buffers[%d].mode = STARPU_RW;".format(task,i))
+        }
       }
+      f.println
     }
-    f.println
 
     printlnt("/* Set task dependencies */")
     printlnt("{")

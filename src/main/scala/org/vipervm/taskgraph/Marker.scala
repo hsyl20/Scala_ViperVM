@@ -13,9 +13,12 @@
 
 package org.vipervm.taskgraph
 
+import org.vipervm.platform.{ReadOnly,ReadWrite}
+
 class Marker extends Task {
   val name = "marker"
   val args = Nil
+  val argModes = Nil
 }
 
 class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task {
@@ -23,5 +26,6 @@ class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task 
 
   private val o = op(dummy,dummy,dummy)
   val name = "reduction_" + o.name
-  val args = as :+ res
+  val args = res +: as
+  val argModes = ReadWrite +: as.map(_ => ReadOnly)
 }

@@ -20,5 +20,7 @@ abstract class Task {
   val argModes:Seq[AccessMode]
   val name:String
   val splits:Map[Symbol,() => TaskGraph] = Map.empty
+
+  val source:String
 }
 

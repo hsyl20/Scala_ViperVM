@@ -20,4 +20,6 @@ class MatAdd(a:Data,b:Data,c:Data) extends Task {
   val name = "matadd"
   val args = Seq(a,b,c)
   val argModes = Seq(ReadOnly,ReadOnly,ReadWrite)
+
+  val source = "//TODO"
 }

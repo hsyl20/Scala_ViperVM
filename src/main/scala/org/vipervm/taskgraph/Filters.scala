@@ -28,7 +28,7 @@ case class LineSplit(n:Int) extends Filter {
 
   def apply(d:Data) = {
     val f = new FilteredData(d,this)
-    for (i <- 1 to n) yield new DataSelect(f,i)
+    for (i <- 0 until n) yield new DataSelect(f,i)
   }
 
   def name = "LineSplit x"+n
@@ -46,7 +46,7 @@ case class ColumnSplit(n:Int) extends Filter {
 
   def apply(d:Data) = {
     val f = new FilteredData(d,this)
-    for (i <- 1 to n) yield new DataSelect(f,i)
+    for (i <- 0 until n) yield new DataSelect(f,i)
   }
 
   def name = "ColumnSplit x"+n
@@ -64,7 +64,7 @@ case class BlockSplit(n:Int,m:Int) extends Filter {
 
   def apply(d:Data) = {
     val f = new FilteredData(d,this)
-    for (i <- 1 to n) yield (1 to m) map (j => new DataSelect(f,i,j))
+    for (i <- 0 until n) yield (0 until m) map (j => new DataSelect(f,i,j))
   }
 
   def name = "BlockSplit (%d x %d)".format(n,m)

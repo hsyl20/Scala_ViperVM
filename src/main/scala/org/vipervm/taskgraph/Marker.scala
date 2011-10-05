@@ -19,6 +19,7 @@ class Marker extends Task {
   val name = "marker"
   val args = Nil
   val argModes = Nil
+  val source = ""
 }
 
 class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task {
@@ -28,4 +29,6 @@ class Reduction(op:(Data,Data,Data) => Task,as:Seq[Data],res:Data) extends Task 
   val name = "reduction_" + o.name
   val args = res +: as
   val argModes = ReadWrite +: as.map(_ => ReadOnly)
+
+  val source = "//TODO"
 }

@@ -159,6 +159,13 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     f.println("#include<starpu.h>")
     f.println
 
+    printlnt("/* Create codelets */")
+    for (t <- tasks.groupBy(_.name).map(a => a._2.head)) {
+      printlnt(t.source)
+    }
+    f.println
+
+
     f.println("int main(int argc, char **argv) {")
     f.println
 
@@ -223,7 +230,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
       printlnt("starpu_data_handle handle_%d;".format(tid(d)))
       d.desc match {
-        case MatrixDesc(m,n,typ) => printlnt("starpu_data_matrix_register(&handle_%d, 0, %s, %d, %d, sizeof(%s));".format(tid(d),ptr,m,n,typ2c(typ)))
+        case MatrixDesc(m,n,typ) => printlnt("starpu_matrix_data_register(&handle_%d, 0, %s, 0, %d, %d, sizeof(%s));".format(tid(d),ptr,m,n,typ2c(typ)))
         case _ => throw new Exception("Data type not supported")
       }
     }

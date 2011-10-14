@@ -88,7 +88,7 @@ import java.util.Random
         and("an OpenCL kernel object can be created")
         val kernel = new DummyKernel
 
-        val params = Seq(LongKernelParameter(n), BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor))
+        val params = Seq(BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor), LongKernelParameter(n))
 
         and("an OpenCL kernel object can be compiled and executed asynchonously")
         /*val event = try {

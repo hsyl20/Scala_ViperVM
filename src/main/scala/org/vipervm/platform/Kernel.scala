@@ -28,5 +28,9 @@ trait Kernel {
 }
 
 case class Param[A<:KernelParameter](position:Int,mode:AccessMode) {
-  def apply(s:Seq[KernelParameter]):A = s.drop(position).head.asInstanceOf[A]
+  def apply(s:Seq[KernelParameter]):A = try {
+    s.drop(position).head.asInstanceOf[A]
+  } catch {
+    case e => throw new Exception("Invalid kernel parameter defined (position %d)".format(position))
+  }
 }

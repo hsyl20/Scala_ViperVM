@@ -36,9 +36,11 @@ private[platform] class DummyKernel extends OpenCLKernel {
 
   def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = {
 
-    Some(new OpenCLKernelConfig {
-        val globalWorkSize = List(size(params).value, 1, 1)
-        val parameters = IndexedSeq(in(params), out(params), factor(params))
-    })
+    val config = OpenCLKernelConfig(
+      globalWorkSize = List(size(params).value, 1, 1),
+      parameters = IndexedSeq(in(params), out(params), factor(params))
+    )
+
+    Some(config)
   }
 }

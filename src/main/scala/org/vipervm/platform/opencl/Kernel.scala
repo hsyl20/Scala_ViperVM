@@ -73,26 +73,12 @@ abstract class OpenCLKernel extends Kernel {
 
 /**
  * Configuration for a kernel execution
+ *
+ * @param localWorkSize Local work size is optional. Default behavior is to let the OpenCL
+ * implementation decide how to break the global work-items into work-groups
  */
-abstract class OpenCLKernelConfig {
-
-  /**
-   * Global work size
-   */
-  val globalWorkSize: List[Long]
-
-  /**
-   * Local work size (optional)
-   *
-   * Default behavior is to let the OpenCL implementation decide how
-   * to break the global work-items into work-groups
-   */
-  val localWorkSize: Option[List[Long]] = None
-
-  /**
-   * Effective kernel parameters
-   *
-   * These parameters can include shared memory allocation, etc.
-   */
-  val parameters: IndexedSeq[KernelParameter]
-}
+case class OpenCLKernelConfig(
+  val parameters: IndexedSeq[KernelParameter],
+  val globalWorkSize: List[Long],
+  val localWorkSize: Option[List[Long]] = None 
+)

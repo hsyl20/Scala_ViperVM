@@ -116,20 +116,31 @@ object Wrapper {
   implicit def nativesize2long(i:NativeSize): Long = i.longValue()
 
   implicit def arraypointer2pointer(a:Seq[Pointer]): Pointer = {
-    val m = new Memory(a.length * Pointer.SIZE)
-    for ((e,i) <- a.zipWithIndex)
-      m.setPointer(Pointer.SIZE*i, e)
-    m
+    if (a == null) {
+      null
+    }
+    else {
+      val m = new Memory(a.length * Pointer.SIZE)
+      for ((e,i) <- a.zipWithIndex)
+        m.setPointer(Pointer.SIZE*i, e)
+      m
+    }
   }
 
   implicit def arraynativesize2pointer(a:Seq[NativeSize]): Pointer = {
-    val m = new Memory(a.length * NativeSize.SIZE)
-    for ((e,i) <- a.zipWithIndex)
-      m.setLong(NativeSize.SIZE*i, e.value)
-    m
+    if (a == null) {
+      null
+    }
+    else {
+      val m = new Memory(a.length * NativeSize.SIZE)
+      for ((e,i) <- a.zipWithIndex)
+        m.setLong(NativeSize.SIZE*i, e.value)
+      m
+    }
   }
 
-  implicit def stringarray2stringarray(a:Array[String]): StringArray = new StringArray(a)
+  implicit def stringarray2stringarray(a:Array[String]): StringArray =
+    if (a == null) null else new StringArray(a)
 }
 
 /*

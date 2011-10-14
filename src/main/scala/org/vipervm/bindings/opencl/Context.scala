@@ -13,9 +13,9 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
+import org.vipervm.bindings.NativeSize
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 import java.nio.ByteBuffer
@@ -28,8 +28,8 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
 
    def this(device: Device) = this(List(device))
 
-   protected val retainFunc = clRetainContext
-   protected val releaseFunc = clReleaseContext
+   protected val retainFunc = clRetainContext _
+   protected val releaseFunc = clReleaseContext _
    protected val infoFunc = clGetContextInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
     
    //Check that all devices have the same endianness
@@ -53,7 +53,7 @@ class Context(devices: Seq[Device]) extends Entity with Retainable with Info {
    // Create context    
    private val err = new IntByReference
    //FIXME: support callback?
-   val peer = clCreateContext(properties, devices.size, devices.map(_.peer).toArray, NULL, NULL, err.getPointer)
+   val peer = clCreateContext(properties, devices.size, devices.map(_.peer), NULL, NULL, err.getPointer)
    checkError(err.getValue)
 
    //We don't use clCreateContextFromType. I don't think we miss much

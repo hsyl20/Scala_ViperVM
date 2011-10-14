@@ -13,107 +13,123 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
-import com.sun.jna.ptr.{IntByReference, PointerByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory,NativeLong}
-import com.sun.jna.Pointer.NULL
-import scala.collection.immutable._
+import org.vipervm.bindings.NativeSize
+import com.sun.jna._
 import java.nio.ByteBuffer
 
-object Wrapper extends SNA {
-   snaLibrary = "OpenCL"
-   /* Platform API */
-   val clGetPlatformIDs  = SNAS[Int, Pointer, Pointer, Int]("clGetPlatformIDs")
-   val clGetPlatformInfo = SNAS[Pointer,Int, NativeSize, Pointer, Pointer, Int]("clGetPlatformInfo")
-   /* Device API */
-   val clGetDeviceIDs    = SNAS[Pointer, Int, Int, Pointer, Pointer, Int]("clGetDeviceIDs")
-   val clGetDeviceInfo   = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetDeviceInfo") 
+object Wrapper {
 
-   /* Context API */
-   val clCreateContext = SNAS[Pointer, Int, Array[Pointer], Pointer, Pointer, Pointer, Pointer]("clCreateContext")
-   val clCreateContextFromType = SNAS[Pointer, Int, Pointer, Pointer, Pointer, Pointer]("clCreateContextFromType")
-   val clRetainContext = SNAS[Pointer, Int]("clRetainContext")
-   val clReleaseContext = SNAS[Pointer, Int]("clReleaseContext")
-   val clGetContextInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetContextInfo") 
+  Native.register("OpenCL")
 
-   /* Command Queue APIs */
-   val clCreateCommandQueue = SNAS[Pointer, Pointer, Long, Pointer, Pointer]("clCreateCommandQueue")
-   val clRetainCommandQueue = SNAS[Pointer, Int]("clRetainCommandQueue")
-   val clReleaseCommandQueue = SNAS[Pointer, Int]("clReleaseCommandQueue")
-   val clGetCommandQueueInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetCommandQueueInfo") 
-   val clSetCommandQueueProperty = SNAS[Pointer, Long, Int, Pointer, Int]("clSetCommandQueueProperty") 
+  /* Platform API */
+  @native def clGetPlatformIDs(numEntries:Int, platforms:Pointer, numPlatforms:Pointer): Int
+  @native def clGetPlatformInfo(platform:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   /* Memory Object APIs  */
-   //val clCreateBuffer = SNAS[Pointer, Long, NativeSize, Pointer, Pointer, Pointer]("clCreateBuffer")
-   val clCreateBuffer = SNAS[Pointer, Long, NativeSize, ByteBuffer, Pointer, Pointer]("clCreateBuffer")
+  /* Device API */
+  @native def clGetDeviceIDs(platform:Pointer, deviceType:Int, numEntries:Int, devices:Pointer, numDevices:Pointer): Int
+  @native def clGetDeviceInfo(device:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   val clRetainMemObject = SNAS[Pointer, Int]("clRetainMemObject")
-   val clReleaseMemObject = SNAS[Pointer, Int]("clReleaseMemObject")
-   val clGetMemObjectInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetMemObjectInfo")
+  /* Context API */
+  @native def clCreateContext(properties:Pointer, numDevices:Int, devices:Pointer, pfnNotify:Pointer, userData:Pointer, errcodeRet:Pointer): Pointer
+  @native def clCreateContextFromType(propeties:Pointer, deviceType:Int, pfnNotify:Pointer, userData:Pointer, errcodeRet:Pointer): Pointer
+  @native def clRetainContext(context:Pointer): Int
+  @native def clReleaseContext(context:Pointer): Int
+  @native def clGetContextInfo(context:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   /* Program Object APIs  */
-   val clCreateProgramWithSource = SNAS[Pointer, Int, Array[String], Array[NativeSize], Pointer, Pointer]("clCreateProgramWithSource")
-   val clRetainProgram = SNAS[Pointer, Int]("clRetainProgram")
-   val clReleaseProgram = SNAS[Pointer, Int]("clReleaseProgram")
-   val clBuildProgram = SNAS[Pointer, Int, Array[Pointer], String, Pointer, Pointer, Int]("clBuildProgram")
-   val clGetProgramInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetProgramInfo")
+  /* Command Queue APIs */
+  @native def clCreateCommandQueue(context:Pointer, device:Pointer, properties:Long, errcodeRet:Pointer): Pointer
+  @native def clRetainCommandQueue(commandQueue:Pointer): Int
+  @native def clReleaseCommandQueue(commandQueue:Pointer): Int
+  @native def clGetCommandQueueInfo(commandQueue:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+  @native def clSetCommandQueueProperty(commandQueue:Pointer, properties:Long, enable:Int, oldProperties:Pointer): Int
 
-   val clUnloadCompiler = SNAS[Int]("clUnloadCompiler")
+  /* Memory Object APIs  */
+  //@native def clCreateBuffer(context:Pointer, flags:Long, size:NativeSize, hostPtr:Pointer, errcodeRet:Pointer): Pointer
+  @native def clCreateBuffer(context:Pointer, flags:Long, size:NativeSize, hostPtr:ByteBuffer, errcodeRet:Pointer): Pointer
 
-   val clGetProgramBuildInfo = SNAS[Pointer, Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetProgramBuildInfo")
+  @native def clRetainMemObject(memobj:Pointer): Int
+  @native def clReleaseMemObject(memobj:Pointer): Int
+  @native def clGetMemObjectInfo(memobj:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   /* Kernel Object APIs */
-   val clCreateKernel = SNAS[Pointer, String, Pointer, Pointer]("clCreateKernel")
-   val clRetainKernel = SNAS[Pointer, Int]("clRetainKernel")
-   val clReleaseKernel = SNAS[Pointer, Int]("clReleaseKernel")
-   val clGetKernelInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetKernelInfo")
-   val clGetKernelWorkGroupInfo = SNAS[Pointer, Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetKernelWorkGroupInfo")
-   val clCreateKernelsInProgram = SNAS[Pointer, Int, Pointer, Pointer, Int]("clCreateKernelsInProgram")
-   val clSetKernelArg = SNAS[Pointer, Int, NativeSize, Pointer, Int]("clSetKernelArg")
+  /* Program Object APIs  */
+  @native def clCreateProgramWithSource(context:Pointer, count:Int, strings:StringArray, lengths:Pointer, errcodeRet:Pointer): Pointer
+  @native def clRetainProgram(program:Pointer): Int
+  @native def clReleaseProgram(program:Pointer): Int
+  @native def clBuildProgram(program:Pointer, numDevices:Int, deviceList:Pointer, options:String, pfnNotify:Pointer, userData:Pointer): Int
+  @native def clGetProgramInfo(program:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   /* Event Object APIs  */
-   val clRetainEvent = SNAS[Pointer, Int]("clRetainEvent")
-   val clReleaseEvent = SNAS[Pointer, Int]("clReleaseEvent")
-   val clGetEventInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetEventInfo")
-   val clWaitForEvents = SNAS[Int, Array[Pointer], Int]("clWaitForEvents")
-   
-   /* Profiling APIs  */
-   val clGetEventProfilingInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetEventProfilingInfo") 
+  @native def clUnloadCompiler():Int
 
-   /* Flush and Finish APIs */
-   val clFlush = SNAS[Pointer, Int]("clFlush")
-   val clFinish = SNAS[Pointer, Int]("clFinish")
+  @native def clGetProgramBuildInfo(program:Pointer, device:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   /* Enqueued Commands APIs */
-   val clEnqueueReadBuffer = SNAS[Pointer, Pointer, Int, NativeSize, NativeSize, Pointer, Int, Array[Pointer], Pointer, Int]("clEnqueueReadBuffer")
-   val clEnqueueWriteBuffer = SNAS[Pointer, Pointer, Int, NativeSize, NativeSize, Pointer, Int, Array[Pointer], Pointer, Int]("clEnqueueWriteBuffer")
-   val clEnqueueCopyBuffer = SNAS[Pointer, Pointer, Pointer, NativeSize, NativeSize, NativeSize, Int, Array[Pointer], Pointer, Int]("clEnqueueCopyBuffer")
+  /* Kernel Object APIs */
+  @native def clCreateKernel(program:Pointer, kernelName:String, errcodeRet:Pointer): Pointer
+  @native def clRetainKernel(kernel:Pointer): Int
+  @native def clReleaseKernel(kernel:Pointer): Int
+  @native def clGetKernelInfo(kernel:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+  @native def clGetKernelWorkGroupInfo(kernel:Pointer, device:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+  @native def clCreateKernelsInProgram(program:Pointer, numKernels:Int, kernels:Pointer, numkernelsRet:Pointer): Int
+  @native def clSetKernelArg(kernel:Pointer, argIndex:Int, argSize:NativeSize, argValue:Pointer): Int
 
-   val clEnqueueMapBuffer = SNAS[Pointer, Pointer, Int, Long, NativeSize, NativeSize, Int, Array[Pointer], Pointer, Pointer, Pointer]("clEnqueueMapBuffer")
+  /* Event Object APIs  */
+  @native def clRetainEvent(event:Pointer): Int
+  @native def clReleaseEvent(event:Pointer): Int
+  @native def clGetEventInfo(event:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+  @native def clWaitForEvents(numEvents:Int, eventList:Pointer): Int
 
-   val clEnqueueUnmapMemObject = SNAS[Pointer, Pointer, Pointer, Int, Array[Pointer], Pointer, Int]("clEnqueueUnmapMemObject")
+  /* Profiling APIs  */
+  @native def clGetEventProfilingInfo(event:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
 
-   val clEnqueueNDRangeKernel = SNAS[Pointer, Pointer, Int, Array[NativeSize], Array[NativeSize], Array[NativeSize], Int, Array[Pointer], Pointer, Int]("clEnqueueNDRangeKernel")
+  /* Flush and Finish APIs */
+  @native def clFlush(commandQueue:Pointer): Int
+  @native def clFinish(commandQueue:Pointer): Int
 
-   val clEnqueueWaitForEvents = SNAS[Pointer, Int, Array[Pointer], Int]("clEnqueueWaitForEvents")
-   
-   val clEnqueueTask = SNAS[Pointer, Pointer, Int, Array[Pointer], Pointer, Int]("clEnqueueTask")
-   val clEnqueueMarker = SNAS[Pointer, Pointer, Int]("clEnqueueMarker")
-   val clEnqueueBarrier = SNAS[Pointer, Int]("clEnqueueBarrier")
+  /* Enqueued Commands APIs */
+  @native def clEnqueueReadBuffer(commandQueue:Pointer, buffer:Pointer, blockingRead:Int, offset:NativeSize, cb:NativeSize, ptr:Pointer, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
+  @native def clEnqueueWriteBuffer(commandQueue:Pointer, buffer:Pointer, blockingWrite:Int, offset:NativeSize, cb:NativeSize, ptr:Pointer, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
+  @native def clEnqueueCopyBuffer(commandQueue:Pointer, srcBuffer:Pointer, dstBuffer:Pointer, srcOffset:NativeSize, dstOffset:NativeSize, cb:NativeSize, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
 
-   /* Image APIs */
-   val clGetImageInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetImageInfo")
+  @native def clEnqueueMapBuffer(commandQueue:Pointer, buffer:Pointer, blockingMap:Int, mapFlags:Long, offset:NativeSize, cb:NativeSize, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer, errcodeRet:Pointer): Pointer
 
-   /* Sampler APIs */
-   val clCreateSampler = SNAS[Pointer, Int, Int, Int, Pointer, Pointer]("clCreateSampler")
-   val clGetSamplerInfo = SNAS[Pointer, Int, NativeSize, Pointer, Pointer, Int]("clGetSamplerInfo")
-   val clRetainSampler = SNAS[Pointer, Int]("clRetainSampler")
-   val clReleaseSampler = SNAS[Pointer, Int]("clReleaseSampler")
+  @native def clEnqueueUnmapMemObject(commandQueue:Pointer, memobj:Pointer, mappedPtr:Pointer, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
+
+  @native def clEnqueueNDRangeKernel(commandQueue:Pointer, kernel:Pointer, workDim:Int, globalWorkOffset:Pointer, globalWorkSize:Pointer, localWorkSize:Pointer, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
+
+  @native def clEnqueueWaitForEvents(commandQueue:Pointer, numEvents:Int, eventList:Pointer): Int
+
+  @native def clEnqueueTask(commandQueue:Pointer, kernel:Pointer, numEventsInWaitList:Int, eventWaitList:Pointer, event:Pointer): Int
+  @native def clEnqueueMarker(commandQueue:Pointer, event:Pointer): Int
+  @native def clEnqueueBarrier(commandQueue:Pointer): Int
+
+  /* Image APIs */
+  @native def clGetImageInfo(image:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+
+  /* Sampler APIs */
+  @native def clCreateSampler(context:Pointer, normalizedCoords:Int, addressingMode:Int, filterMode:Int, errcodeRet:Pointer): Pointer
+  @native def clGetSamplerInfo(sampler:Pointer, paramName:Int, paramValueSize:NativeSize, paramValue:Pointer, paramValueSizeRet:Pointer): Int
+  @native def clRetainSampler(sampler:Pointer): Int
+  @native def clReleaseSampler(sampler:Pointer): Int
 
 
-   implicit def int2nativesize(i:Int): NativeSize = new NativeSize(i)
-   implicit def long2nativesize(i:Long): NativeSize = new NativeSize(i)
-   implicit def nativesize2long(i:NativeSize): Long = i.longValue()
+  implicit def int2nativesize(i:Int): NativeSize = new NativeSize(i)
+  implicit def long2nativesize(i:Long): NativeSize = new NativeSize(i)
+  implicit def nativesize2long(i:NativeSize): Long = i.longValue()
+
+  implicit def arraypointer2pointer(a:Seq[Pointer]): Pointer = {
+    val m = new Memory(a.length * Pointer.SIZE)
+    for ((e,i) <- a.zipWithIndex)
+      m.setPointer(Pointer.SIZE*i, e)
+    m
+  }
+
+  implicit def arraynativesize2pointer(a:Seq[NativeSize]): Pointer = {
+    val m = new Memory(a.length * NativeSize.SIZE)
+    for ((e,i) <- a.zipWithIndex)
+      m.setLong(NativeSize.SIZE*i, e.value)
+    m
+  }
+
+  implicit def stringarray2stringarray(a:Array[String]): StringArray = new StringArray(a)
 }
 
 /*

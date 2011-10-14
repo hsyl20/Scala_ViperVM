@@ -13,7 +13,6 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL
@@ -23,8 +22,8 @@ class Event(val commandQueue:CommandQueue, val peer:Pointer) extends Entity with
    import Wrapper._
    import Event._
 
-   protected val retainFunc = clRetainEvent    
-   protected val releaseFunc = clReleaseEvent
+   protected val retainFunc = clRetainEvent _
+   protected val releaseFunc = clReleaseEvent _
    protected val infoFunc = clGetEventInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
 
    def referenceCount  = getIntInfo(CL_EVENT_REFERENCE_COUNT)
@@ -100,7 +99,7 @@ object Event {
    }
 
    def waitFor(events:Seq[Event]): Unit = {
-      checkError(clWaitForEvents(events.size, events.map(_.peer).toArray))
+      checkError(clWaitForEvents(events.size, events.map(_.peer)))
    }
 
    def waitFor(event:Event): Unit = waitFor(IndexedSeq(event))

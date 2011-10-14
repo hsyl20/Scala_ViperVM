@@ -14,7 +14,6 @@
 package org.vipervm.bindings.opencl
 
 import grizzled.slf4j.Logging
-import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL

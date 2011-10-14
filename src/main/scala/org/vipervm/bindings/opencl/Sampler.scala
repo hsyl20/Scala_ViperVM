@@ -13,7 +13,6 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
 import com.sun.jna.{Pointer, Structure, PointerType, NativeLong, Memory}
 import com.sun.jna.Pointer.NULL
@@ -24,8 +23,8 @@ class Sampler(val context: Context, val normCoords:Boolean, val addressingMode:I
    import Sampler._
    import OpenCL._
 
-   protected val retainFunc = clRetainSampler
-   protected val releaseFunc = clReleaseSampler
+   protected val retainFunc = clRetainSampler _
+   protected val releaseFunc = clReleaseSampler _
    protected val infoFunc = clGetSamplerInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
 
    private val nc = if (normCoords) CL_TRUE else CL_FALSE

@@ -13,9 +13,9 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
+import org.vipervm.bindings.NativeSize
 import com.sun.jna.ptr.{IntByReference, PointerByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 
@@ -24,8 +24,8 @@ class Kernel(val program:Program, val name:String, vpeer:Pointer = NULL) extends
    import Kernel._
    import OpenCL.checkError
 
-   protected val retainFunc = clRetainKernel
-   protected val releaseFunc = clReleaseKernel
+   protected val retainFunc = clRetainKernel _
+   protected val releaseFunc = clReleaseKernel _
    protected val infoFunc = clGetKernelInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
     
    val peer = if (vpeer != NULL) vpeer else {

@@ -13,9 +13,9 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
+import org.vipervm.bindings.NativeSize
 import com.sun.jna.ptr.{IntByReference, PointerByReference, LongByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 import java.nio.ByteBuffer
@@ -24,8 +24,8 @@ trait Mem extends Entity with Retainable with Info {
    import Wrapper._
    import Mem._
 
-   protected val retainFunc = clRetainMemObject
-   protected val releaseFunc = clReleaseMemObject
+   protected val retainFunc = clRetainMemObject _
+   protected val releaseFunc = clReleaseMemObject _
    protected val infoFunc = clGetMemObjectInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
 
    lazy val memType = getIntInfo(CL_MEM_TYPE)

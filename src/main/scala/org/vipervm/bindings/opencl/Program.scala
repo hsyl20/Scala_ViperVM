@@ -13,9 +13,9 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
+import org.vipervm.bindings.NativeSize
 import com.sun.jna.ptr.{IntByReference, PointerByReference, LongByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable._
 
@@ -24,17 +24,17 @@ class Program(val context:Context, val source:String) extends Entity with Retain
    import Wrapper._
    import Program._
    
-   protected val retainFunc = clRetainProgram
-   protected val releaseFunc = clReleaseProgram
+   protected val retainFunc = clRetainProgram _
+   protected val releaseFunc = clReleaseProgram _
    protected val infoFunc = clGetProgramInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
 
 
    private val err = new IntByReference
-   val peer = clCreateProgramWithSource(context.peer, 1, List(source).toArray, List(NativeSize(source.length)).toArray, err.getPointer)
+   val peer = clCreateProgramWithSource(context.peer, 1, Array(source), List(NativeSize(source.length)), err.getPointer)
    checkError(err.getValue)
 
    def build(devices:Seq[Device], options:String = ""): Unit = {
-      val err = clBuildProgram(peer, devices.size, devices.map(_.peer).toArray, options, NULL,NULL)
+      val err = clBuildProgram(peer, devices.size, devices.map(_.peer), options, NULL,NULL)
       if (err != OpenCLException.CL_SUCCESS)
         throw new OpenCLBuildProgramException(err, this, devices)
       //TODO: add built devices to a list

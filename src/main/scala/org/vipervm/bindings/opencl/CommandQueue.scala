@@ -13,9 +13,9 @@
 
 package org.vipervm.bindings.opencl
 
-import net.java.dev.sna.SNA
+import org.vipervm.bindings.NativeSize
 import com.sun.jna.ptr.{IntByReference, PointerByReference, LongByReference}
-import com.sun.jna.{Pointer, Structure, PointerType, NativeSize, Memory}
+import com.sun.jna.{Pointer, Structure, PointerType, Memory}
 import com.sun.jna.Pointer.NULL
 import scala.collection.immutable.BitSet.BitSet1
 import scala.collection.immutable.BitSet
@@ -25,8 +25,8 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
    import CommandQueue._
    import OpenCL.{checkError, CL_FALSE, CL_TRUE}
 
-   protected val retainFunc = clRetainCommandQueue
-   protected val releaseFunc = clReleaseCommandQueue
+   protected val retainFunc = clRetainCommandQueue _
+   protected val releaseFunc = clReleaseCommandQueue _
    protected val infoFunc = clGetCommandQueueInfo(peer, _:Int, _:Int, _:Pointer, _:Pointer)
 
    val err = new IntByReference
@@ -57,8 +57,8 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
    def flush = checkError(clFlush(peer))
    def finish = checkError(clFinish(peer))
 
-   private def eventWaitList(events:Seq[Event]): Array[Pointer] = 
-      if (events.size != 0) events.map(_.peer).toArray else null
+   private def eventWaitList(events:Seq[Event]): Seq[Pointer] = 
+      if (events.size != 0) events.map(_.peer) else null
 
    def enqueueReadBuffer(buffer:Buffer, blocking:Boolean, offset:Long, size:Long, ptr:Pointer, events:Seq[Event]): Event = {
       val b = if (blocking) CL_TRUE else CL_FALSE
@@ -100,11 +100,8 @@ class CommandQueue(val context:Context, val device:Device, prop: BitSet1) extend
 
    def enqueueKernel(kernel:Kernel, globalWorkSize:Seq[Long], localWorkSize:Option[Seq[Long]], events:Seq[Event]): Event = {
       val ev = new PointerByReference
-      val gws = globalWorkSize.map(new NativeSize(_)).toArray
-      val lws = localWorkSize match {
-         case None => null
-         case Some(a) => a.map(new NativeSize(_)).toArray
-      }
+      val gws = globalWorkSize.map(new NativeSize(_))
+      val lws = localWorkSize.map(_.map(new NativeSize(_))).getOrElse(null)
       val err = clEnqueueNDRangeKernel(peer, kernel.peer, gws.size, null, gws, lws, events.size, eventWaitList(events), ev.getPointer)
       checkError(err)
       new Event(this, ev.getValue)

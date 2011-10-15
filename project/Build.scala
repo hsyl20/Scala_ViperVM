@@ -61,8 +61,10 @@ object Dependencies {
   /* Runtime libs */
   val jna = "net.java.dev.jna" % "jna" % "3.3.0"
 
+  val apacheCommons = "commons-io" % "commons-io" % "1.4"
+
   /* GUI libs */
-  val scala_swing = "org.scala-lang" % "scala-swing" % buildScalaVersion
+  val scalaSwing = "org.scala-lang" % "scala-swing" % buildScalaVersion
 
   /* Logging (SLF4J through grizzled) */
   val grizzled = "org.clapper" %% "grizzled-slf4j" % "0.6.6"
@@ -114,7 +116,8 @@ object ViperVMBuild extends Build {
   val commonDeps = Seq (
     jline,
     jna,
-    scala_swing,
+    apacheCommons,
+    scalaSwing,
     grizzled,
     slf4jsimple,
     scalaz,

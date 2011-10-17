@@ -36,9 +36,15 @@ object TemporaryData {
   }
 }
 
-sealed abstract class DataType
-case object FloatType extends DataType
-case object DoubleType extends DataType
+sealed abstract class DataType {
+  val size:Int
+}
+case object FloatType extends DataType {
+  val size = 4
+}
+case object DoubleType extends DataType {
+  val size = 8
+}
 
 sealed abstract class DataDesc
 case class ArrayDesc(dim:Int,sizes:Seq[Int],elem:DataDesc) extends DataDesc

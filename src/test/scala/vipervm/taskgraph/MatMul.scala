@@ -78,6 +78,7 @@ class MatMul(val a:Data, val b:Data, val c:Data) extends Task{
     unsigned ldB = STARPU_MATRIX_GET_LD(descr[1]);
     unsigned ldC = STARPU_MATRIX_GET_LD(descr[2]);
 
+    printf("SGEMM: not implemented\n");
   //  CPU_GEMM("N", "N", nxC, nyC, nyA, (TYPE)1.0, subA, ldA, subB, ldB, (TYPE)0.0, subC, ldC);
   }
 

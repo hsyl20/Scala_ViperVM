@@ -16,27 +16,29 @@ package org.vipervm.taskgraph
 import java.io._
 import scala.math.abs
 import org.vipervm.platform.{ReadOnly,ReadWrite}
+import org.vipervm.Utils._
+
 
 class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
-  private def dataName(d:Data): String = d match {
-    case InitialData(_,_,name) => name
-    case FilteredData(_,filter) => filter.name
-    case DataSelect(_,id@_*) => id.mkString(",")
-    case TemporaryData(_,id) => "tmp"+id
-  }
-
-  private def dta(d:Data):(Int,String,Data) = (d.hashCode, dataName(d), d)
-
-  private def dataHierarchy(d:Data):List[(Int,String,Data)] = d match {
-    case a@InitialData(_,_,_) => List(dta(a))
-    case a@TemporaryData(_,_) => List(dta(a))
-    case a@FilteredData(src,_) => dta(a) :: dataHierarchy(src)
-    case a@DataSelect(f,_*) => dta(a) :: dataHierarchy(f)
-  }
-
   /** Data used by tasks in this graph */
-  lazy val dataSet = tasks.flatMap(_.args).flatMap(dataHierarchy _).toSet
+  lazy val dataSet = tasks.flatMap(_.args).toSet
+  /** Data used by tasks and parent data */
+  lazy val allDataSet = dataSet.flatMap(dataHierarchy _).toSet
+
+  val (maxDataSize,minDataSize,meanDataSize) = {
+    val sizeSet = dataSet.map { _.desc match {
+      case MatrixDesc(m,n,typ) => m*n*typ.size
+      case _ => ???
+    }}
+    (sizeSet.max.toFloat, sizeSet.min.toFloat, sizeSet.sum.toFloat/sizeSet.size.toFloat)
+  }
+
+  /** Statistics string */
+  def statistics = "Data: Count=%d MaxSize=%.2fMB MinSize=%.2fMB MeanSize=%.2fMB".format(
+    dataSet.size, maxDataSize/1024.0, minDataSize/1024.0, meanDataSize/1024.0
+  )
+
 
   /** Associations between data (data + filters + filtered data) */
   lazy val dataLinkMap = tasks.flatMap {
@@ -46,25 +48,25 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
   }.groupBy(a => a._1).mapValues(_.unzip._2.toSet)
 
   /** Root data */
-  lazy val initData = dataSet.flatMap {
+  lazy val initData = allDataSet.flatMap {
     case (_,_,a@InitialData(_,_,_)) => Some(a)
     case _ => None
   }
 
   /** Temporary data */
-  lazy val temporaryData = dataSet.flatMap {
+  lazy val temporaryData = allDataSet.flatMap {
     case (_,_,a@TemporaryData(_,_)) => Some(a)
     case _ => None
   }
 
   /** Filtered data */
-  lazy val filteredData = dataSet.flatMap {
+  lazy val filteredData = allDataSet.flatMap {
     case (_,_,a@FilteredData(_,_)) => Some(a)
     case _ => None
   }
 
   /** Filters */
-  lazy val filters = dataSet.flatMap {
+  lazy val filters = allDataSet.flatMap {
     case (_,_,FilteredData(_,filter)) => Some(filter)
     case _ => None
   }
@@ -81,6 +83,22 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
     val newDeps = oldDeps ++ beginDeps ++ endDeps
     val newNodes = graph.tasks ++ tasks.filterNot(_ == task)
     new TaskGraph(newNodes,newDeps)
+  }
+
+  private def dataName(d:Data): String = d match {
+    case InitialData(_,_,name) => name
+    case FilteredData(_,filter) => filter.name
+    case DataSelect(_,id@_*) => id.mkString(",")
+    case TemporaryData(_,id) => "tmp"+id
+  }
+
+  private def dta(d:Data):(Int,String,Data) = (d.hashCode, dataName(d), d)
+
+  private def dataHierarchy(d:Data):List[(Int,String,Data)] = d match {
+    case a@InitialData(_,_,_) => List(dta(a))
+    case a@TemporaryData(_,_) => List(dta(a))
+    case a@FilteredData(src,_) => dta(a) :: dataHierarchy(src)
+    case a@DataSelect(f,_*) => dta(a) :: dataHierarchy(f)
   }
 
 

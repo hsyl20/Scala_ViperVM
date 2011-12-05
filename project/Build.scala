@@ -45,6 +45,7 @@ object MyProject extends Build {
     "org.clapper" %% "grizzled-slf4j" % "0.6.6",
     "org.scalaz" %% "scalaz-full" % "6.0.3",
     "org.scalatest" %% "scalatest" % "1.6.1",
+    "org.neo4j" % "neo4j" % "1.5",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

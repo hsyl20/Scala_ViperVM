@@ -18,13 +18,14 @@ import org.vipervm.platform.host._
 import org.vipervm.platform._
 import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
-
-private[platform] class DummyKernel extends OpenCLKernel {
-  val source = """__kernel void dummy(__global float * in, __global float * out, int a) {
-                    int i = get_global_id(0);
-                    out[i] = in[i] * (float)a;
-                    out[i] = 1024.0;
-                  }"""
+class DummyKernel extends OpenCLKernel {
+  val source = """
+    __kernel void dummy(__global float * in, __global float * out, int a) {
+      int i = get_global_id(0);
+      out[i] = in[i] * (float)a;
+      out[i] = 1024.0;
+    }
+  """
 
   val program = new OpenCLProgram(source)
   val name = "dummy"

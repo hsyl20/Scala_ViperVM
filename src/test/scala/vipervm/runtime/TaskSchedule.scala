@@ -11,8 +11,6 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.junit._
-
 /*import org.vipervm.runtime._
 import org.vipervm.runtime.opencl.OpenCLDriver
 import org.vipervm.runtime.schedulers.SingleDeviceScheduler

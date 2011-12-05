@@ -1,9 +1,9 @@
 import org.vipervm.bindings.opencl._
-import org.junit._
+import org.scalatest.FunSuite
 
-class TestPlatforms {
+class TestPlatforms extends FunSuite {
    
-   @Test def platforms {
+   test("OpenCL platforms") {
       println("Platforms:")
       for (p <- OpenCL.platforms) {
          println(p.name + " - " + p.vendor)

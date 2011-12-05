@@ -1,7 +1,7 @@
 import org.vipervm.bindings.opencl._
-import org.junit._
+import org.scalatest.FunSuite
 
-class TestProgram {
+class TestProgram extends FunSuite {
    
    val src = """__kernel void dummy(__global float *s, __global float *d) {
                     int x = get_global_id(0);
@@ -17,7 +17,7 @@ class TestProgram {
                     d[x] = s[x];
                 }"""
 
-   @Test def program {
+   test("OpenCL program") {
       OpenCL.platforms match {
          case Nil => println("No OpenCL platform to test!")
          case p::_ => p.devices() match {

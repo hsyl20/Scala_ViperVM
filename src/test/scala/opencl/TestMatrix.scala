@@ -1,9 +1,9 @@
-import org.junit._
 
+import org.scalatest.FunSuite
 import org.vipervm.bindings.opencl._
 import java.nio.{ByteBuffer, ByteOrder}
 
-class TestMatrix {
+class TestMatrix extends FunSuite {
    
    val src = """__kernel void matrix_add(__global float *s1, __global float *s2, __global float *d) {
                     int x = get_global_id(0);
@@ -13,7 +13,7 @@ class TestMatrix {
                 }"""
 
 
-   @Test def program {
+   test("OpenCL program") {
       OpenCL.platforms match {
          case Nil => println("No OpenCL platform to test!")
          case platform::_ => platform.devices() match {

@@ -1,9 +1,8 @@
 import org.vipervm.bindings.opencl._
+import org.scalatest.FunSuite
 
-import org.junit._
-
-class TestMem {
-   @Test def context {
+class TestMem extends FunSuite {
+   test("OpenCL context") {
       OpenCL.platforms match {
          case Nil => println("No OpenCL platform to test!")
          case p::_ => p.devices() match {

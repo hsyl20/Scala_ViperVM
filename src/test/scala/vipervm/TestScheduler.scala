@@ -11,7 +11,6 @@
 **                     GPLv3                        **
 \*                                                  */
 
-import org.junit._
 import org.vipervm._
 
 /*class TestScheduler {

@@ -15,7 +15,7 @@ package org.vipervm.platform
 
 import scala.util.continuations._
 
-object Sequence {
+trait Sequence {
   def barrier[T](event:Event):Unit @cps[FutureEvent[T]]= {
     shift { k: (Unit=>FutureEvent[T]) =>
       event.fold(k())

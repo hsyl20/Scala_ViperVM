@@ -25,6 +25,11 @@ object MyProject extends Build {
     /* GIT ready shell prompt */
     shellPrompt  := ShellPrompt.buildShellPrompt,
 
+    /* Continuation plugin */
+    autoCompilerPlugins := true,
+    addCompilerPlugin("org.scala-lang.plugins" % "continuations" % buildScalaVersion),
+    scalacOptions += "-P:continuations:enable",
+
     /* Tasks */
     fullRunTask(TaskKey[Unit]("run-demo-codegen", "C Code generation demo"), Test, "demos.codegen.Main"),
     fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Test, "org.vipervm.apps.Profiler"),

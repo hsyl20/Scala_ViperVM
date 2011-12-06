@@ -269,7 +269,7 @@ class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {
 
     def defineFilter(filter:Filter): Unit = filter match {
       case ColumnSplit(n) => {
-        printlnt("struct starpu_data_filter fitler_%d_t = {".format(tid(filter)))
+        printlnt("struct starpu_data_filter filter_%d_t = {".format(tid(filter)))
         printlntt(".filter_func = starpu_vertical_block_filter_func,")
         printlntt(".nchildren = %d".format(n))
         printlnt("};")

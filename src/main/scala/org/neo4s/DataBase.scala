@@ -1,14 +1,14 @@
 package org.neo4s
 
-import org.neo4j.kernel.EmbeddedGraphDatabase
+import org.neo4j.kernel.{EmbeddedGraphDatabase => EGDB}
 import org.neo4j.graphdb.{Node,PropertyContainer}
 
 import scala.collection.JavaConversions._
 import org.neo4s.Neo4s._
 
-class EmbeddedGraphDataBase(path:String) {
+class DataBase(path:String) {
 
-  protected val peer = new EmbeddedGraphDatabase(path)
+  protected val peer = new EGDB(path)
 
   /* Shutdown the database when the JVM exits */
   Runtime.getRuntime.addShutdownHook( new Thread {

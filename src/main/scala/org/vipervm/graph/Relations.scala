@@ -15,7 +15,7 @@ object Relations {
 
   val what = Relation("what")           /** Main: what to compute */
   val whereTo = Relation("whereTo")     /** Main: where should it be actually stored  */
-  val main = Relation("main")     /** Main: where should it be actually stored  */
+  val main = Relation("main")           /** Main node  */
 
   val typeKey = "type"
   val applicationType = "application"

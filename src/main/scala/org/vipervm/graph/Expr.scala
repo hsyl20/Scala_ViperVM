@@ -1,6 +1,5 @@
 package org.vipervm.graph
 
-
 import org.neo4s.Node
 
 abstract class Expr {

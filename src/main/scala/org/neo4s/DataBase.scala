@@ -48,7 +48,7 @@ class DataBase(path:String) {
   /**
    * Return the root node of the graph
    */
-  def root = peer.getReferenceNode
+  def root:Node = peer.getReferenceNode
 
   /**
    * Clear a database

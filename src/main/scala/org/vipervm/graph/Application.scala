@@ -1,6 +1,5 @@
 package org.vipervm.graph
 
-import org.neo4s.Neo4s._
 import org.neo4s.Direction._
 import org.neo4s.{DataBase,Node}
 import Relations._

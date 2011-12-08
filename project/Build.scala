@@ -51,6 +51,7 @@ object MyProject extends Build {
     "org.scalaz" %% "scalaz-full" % "6.0.3",
     "org.scalatest" %% "scalatest" % "1.6.1",
     "org.neo4j" % "neo4j" % "1.5",
+    "org.neo4s" %% "neo4s" % "0.1-SNAPSHOT",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

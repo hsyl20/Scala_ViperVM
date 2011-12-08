@@ -1,6 +1,7 @@
 package org.vipervm.graph
 
-import org.neo4j.graphdb.Node
+
+import org.neo4s.Node
 
 abstract class Expr {
     val peer:Node

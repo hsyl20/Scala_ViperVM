@@ -1,7 +1,7 @@
 package org.neo4s
 
 import org.neo4j.kernel.{EmbeddedGraphDatabase => EGDB}
-import org.neo4j.graphdb.{Node,PropertyContainer}
+import org.neo4j.graphdb.{Node=>Nod,PropertyContainer}
 
 import scala.collection.JavaConversions._
 import org.neo4s.Neo4s._
@@ -43,7 +43,7 @@ class DataBase(path:String) {
   /**
    * Return all nodes of the graph
    */
-  def allNodes:Iterable[Node] = peer.getAllNodes
+  def allNodes:Iterable[Node] = peer.getAllNodes.view.map(nodeWrap)
 
   /**
    * Return the root node of the graph

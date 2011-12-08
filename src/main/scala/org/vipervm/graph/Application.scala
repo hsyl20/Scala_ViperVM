@@ -1,10 +1,8 @@
 package org.vipervm.graph
 
-import org.neo4j.graphdb.Node
-
 import org.neo4s.Neo4s._
 import org.neo4s.Direction._
-import org.neo4s.DataBase
+import org.neo4s.{DataBase,Node}
 import Relations._
 
 class Application(val peer:Node) {

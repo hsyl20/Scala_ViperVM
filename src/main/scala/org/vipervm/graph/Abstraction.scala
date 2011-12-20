@@ -13,7 +13,7 @@ class Abstraction(val peer:Node) {
 }
 
 object Abstraction {
-  /** Create a new abstraction nodde */
+  /** Create a new abstraction node */
   def create(fun:Expr=>Expr)(implicit db:DataBase) = {
     val abs = db.createNode
     abs.properties += typeKey -> abstractionType

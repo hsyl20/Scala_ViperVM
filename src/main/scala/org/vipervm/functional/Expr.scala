@@ -9,7 +9,10 @@ case class Abstraction(f:Expr=>Expr) extends Expr {
     case _ => false
   }
 }
-case class Application(e:Expr,arg:Expr) extends Expr
+case class Application(exprs:Expr*) extends Expr {
+  override def apply(x:Expr):Application = Application(exprs :+ x :_*)
+}
+
 case object DummyExpr extends Expr
 case class Var(name:String) extends Expr
 
@@ -24,3 +27,5 @@ case object Join extends Op
 case object Plus extends Op
 case object Minus extends Op
 case object Time extends Op
+
+case class Data(id:Int) extends Expr

@@ -9,6 +9,8 @@ object MyProject extends Build {
 
   lazy val project = Project (buildName, file("."), settings = mySettings)
 
+  val replTaskKey = TaskKey[Unit]("run-repl", "Read-Eval-Print-Loop")
+
   val mySettings = Defaults.defaultSettings ++ Seq (
     organization := buildOrganization,
     name         := buildName,
@@ -33,7 +35,11 @@ object MyProject extends Build {
     /* Tasks */
     fullRunTask(TaskKey[Unit]("run-demo-codegen", "C Code generation demo"), Test, "demos.codegen.Main"),
     fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Test, "org.vipervm.apps.Profiler"),
-    fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Test, "org.vipervm.apps.Info")
+    fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Test, "org.vipervm.apps.Info"),
+    fullRunTask(replTaskKey, Test, "org.vipervm.fp.REPL"),
+    fork in replTaskKey := true,
+    outputStrategy in replTaskKey := Some(StdoutOutput),
+    connectInput in replTaskKey := true
   )
 
   val myResolvers = Seq(
@@ -44,6 +50,7 @@ object MyProject extends Build {
 
   val myDependencies = Seq (
     "org.scala-lang" % "jline" % buildScalaVersion,
+    "jline" % "jline" % "1.0",
     "org.scala-lang" % "scala-swing" % buildScalaVersion,
     "net.java.dev.jna" % "jna" % "3.3.0",
     "commons-io" % "commons-io" % "1.4",

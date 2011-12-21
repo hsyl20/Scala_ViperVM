@@ -26,7 +26,7 @@ class REPL {
         repl
       }
       case _ => {
-        val e = Parser.parse(args)
+        val e = Parser.parse(s)
         e match {
           case Parser.Success(t,_) => println(Printer.print(Term.eval(t)))
           case Parser.NoSuccess(msg,_) => println(msg)

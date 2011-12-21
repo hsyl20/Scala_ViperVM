@@ -14,7 +14,7 @@ object LambdaTerm {
     case TmApp(fi,t1,t2) => TmApp(fi, tmMap(onvar,t1,c), tmMap(onvar,t2,c))
   }
 
-  def shift(t:LambdaTerm,step:Int):LambdaTerm = {
+  def shift(step:Int,t:LambdaTerm):LambdaTerm = {
     def onvar(c:Int,v:TmVar):LambdaTerm = v match {
       case TmVar(fi,x,n) => if (x>c) TmVar(fi,x+step,n+step) else TmVar(fi,x,n+step)
     }
@@ -23,10 +23,40 @@ object LambdaTerm {
 
   def subst(j:Int,s:LambdaTerm,t:LambdaTerm):LambdaTerm = {
     def onvar(c:Int,v:TmVar):LambdaTerm = v match {
-      case TmVar(fi,x,n) => if (x==j+c) shift(s,c) else TmVar(fi,x,n)
+      case TmVar(fi,x,n) => if (x==j+c) shift(c,s) else TmVar(fi,x,n)
     }
     tmMap(onvar,t)
   }
+
+  def substTop(s:LambdaTerm,t:LambdaTerm):LambdaTerm = {
+    shift(-1, subst(0, shift(1,s), t))
+  }
+
+  def isValue(ctx:Context,t:LambdaTerm):Boolean = t match {
+    case TmAbs(_,_,_) => true
+    case _ => false
+  }
+
+  case object NoRuleApplies extends Exception
+
+  /**
+   * Single step evaluation
+   */
+  def eval(ctx:Context,t:LambdaTerm):LambdaTerm = try {
+    eval(ctx, eval1(ctx,t))
+  }
+  catch {
+    case NoRuleApplies => t
+  }
+
+  def eval1(ctx:Context,t:LambdaTerm):LambdaTerm = t match {
+    case TmApp(fi,TmAbs(_,x,t12),v2) if isValue(ctx,v2) => substTop(v2,t12)
+    case TmApp(fi,v1,t2) if isValue(ctx,v1) => TmApp(fi,v1,eval1(ctx,t2))
+    case TmApp(fi,t1,t2) => TmApp(fi,eval1(ctx,t1), t2)
+    case _ => throw NoRuleApplies
+  }
+
+
 }
 
 

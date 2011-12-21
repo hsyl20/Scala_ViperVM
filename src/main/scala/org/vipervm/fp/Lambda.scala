@@ -8,22 +8,24 @@ case class TmAbs(info:Info,name:String,term:LambdaTerm) extends LambdaTerm
 case class TmApp(info:Info,t1:LambdaTerm,t2:LambdaTerm) extends LambdaTerm
 
 object LambdaTerm {
-  def tmMap(onvar:(Int,TmVar)=>TmVar,t:LambdaTerm,c:Int=0):LambdaTerm = t match {
+  def tmMap(onvar:(Int,TmVar)=>LambdaTerm,t:LambdaTerm,c:Int=0):LambdaTerm = t match {
     case v@TmVar(_,_,_) => onvar(c,v)
     case TmAbs(fi,x,t1) => TmAbs(fi,x, tmMap(onvar,t1,c+1))
     case TmApp(fi,t1,t2) => TmApp(fi, tmMap(onvar,t1,c), tmMap(onvar,t2,c))
   }
 
-  def shift(t:LambdaTerm,step:Int,c:Int=0):LambdaTerm = t match {
-    case TmVar(fi,x,n) => if (x>c) TmVar(fi,x+step,n+step) else TmVar(fi,x,n+step)
-    case TmAbs(fi,x,t1) => TmAbs(fi,x, shift(t1,step,c+1))
-    case TmApp(fi,t1,t2) => TmApp(fi, shift(t1,step,c), shift(t2,step,c))
+  def shift(t:LambdaTerm,step:Int):LambdaTerm = {
+    def onvar(c:Int,v:TmVar):LambdaTerm = v match {
+      case TmVar(fi,x,n) => if (x>c) TmVar(fi,x+step,n+step) else TmVar(fi,x,n+step)
+    }
+    tmMap(onvar,t)
   }
 
-  def subst(j:Int,s:LambdaTerm,t:LambdaTerm,c:Int=0):LambdaTerm = t match {
-    case TmVar(fi,x,n) => if (x==j+c) shift(s,c) else TmVar(fi,x,n)
-    case TmAbs(fi,x,t1) => TmAbs(fi,x, subst(j,s,t1,c+1))
-    case TmApp(fi,t1,t2) => TmApp(fi, subst(j,s,t1,c), subst(j,s,t2,c))
+  def subst(j:Int,s:LambdaTerm,t:LambdaTerm):LambdaTerm = {
+    def onvar(c:Int,v:TmVar):LambdaTerm = v match {
+      case TmVar(fi,x,n) => if (x==j+c) shift(s,c) else TmVar(fi,x,n)
+    }
+    tmMap(onvar,t)
   }
 }
 

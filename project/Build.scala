@@ -52,7 +52,7 @@ object MyProject extends Build {
     "org.scala-lang" % "jline" % buildScalaVersion,
     "jline" % "jline" % "1.0",
     "org.scala-lang" % "scala-swing" % buildScalaVersion,
-    "net.java.dev.jna" % "jna" % "3.3.0",
+    "net.java.dev.jna" % "jna" % "3.4.0",
     "commons-io" % "commons-io" % "1.4",
     "org.clapper" %% "grizzled-slf4j" % "0.6.6",
     "org.scalaz" %% "scalaz-full" % "6.0.3",

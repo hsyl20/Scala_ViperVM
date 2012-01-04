@@ -30,9 +30,12 @@ class OpenCLContinuations extends FunSuite with Sequence {
   val n = 100
   val factor = 10
 
-  test("continuation plugin for asynchronous OpenCL barriers") {
+  test("Low-Level Asynchronous OpenCL Using Continuations") {
 
     val check = reset {
+      /* Type of the returned value */
+      type R = Boolean 
+
       val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
 
       val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
@@ -69,7 +72,7 @@ class OpenCLContinuations extends FunSuite with Sequence {
 
       val writeEvent = writeLink.copy(hostView,inView)
 
-      barrier[Boolean](writeEvent)
+      barrier[R](writeEvent)
 
       val kernel = new DummyKernel
 
@@ -87,7 +90,7 @@ class OpenCLContinuations extends FunSuite with Sequence {
       }*/
       val event = proc.execute(kernel,params)
 
-      barrier[Boolean](event)
+      barrier[R](event)
 
       val readLink = platform.linkBetween(outBuf, hostOutBuf) match {
         case None => throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
@@ -96,7 +99,7 @@ class OpenCLContinuations extends FunSuite with Sequence {
 
       val readEvent = readLink.copy(outView,hostOutView)
 
-      barrier[Boolean](readEvent)
+      barrier[R](readEvent)
 
       mem.free(inBuf)
       mem.free(outBuf)

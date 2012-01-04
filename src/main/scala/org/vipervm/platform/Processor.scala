@@ -30,6 +30,11 @@ abstract class Processor {
   lazy val memory:MemoryNodeType = memories.head
 
   /**
+   * Compile the kernel for this processor
+   */
+  def compile(kernel:Kernel):Unit
+
+  /**
    * Execute the kernel with the specified parameters
    */
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent

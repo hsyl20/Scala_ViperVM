@@ -21,6 +21,8 @@ class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends HostProcessor {
 
   val memories = Seq(mem)
 
+  def compile(kernel:Kernel):Unit = {}
+
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
     throw new Exception("Unable to execute kernels (not implemented)")
   }

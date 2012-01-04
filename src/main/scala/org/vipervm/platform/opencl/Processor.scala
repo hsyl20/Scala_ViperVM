@@ -47,6 +47,13 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
   val memories = Seq(new OpenCLMemoryNode(this))
 
   /**
+   * Compile the kernel for this processor
+   */
+  def compile(kernel:Kernel):Unit = {
+    kernel.get(this)
+  }
+
+  /**
    * Execute the kernel with the specified parameters
    */
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {

@@ -21,6 +21,8 @@ class JVMProcessor extends Processor {
 
   val memories = Seq(JVMMemoryNode)
 
+  def compile(kernel:Kernel):Unit = {}
+
   def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
     implicit def ker2ker(k:Kernel):JVMKernel =
       k.asInstanceOf[JVMKernel]

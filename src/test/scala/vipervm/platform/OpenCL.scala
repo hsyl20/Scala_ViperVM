@@ -95,7 +95,12 @@ class OpenCL extends FixtureFunSuite {
     val inView = BufferView1D(inBuf, 0, n * 4L)
     val outView = BufferView1D(outBuf, 0, n * 4L)
 
-    val params = Seq(BufferKernelParameter(inBuf), BufferKernelParameter(outBuf), IntKernelParameter(factor), LongKernelParameter(n))
+    val params = Seq(
+      BufferKernelParameter(inBuf),
+      BufferKernelParameter(outBuf),
+      IntKernelParameter(factor),
+      LongKernelParameter(n)
+    )
 
     val readLink = platform.linkBetween(outBuf, hostOutBuf).getOrElse {
       throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")

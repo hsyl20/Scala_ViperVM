@@ -67,7 +67,6 @@ class OpenCL extends FixtureFunSuite {
         devices.foreach(dev => println(e.buildInfo(dev).log))
         throw e
       }
-      case e => throw e
     }
 
     /* Select a memory in which the processor can compute */

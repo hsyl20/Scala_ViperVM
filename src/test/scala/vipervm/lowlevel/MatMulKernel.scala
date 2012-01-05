@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests.platform
+package org.vipervm.tests.lowlevel
 
 import org.vipervm.platform.opencl._
 import org.vipervm.platform.host._

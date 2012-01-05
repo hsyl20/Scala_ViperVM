@@ -36,10 +36,12 @@ trait Event {
    * Synchronously wait for an event to complete
    */
   def syncWait: Unit = {
-    lock.acquire
-    while(!completed)
-      lock.wait
-    lock.release
+    var c:Boolean = false
+    while (!c) {
+      lock.acquire
+      c = completed
+      lock.release
+    }
   }
 
   /**

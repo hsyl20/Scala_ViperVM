@@ -26,16 +26,16 @@ class EventGroup[E <: Event](val events:Seq[E]) extends Event {
   private var remaining: Set[Any] = events.toSet
 
   private val myAct = actor {
-    loopWhile(!events.isEmpty) {
+    loopWhile(!remaining.isEmpty) {
       react {
         case EventComplete(event) => {
           remaining -= event
-          if (events.isEmpty)
+          if (remaining.isEmpty)
             complete
         }
       }
     }
-  }
+  }.start
 
   events.foreach(_ willNotify myAct)
 }
@@ -44,4 +44,6 @@ object EventGroup {
   implicit def seqev[E<:Event](evs:Seq[E]) = new {
     def group = new EventGroup[E](evs)
   }
+
+  def apply[E<:Event](events:E*) = new EventGroup(events)
 }

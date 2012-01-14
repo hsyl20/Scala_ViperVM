@@ -32,7 +32,7 @@ class OpenCL extends FixtureFunSuite {
   type FixtureParam = Common
 
   def withFixture(test: OneArgTest) {
-    val common = new Common{}
+    val common = new Common
     try {
       test(common)
     }
@@ -47,7 +47,7 @@ class OpenCL extends FixtureFunSuite {
   }
 
 
-  trait Common {
+  class Common {
     val n = 100
     val factor = 10
     val kernel = new DummyKernel

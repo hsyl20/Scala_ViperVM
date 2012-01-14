@@ -11,9 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
-
-import org.vipervm.platform.Event
+package org.vipervm.platform
 
 /**
  * Event that can be triggered by user code.

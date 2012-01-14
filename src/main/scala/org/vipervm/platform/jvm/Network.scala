@@ -27,7 +27,7 @@ class JVMNetwork extends Network {
 }
 
 class JVMMemoryCopier extends MemoryCopier with Copy1DSupport {
-  def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer[BufferView1D] = {
+  def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer = {
     link match {
       case JVMReadLink(net,tgtMem) => {
         val srcPeer = JVMMemoryNode.get(source.buffer).peer

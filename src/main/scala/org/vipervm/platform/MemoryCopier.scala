@@ -21,7 +21,7 @@ trait MemoryCopier {
    * @param source  Source buffer view
    * @param target  Target buffer view
    */
-  def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] =
+  def copy(link:Link,source:BufferView,target:BufferView):DataTransfer =
     throw new Exception("Unsupported copy")
 }
 
@@ -36,10 +36,10 @@ trait Copy1DSupport extends MemoryCopier {
    * @param source  Source buffer view
    * @param target  Target buffer view
    */
-  def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer[BufferView1D]
+  def copy1D(link:Link,source:BufferView1D,target:BufferView1D):DataTransfer
 
 
-  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer = {
     
     if (source.buffer.memory != link.source || target.buffer.memory != link.target)
       throw new Exception("Invalid copy: link cannot transfer between the given buffers")
@@ -68,9 +68,9 @@ trait Copy2DSupport extends MemoryCopier {
    * @param source  Source buffer view
    * @param target  Target buffer view
    */
-  def copy2D(link:Link,source:BufferView2D,target:BufferView2D):DataTransfer[BufferView2D]
+  def copy2D(link:Link,source:BufferView2D,target:BufferView2D):DataTransfer
 
-  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer = {
     
     if (source.buffer.memory != link.source || target.buffer.memory != link.target)
       throw new Exception("Invalid copy: link cannot transfer between the given buffers")
@@ -101,9 +101,9 @@ trait Copy3DSupport extends MemoryCopier {
    * @param source  Source buffer view
    * @param target  Target buffer view
    */
-  def copy3D(link:Link,source:BufferView3D,target:BufferView3D):DataTransfer[BufferView3D]
+  def copy3D(link:Link,source:BufferView3D,target:BufferView3D):DataTransfer
 
-  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer[BufferView] = {
+  override def copy(link:Link,source:BufferView,target:BufferView):DataTransfer = {
     
     if (source.buffer.memory != link.source || target.buffer.memory != link.target)
       throw new Exception("Invalid copy: link cannot transfer between the given buffers")

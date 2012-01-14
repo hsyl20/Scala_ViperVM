@@ -25,7 +25,7 @@ trait DataManager extends ActorFunctionalScheduler {
   /* Indicate how many tasks/transfers use a given data */
   protected var dataLocks: Map[(MemoryNode,Data),Int] = Map.empty
   /* Active data transfers */
-  protected var dataTransfers: Map[MemoryNode, Map[Data, DataTransfer[_]]] = Map.empty
+  protected var dataTransfers: Map[MemoryNode, Map[Data, DataTransfer]] = Map.empty
   /* Active data duplications */
   //TODO
   //protected var dataDuplications:

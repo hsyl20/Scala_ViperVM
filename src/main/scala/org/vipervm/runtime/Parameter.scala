@@ -13,20 +13,9 @@
 
 package org.vipervm.runtime
 
-/*/**
- * Task parameter
- */
-sealed abstract class TaskParameter {
-  def toKernelParameter(mem:MemoryNode): KernelParameter = this match {
-    case DataTaskParameter(d) => BufferKernelParameter(d.getBuffer(mem).get)
-    case IntTaskParameter(v) => IntKernelParameter(v)
-    case DoubleTaskParameter(v) => DoubleKernelParameter(v)
-    case FloatTaskParameter(v) => FloatKernelParameter(v)
-  }
-}
+sealed abstract class TaskParameter
 
 case class DataTaskParameter(data:Data)       extends TaskParameter
 case class IntTaskParameter(value:Int)        extends TaskParameter
 case class DoubleTaskParameter(value:Double)  extends TaskParameter
 case class FloatTaskParameter(value:Float)    extends TaskParameter
-*/

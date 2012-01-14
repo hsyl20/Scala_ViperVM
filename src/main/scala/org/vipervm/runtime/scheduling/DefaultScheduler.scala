@@ -18,11 +18,20 @@ import scala.actors.{Actor,OutputChannel}
 import org.vipervm.platform._
 import org.vipervm.runtime._
 
-trait Scheduler extends Actor
+abstract class DefaultScheduler extends Scheduler {
+  def act = loop {
+    react {
+      case SubmitTask(task,deps) => submitTask(task,deps)
+      case TransferComplete(transfer) => transferComplete(transfer)
+      case TaskComplete(task) => taskComplete(task)
+      case DiscardData(data) => discardData(data)
+      case RetrieveData(data) => retrieveData(sender, data)
+    }
+  }
 
-abstract class SchedulerMessage
-case class SubmitTask(task:Task,deps:Seq[Event]) extends SchedulerMessage
-case class TransferComplete(transfer:DataTransfer) extends SchedulerMessage
-case class TaskComplete(task:Task) extends SchedulerMessage
-case class DiscardData(data:Data) extends SchedulerMessage
-case class RetrieveData(data:Data) extends SchedulerMessage
+  protected def submitTask(task:Task,deps:Seq[Event]):Unit
+  protected def transferComplete(transfer:DataTransfer):Unit
+  protected def taskComplete(task:Task):Unit
+  protected def discardData(data:Data):Unit
+  protected def retrieveData(sender:OutputChannel[_],data:Data):Unit
+}

@@ -23,7 +23,7 @@ import org.vipervm.platform.{Kernel,Processor}
 trait MetaKernel {
 
   /**
-   * Get the kernel for the given processor
+   * Get kernels for the given processor
    */
   def getKernelsFor(proc:Processor): Seq[Kernel]
 

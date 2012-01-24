@@ -4,3 +4,4 @@ lib_managed
 project/build
 project/boot
 *.swp
+*~

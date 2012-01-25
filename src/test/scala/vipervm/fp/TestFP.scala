@@ -20,10 +20,8 @@ class TestFP extends FunSuite {
     tryParse("if true then (if true then false else false) else true")
   }
 
-  test("Parser Bool Nat Untyped") {
-    tryParse("0")
-    tryParse("pred (succ 0)")
-    tryParse("isZero (succ 0)")
-    tryParse("isZero (succ (succ 0))")
+  test("Parser let") {
+    tryParse("let a = true in false")
+    tryParse("let a = true in (if true then false else true)")
   }
 }

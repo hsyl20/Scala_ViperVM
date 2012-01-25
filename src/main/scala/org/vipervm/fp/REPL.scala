@@ -20,7 +20,9 @@ class REPL {
       case ":eval" => {
         val e = Parser.parse(args)
         e match {
-          case Parser.Success(t,_) => println(Printer.print(Term.eval(t)))
+          case Parser.Success(t,_) => {
+	    println(Printer.print(Term.eval(new Context, t), new Context))
+	  }
           case Parser.NoSuccess(msg,_) => println(msg)
         }
         repl
@@ -28,7 +30,7 @@ class REPL {
       case _ => {
         val e = Parser.parse(s)
         e match {
-          case Parser.Success(t,_) => println(Printer.print(Term.eval(t)))
+          case Parser.Success(t,_) => println(Printer.print(Term.eval(new Context,t), new Context))
           case Parser.NoSuccess(msg,_) => println(msg)
         }
         repl

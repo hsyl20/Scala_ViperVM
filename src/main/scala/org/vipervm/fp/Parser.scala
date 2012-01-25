@@ -4,29 +4,25 @@ import scala.util.parsing.combinator.syntactical._
 
 object Parser extends StandardTokenParsers {
 
-  lexical.reserved += ("true", "false", "if", "then", "else", "pred", "succ", "isZero")
+  lexical.reserved += ("true", "false", "if", "then", "else", "let", "in")
 
-  lexical.delimiters += ("(", ")")
+  lexical.delimiters += ("(", ")", "=")
 
   lazy val root: Parser[Term] = term
 
   lazy val term:Parser[Term] = (
-      "true" ^^^ TmTrue(DummyInfo)
-    | "false" ^^^ TmFalse(DummyInfo)
+      "true" ^^^ TmTrue
+    | "false" ^^^ TmFalse
     | "if"~>term~("then"~>term)~("else"~>term) ^^ {
-        case t1~t2~t3 => TmIf(DummyInfo,t1,t2,t3)
-      }
-    | numericLit ^^^ TmZero(DummyInfo)
-    | "succ"~>term ^^ {
-        case t => TmSucc(DummyInfo,t)
-      }
-    | "pred"~>term ^^ {
-        case t => TmPred(DummyInfo,t)
-      }
-    | "isZero"~>term ^^ {
-        case t => TmIsZero(DummyInfo,t)
+        case t1~t2~t3 => TmIf(t1,t2,t3)
       }
     | "("~>term<~")"
+    | "let"~>ident~("="~>term)~("in"~>term) ^^ {
+        case name~t1~t2 => TmLet(name,t1,t2)
+      }
+    | term~term ^^ {
+        case t1~t2 => TmApp(t1,t2)
+      }
   )
 
   def parse(s:String) = {

@@ -1,39 +1,52 @@
 package org.vipervm.fp
 
 /** Lambda calculus */
-sealed abstract class LambdaTerm
+sealed abstract class Term
 
-case class TmVar(info:Info,n:Int,totalLength:Int) extends LambdaTerm
-case class TmAbs(info:Info,name:String,term:LambdaTerm) extends LambdaTerm
-case class TmApp(info:Info,t1:LambdaTerm,t2:LambdaTerm) extends LambdaTerm
+case class TmVar(n:Int,totalLength:Int) extends Term
+case class TmAbs(name:String,term:Term) extends Term
+case class TmApp(t1:Term,t2:Term) extends Term
+case object TmTrue extends Term
+case object TmFalse extends Term
+case class TmIf(t1:Term,t2:Term,t3:Term) extends Term
+case class TmLet(name:String,t1:Term,t2:Term) extends Term
 
-object LambdaTerm {
-  def tmMap(onvar:(Int,TmVar)=>LambdaTerm,t:LambdaTerm,c:Int=0):LambdaTerm = t match {
-    case v@TmVar(_,_,_) => onvar(c,v)
-    case TmAbs(fi,x,t1) => TmAbs(fi,x, tmMap(onvar,t1,c+1))
-    case TmApp(fi,t1,t2) => TmApp(fi, tmMap(onvar,t1,c), tmMap(onvar,t2,c))
+
+object Term {
+  def tmMapVar(onvar:(Int,TmVar)=>Term,t:Term,c:Int=0):Term = t match {
+    case v@TmVar(_,_) => onvar(c,v)
+    case TmAbs(x,t1) => TmAbs(x, tmMapVar(onvar,t1,c+1))
+    case TmApp(t1,t2) => TmApp(tmMapVar(onvar,t1,c), tmMapVar(onvar,t2,c))
+    case TmTrue => TmTrue
+    case TmFalse => TmFalse
+    case TmIf(t1,t2,t3) => TmIf(tmMapVar(onvar,t1,c),tmMapVar(onvar,t2,c),tmMapVar(onvar,t3,c))
+    case TmLet(name,t1,t2) => TmLet(name,tmMapVar(onvar,t1,c),tmMapVar(onvar,t2,c+1))
   }
 
-  def shift(step:Int,t:LambdaTerm):LambdaTerm = {
-    def onvar(c:Int,v:TmVar):LambdaTerm = v match {
-      case TmVar(fi,x,n) => if (x>c) TmVar(fi,x+step,n+step) else TmVar(fi,x,n+step)
+  def shift(step:Int,t:Term):Term = {
+    def onvar(c:Int,v:TmVar):Term = {
+      val TmVar(x,n) = v
+      if (x>c) TmVar(x+step,n+step) else TmVar(x,n+step)
     }
-    tmMap(onvar,t)
+    tmMapVar(onvar,t)
   }
 
-  def subst(j:Int,s:LambdaTerm,t:LambdaTerm):LambdaTerm = {
-    def onvar(c:Int,v:TmVar):LambdaTerm = v match {
-      case TmVar(fi,x,n) => if (x==j+c) shift(c,s) else TmVar(fi,x,n)
+  def subst(j:Int,s:Term,t:Term):Term = {
+    def onvar(c:Int,v:TmVar):Term = {
+      val TmVar(x,n) = v
+      if (x==j+c) shift(c,s) else v
     }
-    tmMap(onvar,t)
+    tmMapVar(onvar,t)
   }
 
-  def substTop(s:LambdaTerm,t:LambdaTerm):LambdaTerm = {
+  def substTop(s:Term,t:Term):Term = {
     shift(-1, subst(0, shift(1,s), t))
   }
 
-  def isValue(ctx:Context,t:LambdaTerm):Boolean = t match {
-    case TmAbs(_,_,_) => true
+  def isValue(ctx:Context,t:Term):Boolean = t match {
+    case TmAbs(_,_) => true
+    case TmTrue => true
+    case TmFalse => true
     case _ => false
   }
 
@@ -42,17 +55,22 @@ object LambdaTerm {
   /**
    * Single step evaluation
    */
-  def eval(ctx:Context,t:LambdaTerm):LambdaTerm = try {
+  def eval(ctx:Context,t:Term):Term = try {
     eval(ctx, eval1(ctx,t))
   }
   catch {
     case NoRuleApplies => t
   }
 
-  def eval1(ctx:Context,t:LambdaTerm):LambdaTerm = t match {
-    case TmApp(fi,TmAbs(_,x,t12),v2) if isValue(ctx,v2) => substTop(v2,t12)
-    case TmApp(fi,v1,t2) if isValue(ctx,v1) => TmApp(fi,v1,eval1(ctx,t2))
-    case TmApp(fi,t1,t2) => TmApp(fi,eval1(ctx,t1), t2)
+  def eval1(ctx:Context,t:Term):Term = t match {
+    case TmApp(TmAbs(x,t12),v2) if isValue(ctx,v2) => substTop(v2,t12)
+    case TmApp(v1,t2) if isValue(ctx,v1) => TmApp(v1,eval1(ctx,t2))
+    case TmApp(t1,t2) => TmApp(eval1(ctx,t1), t2)
+    case TmIf(TmTrue,t2,_) => t2
+    case TmIf(TmFalse,_,t3) => t3
+    case TmIf(t1,t2,t3) => TmIf(eval1(ctx,t1), t2, t3)
+    case TmLet(_,v1,t2) if isValue(ctx, v1) => substTop(v1,t2)
+    case TmLet(name,t1,t2) => TmLet(name, eval1(ctx,t1), t2)
     case _ => throw NoRuleApplies
   }
 
@@ -72,20 +90,7 @@ class Context(items:Vector[(String,Binding)])  {
 
   def length = items.length
 
-  def apply(fi:Info,x:Int):String = items(x)._1
-}
+  def apply(x:Int):String = items(x)._1
 
-object LambdaPrinter {
-
-  def print(ctx:Context,t:LambdaTerm):String = t match {
-    case TmAbs(fi,x,t1) => {
-      val (ctx2,x2) = ctx.pickFreshName(x)
-      "(lambda %s. %s )".format(x2, print(ctx2,t1))
-    }
-    case TmApp(fi,t1,t2) => "(%s %s)".format(print(ctx,t1),print(ctx,t2))
-    case TmVar(fi,x,n) => {
-      if (ctx.length != n) throw new Exception("Bad index")
-      ctx(fi,x)
-    }
-  }
+  def this() = this(Vector.empty)
 }

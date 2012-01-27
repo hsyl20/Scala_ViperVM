@@ -24,4 +24,26 @@ class TestFP extends FunSuite {
     tryParse("let a = true in false")
     tryParse("let a = true in (if true then false else true)")
   }
+
+  test("Evaluation: R = A*B + A*C") {
+    val matmul = TmKernel("matmul",2)
+    val matadd = TmKernel("matadd", 2)
+    val a = TmData(9000)
+    val b = TmData(9001)
+    val c = TmData(9002)
+    val prog = TmApp(TmApp(matadd, TmApp(TmApp(matmul, a), b)), TmApp(TmApp(matmul, a), c))
+    println(Term.eval(new Context,prog))
+  }
+
+  test("Evaluation: R = if true then A*B else A*C") {
+    val matmul = TmKernel("matmul",2)
+    val matadd = TmKernel("matadd", 2)
+    val a = TmData(9000)
+    val b = TmData(9001)
+    val c = TmData(9002)
+    val e = TmData(9003)
+    val prog = TmIf(TmTrue, TmApp(TmApp(matmul, a), b), TmApp(TmApp(matmul, a), c))
+    println(Term.eval(new Context,prog))
+  }
+
 }

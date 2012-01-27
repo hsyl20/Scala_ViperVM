@@ -14,7 +14,6 @@
 package org.vipervm.runtime
 
 import org.vipervm.platform.Platform
-import org.vipervm.runtime.ast._
 
 /**
  * A runtime system
@@ -23,4 +22,4 @@ import org.vipervm.runtime.ast._
  *  - a platform
  *  - a task scheduler
  */
-class Runtime(platform:Platform /*, scheduler:Scheduler */ ) 
+class Runtime(platform:Platform /*, scheduler:Scheduler */) 

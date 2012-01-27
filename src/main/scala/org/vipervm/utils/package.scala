@@ -13,6 +13,6 @@
 
 package org.vipervm
 
-object Utils {
+package object utils {
   def ??? = throw new Exception("Not implemented")
 }

@@ -16,7 +16,7 @@ package org.vipervm.taskgraph
 import java.io._
 import scala.math.abs
 import org.vipervm.platform.{ReadOnly,ReadWrite}
-import org.vipervm.Utils._
+import org.vipervm.utils._
 
 
 class TaskGraph(val tasks:Seq[Task], val deps:Seq[(Task,Task)]) {

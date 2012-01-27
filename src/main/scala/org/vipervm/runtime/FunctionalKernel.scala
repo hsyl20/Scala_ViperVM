@@ -27,7 +27,7 @@ import org.vipervm.platform.{Kernel,KernelParameter}
  *
  * @param kernel Kernel decorated by this class
  */
-abstract class FunctionalKernel(val kernel:Kernel) {
+abstract class FunctionalKernel(val kernel:MetaKernel) {
   /** Number of arguments */
   val paramCount:Int
 
@@ -35,18 +35,18 @@ abstract class FunctionalKernel(val kernel:Kernel) {
    * Prepare parameters for kernel execution
    *  - Transform views into buffer + immediate values
    */
-  def pre(input:Seq[FutureValue]):Seq[KernelParameter]
+  def pre(input:Seq[Value]):Seq[KernelParameter]
 
   /**
    * Select outputs from the whole kernel parameter list
    */
-  def post(ks:Seq[FutureValue]):Seq[FutureValue]
+  def post(output:Seq[KernelParameter]):Value
 
   /**
    * Create kernel output parameters from inputs
    *  - Allocate data
    * @return input and output parameters
    */
-  protected def createKernelParameters(input:List[Value]):List[FutureValue]
+  protected def createOutputs(args:Seq[Value]):Seq[Value]
 
 }

@@ -21,7 +21,7 @@ abstract class Data {
   var views = ViewSet.empty[ViewType]
 
   /** Indicate whether this data has been computed */
-  def computed:Boolean = !views.isEmpty
+  def isDefined:Boolean = !views.isEmpty
 
   /** Event triggered when this data is computed */
   val computedEvent:ComputedDataEvent = new ComputedDataEvent(this)

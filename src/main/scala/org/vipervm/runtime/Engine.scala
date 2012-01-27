@@ -13,22 +13,13 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.Platform
-import org.vipervm.platform.opencl.OpenCLProcessor
+import org.vipervm.platform.{Processor,MemoryNode}
 import org.vipervm.utils._
 
 /**
  * An engine execute a given functional program
  */
-class Engine(platform:Platform) {
-
-  val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
-  val proc = device.getOrElse {
-    throw new Exception("No OpenCL device available")
-  }
-
-  val mem = proc.memory
-
+class Engine(proc:Processor,mem:MemoryNode) {
 
   def evaluate(expr:Term, context:Context):TmData = expr match {
     case TmData(name)   => TmData(name)
@@ -39,7 +30,6 @@ class Engine(platform:Platform) {
   var id = 0
 
   def submit(kernel:TmKernel, args:Vector[TmData], context:Context):TmData = {
-    context.kernels(kernel.name)
 
     val d = synchronized {
       val r = TmData("d"+id)
@@ -48,6 +38,13 @@ class Engine(platform:Platform) {
     }
     
     println("%s <- %s(%s)".format(d.name, kernel.name, args.map(_.name).mkString(",")))
+
+    val ker = context.kernels(kernel.name).getKernelsFor(proc).head
+    val datas = args.map(_.name).map(context.datas(_)).flatMap(_.viewIn(mem))
+  
+    //TODO
+//    proc.execute(ker, datas
+
     d
   }
 }

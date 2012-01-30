@@ -23,7 +23,7 @@ import org.vipervm.platform.host.DefaultHostDriver
 object Info {
 
   def main(args:Array[String]): Unit = {
-    val p = new Platform(new DefaultHostDriver, new OpenCLDriver)
+    val p = Platform(DefaultHostDriver, new OpenCLDriver)
 
     println("Processors:")
     p.processors.foreach(a => println(" - %s".format(a)))

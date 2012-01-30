@@ -11,10 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.scheduling
 
-import org.vipervm.platform._
-import org.vipervm.platform.opencl.OpenCLDriver
-import org.vipervm.platform.host.DefaultHostDriver
+import org.vipervm.runtime.{Task,Data}
+import org.vipervm.platform.{Event,DataTransfer}
 
-class DefaultRuntime extends Runtime(new Platform(new DefaultHostDriver, new OpenCLDriver))
+case class SubmitTask(task:Task,deps:Seq[Event])
+case class TransferComplete(transfer:DataTransfer)
+case class DiscardData(data:Data)
+case class RetrieveData(data:Data)
+case class ExecuteTask(task:Task)
+case class TaskComplete(task:Task)

@@ -11,16 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.scheduling
+package org.vipervm.tests.runtime
 
-import scala.actors.Actor
-import org.vipervm.platform.{Event,Platform}
-import org.vipervm.runtime.Task
+import org.vipervm.tests.lowlevel.MatMulKernel
+import org.vipervm.runtime._
+import org.vipervm.runtime.data.Matrix2D
 
-abstract class Scheduler(platform:Platform) extends Actor {
+class FMatMulKernel extends FunctionalKernel {
+  val peer = new MatMulKernel
 
-  def submitTask(task:Task,deps:Seq[Event]):Event = {
-    (this !? SubmitTask(task,deps)).asInstanceOf[Event]
+  def createTask(args:Seq[TaskParameter]):(Task,Data) = args match {
+    case (a:Matrix2D) :: (b:Matrix2D) :: Nil => {
+      val c = new Matrix2D(a.elemSize, b.width, a.height)
+      val task = Task(peer, List(a,b,DataTaskParameter(c)))
+      (task,c)
+    }
+    case _ => throw new Exception("Invalid parameters")
   }
-
 }

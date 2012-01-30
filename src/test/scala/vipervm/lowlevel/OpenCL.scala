@@ -52,7 +52,7 @@ class OpenCL extends FixtureFunSuite {
     val factor = 10
     val kernel = new DummyKernel
 
-    val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
+    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
     val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
     val proc = device.getOrElse {

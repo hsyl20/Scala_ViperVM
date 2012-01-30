@@ -13,39 +13,40 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Processor,MemoryNode}
+import org.vipervm.platform.Event
 import org.vipervm.utils._
+import org.vipervm.runtime.scheduling.Scheduler
+
+import scala.collection.mutable
 
 /**
  * An engine execute a given functional program
  */
-class Engine(proc:Processor,mem:MemoryNode) {
+class Engine(scheduler:Scheduler) {
 
-  def evaluate(expr:Term, context:Context):TmData = expr match {
-    case TmData(name)   => TmData(name)
-    case TmApp(k@TmKernel(_),args)  => submit(k, args.par.map(x => evaluate(x,context)).seq, context)
+  val events:mutable.Map[Data,Event] = mutable.Map.empty
+
+  def evaluate(expr:Term, context:Context):Data = expr match {
+    case TmData(name)   => context.datas(name)
+    case TmApp(TmKernel(name),args)  => {
+      val k = context.kernels(name)
+      val params = args.par.map(x => evaluate(x,context)).seq
+      submit(k, params, context)
+    }
     case _ => ???
   }
 
-  var id = 0
+  def submit(fkernel:FunctionalKernel, args:Vector[Data], context:Context):Data = {
 
-  def submit(kernel:TmKernel, args:Vector[TmData], context:Context):TmData = {
-
-    val d = synchronized {
-      val r = TmData("d"+id)
-      id += 1
-      r
-    }
+    val params = args.map(DataTaskParameter(_))
+    val (task,result) = fkernel.createTask(params)
+    val deps = args.flatMap(events.get(_))
     
-    println("%s <- %s(%s)".format(d.name, kernel.name, args.map(_.name).mkString(",")))
+    val ev = scheduler.submitTask(task,deps)
+    
+    events += (result -> ev)
 
-    val ker = context.kernels(kernel.name).getKernelsFor(proc).head
-    val datas = args.map(_.name).map(context.datas(_)).flatMap(_.viewIn(mem))
-  
-    //TODO
-//    proc.execute(ker, datas
-
-    d
+    result
   }
 }
 
@@ -54,4 +55,4 @@ case class TmData(name:String) extends Term
 case class TmKernel(name:String) extends Term
 case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term
 
-case class Context(datas:Map[String,Data], kernels:Map[String,MetaKernel])
+case class Context(datas:Map[String,Data], kernels:Map[String,FunctionalKernel])

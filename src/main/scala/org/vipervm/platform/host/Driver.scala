@@ -15,7 +15,7 @@ package org.vipervm.platform.host
 
 import org.vipervm.platform._
 
-class DefaultHostDriver extends HostDriver {
+object DefaultHostDriver extends HostDriver {
   private val mem = new DefaultHostMemoryNode
   private val proc = new DefaultHostProcessor(mem)
 

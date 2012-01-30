@@ -17,25 +17,19 @@ import scala.actors.{Actor,OutputChannel}
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.utils._
 
-abstract class DefaultScheduler extends Scheduler {
+class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
+
+  /* Create a worker per processor */
+  private val workers = platforms.processor.map(new Worker(_,this))
+
+  start
+
   def act = loop {
     react {
-      reactions
+      case SubmitTask(task,deps) => ???
     }
   }
 
-  protected def reactions:PartialFunction[Any,Unit] = {
-    case SubmitTask(task,deps) => sender ! submitTask(task,deps)
-    case TransferComplete(transfer) => transferComplete(transfer)
-    case TaskComplete(task) => taskComplete(task)
-    case DiscardData(data) => discardData(data)
-    case RetrieveData(data) => retrieveData(sender, data)
-  }
-
-  protected def submitTask(task:Task,deps:Seq[Event]):Event
-  protected def transferComplete(transfer:DataTransfer):Unit
-  protected def taskComplete(task:Task):Unit
-  protected def discardData(data:Data):Unit
-  protected def retrieveData(sender:OutputChannel[_],data:Data):Unit
 }

@@ -14,12 +14,14 @@
 package org.vipervm.tests.runtime
 
 import org.scalatest.FunSuite
+
 import org.vipervm.platform.Platform
-import org.vipervm.platform.opencl.{OpenCLDriver,OpenCLProcessor}
+import org.vipervm.platform.opencl.OpenCLDriver
 import org.vipervm.platform.host.DefaultHostDriver
+
 import org.vipervm.runtime._
 import org.vipervm.runtime.data._
-import org.vipervm.tests.lowlevel.{MatMulKernel,MatAddKernel}
+import org.vipervm.runtime.scheduling.DefaultScheduler
 
 class TestEngine extends FunSuite {
 
@@ -27,8 +29,8 @@ class TestEngine extends FunSuite {
     val a = new Matrix2D(4, 100, 50)
     val b = new Matrix2D(4, 50, 20)
     val c = new Matrix2D(4, 50, 20)
-    val matmul = new KernelSet(Seq(new MatMulKernel))
-    val matadd = new KernelSet(Seq(new MatAddKernel))
+    val matmul = new FMatMulKernel
+    val matadd = new FMatAddKernel
 
     val prog = TmApp(TmKernel("matadd"), Vector(
       TmApp(TmKernel("matmul"), Vector(TmData("a"), TmData("b"))),
@@ -38,20 +40,10 @@ class TestEngine extends FunSuite {
       Map("a" -> a, "b" -> b, "c" -> c),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
-    val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
+    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
-    val proc = device.getOrElse {
-      throw new Exception("No OpenCL device available")
-    }
-
-    val mem = proc.memory
-
-    a.allocate(mem)
-    b.allocate(mem)
-    c.allocate(mem)
-
-    val engine = new Engine(proc,mem)
+    val sched = new DefaultScheduler(platform)
+    val engine = new Engine(sched)
     engine.evaluate(prog,context)
   }
 

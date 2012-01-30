@@ -11,15 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.tests.runtime
 
-import org.vipervm.platform.Platform
+import org.vipervm.tests.lowlevel.MatAddKernel
+import org.vipervm.runtime._
+import org.vipervm.runtime.data.Matrix2D
 
-/**
- * A runtime system
- *
- * A runtime system is made of
- *  - a platform
- *  - a task scheduler
- */
-class Runtime(platform:Platform /*, scheduler:Scheduler */) 
+class FMatAddKernel extends FunctionalKernel {
+  val peer = new MatAddKernel
+
+  def createTask(args:Seq[TaskParameter]):(Task,Data) = args match {
+    case (a:Matrix2D) :: (b:Matrix2D) :: Nil => {
+      val c = new Matrix2D(a.elemSize, a.width, a.height)
+      val task = Task(peer, List(a,b,DataTaskParameter(c)))
+      (task,c)
+    }
+    case _ => throw new Exception("Invalid parameters")
+  }
+}

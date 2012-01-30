@@ -18,4 +18,4 @@ import org.vipervm.platform.Kernel
 /**
  * A functional kernel with its parameters
  */
-case class Task(kernel:MetaKernel, params:Seq[TaskParameter])
+case class Task(kernel:Kernel, params:Seq[TaskParameter])

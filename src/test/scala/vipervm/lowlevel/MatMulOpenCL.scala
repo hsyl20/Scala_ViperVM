@@ -53,7 +53,7 @@ class MatMulOpenCL extends FixtureFunSuite {
     val n = 32
     val kernel = new MatMulKernel
 
-    val platform = new Platform(new DefaultHostDriver, new OpenCLDriver)
+    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
     val device = platform.processors.filter(_.isInstanceOf[OpenCLProcessor]).headOption
     val proc = device.getOrElse {

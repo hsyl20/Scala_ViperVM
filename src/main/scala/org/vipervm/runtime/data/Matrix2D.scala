@@ -19,7 +19,7 @@ import org.vipervm.runtime.Data
 /**
  * 2D matrix
  */
-class Matrix2D(elemSize:Int,width:Long,height:Long) extends Data {
+class Matrix2D(val elemSize:Int, val width:Long, val height:Long) extends Data {
   type ViewType = BufferView2D
 
   def allocate(memory:MemoryNode):BufferView2D = {

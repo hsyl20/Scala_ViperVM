@@ -85,3 +85,7 @@ class Platform(val drivers:Driver*) {
   def linkBetween(source:BufferView,target:BufferView):Option[Link] = 
     linksBetween(source.buffer,target.buffer).headOption
 }
+
+object Platform {
+  def apply(drivers:Driver*):Platform = new Platform(drivers:_*)
+}

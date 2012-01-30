@@ -36,9 +36,13 @@ abstract class Data {
    */
   def allocateStore(memory:MemoryNode):ViewType = {
     val view = allocate(memory)
+    store(memory,view)
+    view
+  }
+
+  def store(memory:MemoryNode,view:ViewType):Unit = {
     views.synchronized {
       views.update(memory,view)
     }
-    view
   }
 }

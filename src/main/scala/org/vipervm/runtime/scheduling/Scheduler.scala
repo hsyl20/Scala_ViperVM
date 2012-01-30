@@ -17,7 +17,7 @@ import scala.actors.Actor
 import org.vipervm.platform.{Event,Platform}
 import org.vipervm.runtime.Task
 
-abstract class Scheduler(platform:Platform) extends Actor {
+abstract class Scheduler(val platform:Platform) extends Actor {
 
   def submitTask(task:Task,deps:Seq[Event]):Event = {
     (this !? SubmitTask(task,deps)).asInstanceOf[Event]

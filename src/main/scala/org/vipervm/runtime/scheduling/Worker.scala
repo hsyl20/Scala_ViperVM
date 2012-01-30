@@ -14,7 +14,7 @@
 package org.vipervm.runtime.scheduling
 
 import org.vipervm.platform.Processor
-import org.vipervm.runtime.Task
+import org.vipervm.runtime._
 import scala.actors.Actor
 import org.vipervm.utils._
 import scala.concurrent.Lock
@@ -28,6 +28,7 @@ class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
   private var tasks:List[Task] = Nil
   private var currentTask:Option[Task] = None
 
+  private val memory = proc.memory
 
   def act:Unit = loop { react {
 
@@ -60,7 +61,14 @@ class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
     currentTask = Some(task)
 
     /* Schedule required data transfers */
-    //TODO
+    task.params.foreach { _ match {
+      case DataTaskParameter(data) => {
+	val view = data.viewIn(memory).getOrElse(data.allocateStore(memory))
+	//TODO: update view to valid contents
+	//TODO: check size
+      }
+      case _ => ()
+    }}
 
     /* Schedule kernel execution */
     //TODO

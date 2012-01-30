@@ -28,7 +28,7 @@ import org.vipervm.platform.{Kernel,KernelParameter}
  */
 trait FunctionalKernel {
 
-  val peer:Kernel
+  val peer:TaskKernel
 
   def createTask(args:Seq[TaskParameter]): (Task,Data)
 

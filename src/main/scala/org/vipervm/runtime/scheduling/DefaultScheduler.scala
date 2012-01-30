@@ -13,8 +13,6 @@
 
 package org.vipervm.runtime.scheduling
 
-import scala.actors.{Actor,OutputChannel}
-
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.utils._

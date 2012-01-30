@@ -22,7 +22,7 @@ import org.vipervm.utils._
 class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
 
   /* Create a worker per processor */
-  private val workers = platforms.processor.map(new Worker(_,this))
+  private val workers = platform.processors.map(new Worker(_,this))
 
   start
 

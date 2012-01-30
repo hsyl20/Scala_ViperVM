@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.Event
+import org.vipervm.platform.{Event,FutureEvent}
 import org.vipervm.utils._
 import org.vipervm.runtime.scheduling.Scheduler
 
@@ -26,19 +26,24 @@ class Engine(scheduler:Scheduler) {
 
   val events:mutable.Map[Data,Event] = mutable.Map.empty
 
-  def evaluate(expr:Term, context:Context):Data = expr match {
+  def evaluate(expr:Term,context:Context):FutureEvent[Data] = {
+    val d = eval(expr,context)
+    val ev = events(d)
+    new FutureEvent(ev,d)
+  }
+
+  private def eval(expr:Term, context:Context):Data = expr match {
     case TmData(name)   => context.datas(name)
     case TmApp(TmKernel(name),args)  => {
       val k = context.kernels(name)
-      //TODO: evaluate params in parallel
-      //val params = args.par.map(x => evaluate(x,context)).seq
-      val params = args.map(x => evaluate(x,context))
+      //val params = args.par.map(x => eval(x,context)).seq
+      val params = args.map(x => eval(x,context))
       submit(k, params, context)
     }
     case _ => ???
   }
 
-  def submit(fkernel:FunctionalKernel, args:Vector[Data], context:Context):Data = {
+  private def submit(fkernel:FunctionalKernel, args:Vector[Data], context:Context):Data = {
 
     val params = args.map(DataTaskParameter(_))
     val (task,result) = fkernel.createTask(params)

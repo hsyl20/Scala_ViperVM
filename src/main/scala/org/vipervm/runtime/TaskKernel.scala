@@ -13,12 +13,16 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode}
+import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
 
+/**
+ * Indicate how to convert task parameters to kernel parameters for a given kernel
+ */
 abstract class TaskKernel {
 
   val peer:Kernel
 
   def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter]
 
+  def canExecuteOn(proc:Processor) = peer.canExecuteOn(proc)
 }

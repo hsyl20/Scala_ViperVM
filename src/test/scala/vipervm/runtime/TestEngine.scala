@@ -26,9 +26,9 @@ import org.vipervm.runtime.scheduling.DefaultScheduler
 class TestEngine extends FunSuite {
 
   test("Basic expression") {
-    val a = new Matrix2D(4, 100, 50)
-    val b = new Matrix2D(4, 50, 20)
-    val c = new Matrix2D(4, 50, 20)
+    val a = new Matrix2D(4, 64, 128)
+    val b = new Matrix2D(4, 16, 64)
+    val c = new Matrix2D(4, 16, 64)
     val matmul = new FMatMulKernel
     val matadd = new FMatAddKernel
 
@@ -44,7 +44,9 @@ class TestEngine extends FunSuite {
 
     val sched = new DefaultScheduler(platform)
     val engine = new Engine(sched)
-    engine.evaluate(prog,context)
+    val fe = engine.evaluate(prog,context)
+
+    fe.syncWait
   }
 
 }

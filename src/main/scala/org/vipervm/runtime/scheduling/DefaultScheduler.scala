@@ -33,8 +33,9 @@ class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
 	events += (task -> ev)
 
 	EventGroup(deps:_*).willTrigger {
+
 	  /* Select worker */
-	  val w = workers.filterNot(_.proc.isInstanceOf[OpenCLProcessor]).head
+	  val w = workers.filter(_.canExecute(task)).head
 	  
 	  /* Submit task */
 	  w ! ExecuteTask(task)

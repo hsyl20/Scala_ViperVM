@@ -30,6 +30,8 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
 
   private val memory = proc.memory
 
+  start
+
   def act:Unit = loop { react {
 
     case ExecuteTask(task) => {
@@ -88,5 +90,7 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
       this ! TaskComplete(task)
     }
   }
+
+  def canExecute(task:Task):Boolean = task.canExecuteOn(proc)
 }
 

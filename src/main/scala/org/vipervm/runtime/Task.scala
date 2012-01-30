@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode}
+import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
 
 /**
  * A functional kernel with its parameters
@@ -21,4 +21,6 @@ import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode}
 case class Task(kernel:TaskKernel, params:Seq[TaskParameter]) {
 
   def makeKernelParams(memory:MemoryNode):Seq[KernelParameter] = kernel.makeKernelParams(params, memory)
+
+  def canExecuteOn(proc:Processor):Boolean = kernel.canExecuteOn(proc)
 }

@@ -23,7 +23,7 @@ class TMatAddKernel extends TaskKernel {
   
   def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter] = {
     params match {
-      case DataTaskParameter(a:Matrix2D) :: DataTaskParameter(b:Matrix2D) :: DataTaskParameter(c:Matrix2D) :: Nil => {
+      case Seq(DataTaskParameter(a:Matrix2D), DataTaskParameter(b:Matrix2D), DataTaskParameter(c:Matrix2D)) => {
 	val w = a.width.toInt
 	val h = a.height.toInt
 	val b1 = a.viewIn(memory).get.buffer
@@ -32,7 +32,7 @@ class TMatAddKernel extends TaskKernel {
 	Seq(IntKernelParameter(w),IntKernelParameter(h),BufferKernelParameter(b1),BufferKernelParameter(b2),BufferKernelParameter(b3))
 	//TODO: handle padding and offset
       }
-      case _ => throw new Exception("invalid parameters")
+      case _ => throw new Exception("invalid parameters: "+params)
     }
   }
 }
@@ -41,11 +41,11 @@ class FMatAddKernel extends FunctionalKernel {
   val peer = new TMatAddKernel
 
   def createTask(args:Seq[TaskParameter]):(Task,Data) = args match {
-    case (a:Matrix2D) :: (b:Matrix2D) :: Nil => {
+    case Seq(aa@DataTaskParameter(a:Matrix2D), bb@DataTaskParameter(b:Matrix2D)) => {
       val c = new Matrix2D(a.elemSize, a.width, a.height)
-      val task = Task(peer, List(a,b,DataTaskParameter(c)))
+      val task = Task(peer, List(aa,bb,DataTaskParameter(c)))
       (task,c)
     }
-    case _ => throw new Exception("Invalid parameters")
+    case _ => throw new Exception("Invalid parameters: "+args)
   }
 }

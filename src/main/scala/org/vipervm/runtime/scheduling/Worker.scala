@@ -22,7 +22,7 @@ import scala.concurrent.Lock
 /**
  * There is one worker per device.
  */
-class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
+class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
 
   private val lock = new Lock
   private var tasks:List[Task] = Nil
@@ -34,12 +34,14 @@ class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
 
     case ExecuteTask(task) => {
       lock.acquire
+
       if (currentTask.isDefined) {
 	tasks ::= task
       }
       else {
 	executeTask(task)
       }
+
       lock.release
     }
 
@@ -51,8 +53,10 @@ class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
 
       /* Execute another task, if any */
       lock.acquire
+
       currentTask = None
       tasks.headOption.foreach(executeTask)
+
       lock.release
     }
   }}
@@ -64,17 +68,25 @@ class Worker(proc:Processor, scheduler:Scheduler) extends Actor {
     task.params.foreach { _ match {
       case DataTaskParameter(data) => {
 	val view = data.viewIn(memory).getOrElse(data.allocateStore(memory))
-	//TODO: update view to valid contents
+	//TODO: update view with valid contents
 	//TODO: check size
       }
       case _ => ()
     }}
 
+    /* Select kernel */
+    val kernel = task.kernel.peer match {
+      case k:MetaKernel => k.getKernelsFor(proc).head
+      case k => k
+    }
+
     /* Schedule kernel execution */
-    //TODO
+    val ev = proc.execute(kernel, task.makeKernelParams(memory))
 
     /* Schedule notification after kernel execution */
-    //TODO
+    ev.willTrigger {
+      this ! TaskComplete(task)
+    }
   }
 }
 

@@ -22,7 +22,7 @@ class MatAddKernel extends OpenCLKernel {
   val source = """
     __kernel void matrixAdd(
        const int width,
-       const int height
+       const int height,
        __global float* A,
        __global float* B, 
        __global float* C) {

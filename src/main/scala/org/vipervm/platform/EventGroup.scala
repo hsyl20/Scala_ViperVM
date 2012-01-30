@@ -25,19 +25,26 @@ class EventGroup[E <: Event](val events:Seq[E]) extends Event {
 
   private var remaining: Set[Any] = events.toSet
 
-  private val myAct = actor {
-    loopWhile(!remaining.isEmpty) {
-      react {
-        case EventComplete(event) => {
-          remaining -= event
-          if (remaining.isEmpty)
-            complete
-        }
+  if (remaining.isEmpty) {
+    complete
+  }
+  else {
+
+    val myAct = actor {
+      loopWhile(!remaining.isEmpty) {
+	react {
+          case EventComplete(event) => {
+            remaining -= event
+            if (remaining.isEmpty)
+              complete
+          }
+	}
       }
     }
-  }.start
+    myAct.start
+    events.foreach(_ willNotify myAct)
 
-  events.foreach(_ willNotify myAct)
+  }
 }
 
 object EventGroup {

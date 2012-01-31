@@ -13,6 +13,7 @@
 
 package org.vipervm.runtime
 
+import grizzled.slf4j.Logging
 import org.vipervm.platform.{Event,FutureEvent}
 import org.vipervm.utils._
 import org.vipervm.runtime.scheduling.Scheduler
@@ -48,7 +49,7 @@ class Engine(scheduler:Scheduler) {
     val params = args.map(DataTaskParameter(_))
     val (task,result) = fkernel.createTask(params)
     val deps = args.flatMap(events.get(_))
-    
+
     val ev = scheduler.submitTask(task,deps)
     
     events += (result -> ev)

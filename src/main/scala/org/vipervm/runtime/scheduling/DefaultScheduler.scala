@@ -13,12 +13,13 @@
 
 package org.vipervm.runtime.scheduling
 
+import grizzled.slf4j.Logging
 import org.vipervm.platform._
 import org.vipervm.platform.opencl.OpenCLProcessor
 import org.vipervm.runtime._
 import org.vipervm.utils._
 
-class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
+class DefaultScheduler(platform:Platform) extends Scheduler(platform) with Logging {
 
   /* Create a worker per processor */
   private val workers = platform.processors.map(new Worker(_,this))
@@ -36,6 +37,8 @@ class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
 
 	  /* Select worker */
 	  val w = workers.filter(_.canExecute(task)).head
+
+	  info("[DefaultScheduler] Submit task %s to worker %s".format(task,w))
 	  
 	  /* Submit task */
 	  w ! ExecuteTask(task)
@@ -48,6 +51,8 @@ class DefaultScheduler(platform:Platform) extends Scheduler(platform) {
 	val ev = events(task)
 	events -= task
 	
+	info("[DefaultScheduler] Completed task %s".format(task))	
+
 	ev.complete
       }
 

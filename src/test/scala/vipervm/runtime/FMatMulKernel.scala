@@ -24,7 +24,7 @@ class TMatMulKernel extends TaskKernel {
   def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter] = {
     params match {
       case Seq(DataTaskParameter(a:Matrix2D), DataTaskParameter(b:Matrix2D), DataTaskParameter(c:Matrix2D)) => {
-	val n = (a.width * a.height).toInt
+	val n = a.width.toInt
 	val b1 = a.viewIn(memory).get.buffer
 	val b2 = b.viewIn(memory).get.buffer
 	val b3 = c.viewIn(memory).get.buffer

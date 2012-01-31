@@ -13,6 +13,7 @@
 
 package org.vipervm.runtime.scheduling
 
+import grizzled.slf4j.Logging
 import org.vipervm.platform.Processor
 import org.vipervm.runtime._
 import scala.actors.Actor
@@ -22,9 +23,8 @@ import scala.concurrent.Lock
 /**
  * There is one worker per device.
  */
-class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
+class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging {
 
-  private val lock = new Lock
   private var tasks:List[Task] = Nil
   private var currentTask:Option[Task] = None
 
@@ -35,7 +35,6 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
   def act:Unit = loop { react {
 
     case ExecuteTask(task) => {
-      lock.acquire
 
       if (currentTask.isDefined) {
 	tasks ::= task
@@ -44,27 +43,32 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor {
 	executeTask(task)
       }
 
-      lock.release
     }
 
     case TaskComplete(task) => {
       assert(task == currentTask.get)
       
+      info("[Worker %s] Task complete: %s".format(this,task))
+
       /* Notify scheduler */
       scheduler ! TaskComplete(task)
 
       /* Execute another task, if any */
-      lock.acquire
-
       currentTask = None
-      tasks.headOption.foreach(executeTask)
-
-      lock.release
+      tasks match {
+	case t :: l => {
+	  tasks = l
+	  executeTask(t)
+	}
+	case Nil => ()
+      }
     }
   }}
 
   private def executeTask(task:Task):Unit = {
     currentTask = Some(task)
+
+    info("[Worker %s] Execute task: %s".format(this,task))
 
     /* Schedule required data transfers */
     task.params.foreach { _ match {

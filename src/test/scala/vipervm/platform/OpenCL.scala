@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests.lowlevel
+package org.vipervm.tests.platform
 
 import org.scalatest.fixture.FixtureFunSuite
 

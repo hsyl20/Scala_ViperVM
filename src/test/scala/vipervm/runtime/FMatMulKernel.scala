@@ -13,7 +13,7 @@
 
 package org.vipervm.tests.runtime
 
-import org.vipervm.tests.lowlevel.MatMulKernel
+import org.vipervm.tests.platform.MatMulKernel
 import org.vipervm.platform.{MemoryNode,KernelParameter,IntKernelParameter,BufferKernelParameter}
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D

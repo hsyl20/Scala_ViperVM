@@ -37,7 +37,7 @@ class TestLispyParser extends FunSuite {
     val matadd = new FMatAddKernel
 
     val context = Context(
-      Map("a" -> a, "b" -> b, "c" -> c),
+      Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)

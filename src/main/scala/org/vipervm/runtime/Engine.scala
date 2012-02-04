@@ -25,16 +25,16 @@ import scala.collection.mutable
  */
 class Engine(scheduler:Scheduler) {
 
-  val events:mutable.Map[Data,Event] = mutable.Map.empty
+  val events:mutable.Map[Value,Event] = mutable.Map.empty
 
-  def evaluate(expr:Term,context:Context):FutureEvent[Data] = {
+  def evaluate(expr:Term,context:Context):FutureEvent[Value] = {
     val d = eval(expr,context)
     val ev = events(d)
     new FutureEvent(ev,d)
   }
 
-  private def eval(expr:Term, context:Context):Data = expr match {
-    case TmData(name)   => context.datas(name)
+  private def eval(expr:Term, context:Context):Value = expr match {
+    case TmVar(name)   => context.values(name)
     case TmApp(TmKernel(name),args)  => {
       val k = context.kernels(name)
       //val params = args.par.map(x => eval(x,context)).seq
@@ -44,12 +44,18 @@ class Engine(scheduler:Scheduler) {
     case _ => ???
   }
 
-  private def submit(fkernel:FunctionalKernel, args:Vector[Data], context:Context):Data = {
+  private def submit(fkernel:FunctionalKernel, args:Vector[Value], context:Context):Value = {
 
-    val params = args.map(DataTaskParameter(_))
-    val (task,result) = fkernel.createTask(params)
+    val params = args.map( _ match {
+      case DataValue(v) => DataTaskParameter(v)
+      case IntValue(v) => IntTaskParameter(v)
+      case FloatValue(v) => FloatTaskParameter(v)
+      case DoubleValue(v) => DoubleTaskParameter(v)
+    })
+    val (task,returned) = fkernel.createTask(params)
     val deps = args.flatMap(events.get(_))
 
+    val result = DataValue(returned)
     val ev = scheduler.submitTask(task,deps)
     
     events += (result -> ev)
@@ -59,8 +65,9 @@ class Engine(scheduler:Scheduler) {
 }
 
 sealed abstract class Term
-case class TmData(name:String) extends Term
+case class TmVar(name:String) extends Term
 case class TmKernel(name:String) extends Term
 case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term
 
-case class Context(datas:Map[String,Data], kernels:Map[String,FunctionalKernel])
+case class Context(values:Map[String,Value], kernels:Map[String,FunctionalKernel])
+

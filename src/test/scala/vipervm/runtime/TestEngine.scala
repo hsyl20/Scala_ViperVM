@@ -33,11 +33,11 @@ class TestEngine extends FunSuite {
     val matadd = new FMatAddKernel
 
     val prog = TmApp(TmKernel("matadd"), Vector(
-      TmApp(TmKernel("matmul"), Vector(TmData("a"), TmData("b"))),
-      TmApp(TmKernel("matmul"), Vector(TmData("a"), TmData("c")))))
+      TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("b"))),
+      TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("c")))))
 
     val context = Context(
-      Map("a" -> a, "b" -> b, "c" -> c),
+      Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)

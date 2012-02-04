@@ -26,7 +26,7 @@ object LispyParser extends StandardTokenParsers {
         case k~as => TmApp(TmKernel(k), Vector(as:_*))
       }
     | ident ^^ {
-        case d => TmData(d)
+        case d => TmVar(d)
       }
   )
 

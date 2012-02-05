@@ -44,16 +44,10 @@ class Engine(scheduler:Scheduler) {
     case _ => ???
   }
 
-  private def submit(fkernel:FunctionalKernel, args:Vector[Value], context:Context):Value = {
+  private def submit(fkernel:FunctionalKernel, params:Vector[Value], context:Context):Value = {
 
-    val params = args.map( _ match {
-      case DataValue(v) => DataTaskParameter(v)
-      case IntValue(v) => IntTaskParameter(v)
-      case FloatValue(v) => FloatTaskParameter(v)
-      case DoubleValue(v) => DoubleTaskParameter(v)
-    })
     val (task,returned) = fkernel.createTask(params)
-    val deps = args.flatMap(events.get(_))
+    val deps = params.flatMap(events.get(_))
 
     val result = DataValue(returned)
     val ev = scheduler.submitTask(task,deps)

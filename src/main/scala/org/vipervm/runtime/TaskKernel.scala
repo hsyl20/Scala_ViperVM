@@ -22,7 +22,7 @@ abstract class TaskKernel {
 
   val peer:Kernel
 
-  def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter]
+  def makeKernelParams(params:Seq[Value],memory:MemoryNode):Seq[KernelParameter]
 
   def canExecuteOn(proc:Processor) = peer.canExecuteOn(proc)
 }

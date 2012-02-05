@@ -37,10 +37,10 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
     case ExecuteTask(task) => {
 
       if (currentTask.isDefined) {
-	tasks ::= task
+        tasks ::= task
       }
       else {
-	executeTask(task)
+        executeTask(task)
       }
 
     }
@@ -56,11 +56,11 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
       /* Execute another task, if any */
       currentTask = None
       tasks match {
-	case t :: l => {
-	  tasks = l
-	  executeTask(t)
-	}
-	case Nil => ()
+        case t :: l => {
+          tasks = l
+          executeTask(t)
+        }
+        case Nil => ()
       }
     }
   }}
@@ -72,10 +72,10 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
 
     /* Schedule required data transfers */
     task.params.foreach { _ match {
-      case DataTaskParameter(data) => {
-	val view = data.viewIn(memory).getOrElse(data.allocateStore(memory))
-	//TODO: update view with valid contents
-	//TODO: check size
+      case DataValue(data) => {
+        val view = data.viewIn(memory).getOrElse(data.allocateStore(memory))
+        //TODO: update view with valid contents
+        //TODO: check size
       }
       case _ => ()
     }}

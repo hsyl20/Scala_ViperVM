@@ -21,9 +21,9 @@ import org.vipervm.runtime.data.Matrix2D
 class TMatMulKernel extends TaskKernel {
   val peer = new MatMulKernel
   
-  def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter] = {
+  def makeKernelParams(params:Seq[Value],memory:MemoryNode):Seq[KernelParameter] = {
     params match {
-      case Seq(DataTaskParameter(a:Matrix2D), DataTaskParameter(b:Matrix2D), DataTaskParameter(c:Matrix2D)) => {
+      case Seq(DataValue(a:Matrix2D), DataValue(b:Matrix2D), DataValue(c:Matrix2D)) => {
 	val n = a.width.toInt
 	val b1 = a.viewIn(memory).get.buffer
 	val b2 = b.viewIn(memory).get.buffer
@@ -40,10 +40,10 @@ class TMatMulKernel extends TaskKernel {
 class FMatMulKernel extends FunctionalKernel {
   val peer = new TMatMulKernel
 
-  def createTask(args:Seq[TaskParameter]):(Task,Data) = args match {
-    case Seq(aa@DataTaskParameter(a:Matrix2D), bb@DataTaskParameter(b:Matrix2D)) => {
+  def createTask(args:Seq[Value]):(Task,Data) = args match {
+    case Seq(aa@DataValue(a:Matrix2D), bb@DataValue(b:Matrix2D)) => {
       val c = new Matrix2D(a.elemSize, b.width, a.height)
-      val task = Task(peer, List(aa,bb,DataTaskParameter(c)))
+      val task = Task(peer, List(aa,bb,DataValue(c)))
       (task,c)
     }
     case _ => throw new Exception("Invalid parameters: "+args)

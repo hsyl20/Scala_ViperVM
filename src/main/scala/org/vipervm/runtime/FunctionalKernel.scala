@@ -30,6 +30,6 @@ trait FunctionalKernel {
 
   val peer:TaskKernel
 
-  def createTask(args:Seq[TaskParameter]): (Task,Data)
+  def createTask(args:Seq[Value]): (Task,Data)
 
 }

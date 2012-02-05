@@ -21,16 +21,16 @@ import org.vipervm.runtime.data.Matrix2D
 class TMatAddKernel extends TaskKernel {
   val peer = new MatAddKernel
   
-  def makeKernelParams(params:Seq[TaskParameter],memory:MemoryNode):Seq[KernelParameter] = {
+  def makeKernelParams(params:Seq[Value],memory:MemoryNode):Seq[KernelParameter] = {
     params match {
-      case Seq(DataTaskParameter(a:Matrix2D), DataTaskParameter(b:Matrix2D), DataTaskParameter(c:Matrix2D)) => {
-	val w = a.width.toInt
-	val h = a.height.toInt
-	val b1 = a.viewIn(memory).get.buffer
-	val b2 = b.viewIn(memory).get.buffer
-	val b3 = c.viewIn(memory).get.buffer
-	Seq(IntKernelParameter(w),IntKernelParameter(h),BufferKernelParameter(b1),BufferKernelParameter(b2),BufferKernelParameter(b3))
-	//TODO: handle padding and offset
+      case Seq(DataValue(a:Matrix2D), DataValue(b:Matrix2D), DataValue(c:Matrix2D)) => {
+        val w = a.width.toInt
+        val h = a.height.toInt
+        val b1 = a.viewIn(memory).get.buffer
+        val b2 = b.viewIn(memory).get.buffer
+        val b3 = c.viewIn(memory).get.buffer
+        Seq(IntKernelParameter(w),IntKernelParameter(h),BufferKernelParameter(b1),BufferKernelParameter(b2),BufferKernelParameter(b3))
+        //TODO: handle padding and offset
       }
       case _ => throw new Exception("invalid parameters: "+params)
     }
@@ -40,10 +40,10 @@ class TMatAddKernel extends TaskKernel {
 class FMatAddKernel extends FunctionalKernel {
   val peer = new TMatAddKernel
 
-  def createTask(args:Seq[TaskParameter]):(Task,Data) = args match {
-    case Seq(aa@DataTaskParameter(a:Matrix2D), bb@DataTaskParameter(b:Matrix2D)) => {
+  def createTask(args:Seq[Value]):(Task,Data) = args match {
+    case Seq(aa@DataValue(a:Matrix2D), bb@DataValue(b:Matrix2D)) => {
       val c = new Matrix2D(a.elemSize, a.width, a.height)
-      val task = Task(peer, List(aa,bb,DataTaskParameter(c)))
+      val task = Task(peer, List(aa,bb,DataValue(c)))
       (task,c)
     }
     case _ => throw new Exception("Invalid parameters: "+args)

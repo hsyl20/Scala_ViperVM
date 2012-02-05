@@ -11,16 +11,10 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.platform
 
-import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
 
-/**
- * A functional kernel with its parameters
- */
-case class Task(kernel:TaskKernel, params:Seq[Value], result:Value) {
-
-  def makeKernelParams(memory:MemoryNode):Seq[KernelParameter] = kernel.makeKernelParams(params, memory)
-
-  def canExecuteOn(proc:Processor):Boolean = kernel.canExecuteOn(proc)
+object DummyEvent extends Event {
+  complete
 }
+

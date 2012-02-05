@@ -25,36 +25,29 @@ import scala.collection.mutable
  */
 class Engine(scheduler:Scheduler) {
 
-  val events:mutable.Map[Value,Event] = mutable.Map.empty
-
-  def evaluate(expr:Term,context:Context):FutureEvent[Value] = {
-    val d = eval(expr,context)
-    val ev = events(d)
-    new FutureEvent(d,ev)
-  }
-
-  private def eval(expr:Term, context:Context):Value = expr match {
+  def evaluate(expr:Term, context:Context):FutureValue = expr match {
     case TmVar(name)   => context.values(name)
     case TmApp(TmKernel(name),args)  => {
       val k = context.kernels(name)
       //val params = args.par.map(x => eval(x,context)).seq
-      val params = args.map(x => eval(x,context))
+      val params = args.map(x => evaluate(x,context))
       submit(k, params, context)
     }
     case _ => ???
   }
 
-  private def submit(fkernel:FunctionalKernel, params:Vector[Value], context:Context):Value = {
+  private def submit(fkernel:FunctionalKernel, params:Vector[FutureValue], context:Context):FutureValue = {
 
-    val (task,returned) = fkernel.createTask(params)
-    val deps = params.flatMap(events.get(_))
+    val ftask = fkernel.createTask(params)
+    //We explicitly wait for task creation (even if it requires access to param
+    //values)
+    val task = ftask()
+    val result = task.result
+    val deps = params
 
-    val result = DataValue(returned)
-    val ev = scheduler.submitTask(task,deps)
+    val event = scheduler.submitTask(task,deps)
     
-    events += (result -> ev)
-
-    result
+    new FutureValue(result,event)
   }
 }
 
@@ -63,5 +56,6 @@ case class TmVar(name:String) extends Term
 case class TmKernel(name:String) extends Term
 case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term
 
-case class Context(values:Map[String,Value], kernels:Map[String,FunctionalKernel])
+case class Context(values:Map[String,FutureValue], kernels:Map[String,FunctionalKernel])
+
 

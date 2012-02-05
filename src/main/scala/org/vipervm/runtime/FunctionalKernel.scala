@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Kernel,KernelParameter}
+import org.vipervm.platform.{Kernel,KernelParameter,FutureEvent}
 
 /**
  * A functional kernel
@@ -30,6 +30,6 @@ trait FunctionalKernel {
 
   val peer:TaskKernel
 
-  def createTask(args:Seq[Value]): (Task,Data)
+  def createTask(args:Seq[FutureValue]): FutureEvent[Task]
 
 }

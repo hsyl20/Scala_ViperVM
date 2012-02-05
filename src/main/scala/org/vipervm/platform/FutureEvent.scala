@@ -47,10 +47,6 @@ class FutureEvent[T](value: =>T, event:Event) extends Event with Function0[T] {
 }
 
 object FutureEvent {
-  object DummyEvent extends Event {
-    complete
-  }
-
   def apply[T](value:T, event:Event = DummyEvent):FutureEvent[T] = new FutureEvent[T](value,event)
 
   implicit def any2future[T](a:T):FutureEvent[T] = FutureEvent(a)

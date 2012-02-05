@@ -14,7 +14,7 @@
 package org.vipervm.tests.runtime
 
 import org.vipervm.tests.platform.MatAddKernel
-import org.vipervm.platform.{MemoryNode,KernelParameter,IntKernelParameter,BufferKernelParameter}
+import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D
 
@@ -40,11 +40,11 @@ class TMatAddKernel extends TaskKernel {
 class FMatAddKernel extends FunctionalKernel {
   val peer = new TMatAddKernel
 
-  def createTask(args:Seq[Value]):(Task,Data) = args match {
+  def createTask(args:Seq[FutureValue]):FutureEvent[Task] = args.map(_.value) match {
     case Seq(aa@DataValue(a:Matrix2D), bb@DataValue(b:Matrix2D)) => {
-      val c = new Matrix2D(a.elemSize, a.width, a.height)
-      val task = Task(peer, List(aa,bb,DataValue(c)))
-      (task,c)
+      val c = DataValue(new Matrix2D(a.elemSize, a.width, a.height))
+      val task = Task(peer, List(aa,bb,c), c)
+      FutureEvent(task)
     }
     case _ => throw new Exception("Invalid parameters: "+args)
   }

@@ -190,7 +190,7 @@ class MatMulOpenCL extends FixtureFunSuite {
       val readEvent = readLink.copy(cView,hostcView)
       barrier[R](readEvent)
 
-      constant(check)
+      FutureEvent(check)
     }
 
     if (!chk())

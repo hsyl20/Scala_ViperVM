@@ -64,12 +64,12 @@ trait Event {
   /**
    * Add a callback method that will be called when the event completes
    */
-  def willTrigger[T](f: => T) = new FutureEvent[T](this, f)
+  def willTrigger[T](f: => T) = new FutureEvent[T](f,this)
 
   /**
    * Like willTrigger but folds FutureEvent hierarchy
    */
-  def fold[T](f: => FutureEvent[T]): FutureEvent[T] = new FutureEvent[T](this, f.apply)
+  def fold[T](f: => FutureEvent[T]): FutureEvent[T] = new FutureEvent[T](f.apply, this)
 
   /**
    * Implementations should call this method when the event completes

@@ -17,13 +17,13 @@ import scala.actors._
 import scala.actors.Actor._
 import scala.concurrent.Lock
 
-class FutureEvent[T](event:Event, f: =>T) extends Event with Function0[T] {
+class FutureEvent[T](value: =>T, event:Event) extends Event with Function0[T] {
   private var fvalue: Option[T] = None
   private var waiters: List[OutputChannel[T]] = Nil
 
   private val myAct = actor { loop { react {
     case EventComplete(_) => {
-      fvalue = Some(f)
+      fvalue = Some(value)
       waiters.foreach(_ ! fvalue.get)
       waiters = Nil
       complete
@@ -51,7 +51,7 @@ object FutureEvent {
     complete
   }
 
-  def constant[T](a:T):FutureEvent[T] = new FutureEvent[T](DummyEvent, a)
+  def apply[T](value:T, event:Event = DummyEvent):FutureEvent[T] = new FutureEvent[T](value,event)
 
-  implicit def any2future[T](a:T):FutureEvent[T] = constant(a)
+  implicit def any2future[T](a:T):FutureEvent[T] = FutureEvent(a)
 }

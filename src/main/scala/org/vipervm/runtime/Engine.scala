@@ -30,7 +30,7 @@ class Engine(scheduler:Scheduler) {
   def evaluate(expr:Term,context:Context):FutureEvent[Value] = {
     val d = eval(expr,context)
     val ev = events(d)
-    new FutureEvent(ev,d)
+    new FutureEvent(d,ev)
   }
 
   private def eval(expr:Term, context:Context):Value = expr match {

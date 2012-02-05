@@ -178,7 +178,7 @@ class OpenCL extends FixtureFunSuite {
       val readEvent = readLink.copy(outView,hostOutView)
       barrier[R](readEvent)
 
-      constant(check)
+      FutureEvent(check)
     }
 
     if (!chk())

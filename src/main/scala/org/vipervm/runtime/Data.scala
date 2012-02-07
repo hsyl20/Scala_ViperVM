@@ -28,9 +28,6 @@ abstract class Data {
   /** Indicate whether this data has been computed */
   def isDefined:Boolean = !views.isEmpty
 
-  /** Event triggered when this data is computed */
-  val computedEvent:ComputedDataEvent = new ComputedDataEvent(this)
-
   def viewIn(memory:MemoryNode):Option[ViewType] = views.get(memory).map(_._1)
 
   def stateIn(memory:MemoryNode):Option[DataState] = views.get(memory).map(_._2)

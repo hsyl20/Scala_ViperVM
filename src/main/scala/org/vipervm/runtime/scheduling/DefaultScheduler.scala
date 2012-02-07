@@ -30,30 +30,30 @@ class DefaultScheduler(platform:Platform) extends Scheduler(platform) with Loggi
   def act = loop {
     react {
       case SubmitTask(task,deps) => {
-	val ev = new UserEvent
-	events += (task -> ev)
+        val ev = new UserEvent
+        events += (task -> ev)
 
-	EventGroup(deps:_*).willTrigger {
+        EventGroup(deps:_*).willTrigger {
 
-	  /* Select worker */
-	  val w = workers.filter(_.canExecute(task)).head
+          /* Select worker */
+          val w = workers.filter(_.canExecute(task)).head
 
-	  info("[DefaultScheduler] Submit task %s to worker %s".format(task,w))
-	  
-	  /* Submit task */
-	  w ! ExecuteTask(task)
-	}
+          info("[DefaultScheduler] Submit task %s to worker %s".format(task,w))
 
-	sender ! ev
+          /* Submit task */
+          w ! ExecuteTask(task)
+        }
+
+        sender ! ev
       }
 
       case TaskComplete(task) => {
-	val ev = events(task)
-	events -= task
-	
-	info("[DefaultScheduler] Completed task %s".format(task))	
+        val ev = events(task)
+          events -= task
 
-	ev.complete
+        info("[DefaultScheduler] Completed task %s".format(task))	
+
+        ev.complete
       }
 
 

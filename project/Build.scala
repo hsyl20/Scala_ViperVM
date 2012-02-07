@@ -64,8 +64,8 @@ object MyProject extends Build {
      * - NOP: Discard logging 
      * - log4j 
      */
-  //"org.slf4j" % "slf4j-simple" % "1.6.2"
-    "org.slf4j" % "slf4j-nop" % "1.6.2"
+  "org.slf4j" % "slf4j-simple" % "1.6.2"
+  //  "org.slf4j" % "slf4j-nop" % "1.6.2"
   //"org.slf4j" % "slf4j-log4j12" % "1.6.2"
   )
 

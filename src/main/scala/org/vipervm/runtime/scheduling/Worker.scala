@@ -14,7 +14,7 @@
 package org.vipervm.runtime.scheduling
 
 import grizzled.slf4j.Logging
-import org.vipervm.platform.Processor
+import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup}
 import org.vipervm.runtime._
 import scala.actors.Actor
 import org.vipervm.utils._
@@ -78,15 +78,15 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
 
     val datas = task.params.collect{ case DataValue(d) => d }
 
-    val views = datas.map(data => data.viewIn(memory) match {
-      case Some(v) => v
+    val futureViews = datas.map(data => data.viewIn(memory) match {
+      case Some(v) => FutureEvent(v)
       case None => {
         /* Allocate required buffers and views */
         //FIXME: support "no space left on device" exception
         val view = data.allocate(memory)
 
         /* Test if the view is read or written into */
-        if (data.isDefined) {
+       if (data.isDefined) {
 
           /* Schedule required data transfer to update the view */
           val sources = data.views
@@ -100,27 +100,31 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
           
           val transfer = link.copy(source,view)
 
-          //FIXME: we need to be asynchronous
-          transfer.syncWait
-
           /* Schedule data-view association */
-          data.store(memory,view)
+          val assocEvent = new UserEvent
+          transfer.willTrigger {
+            data.store(memory,view)
+            assocEvent.complete
+          }
+
+          FutureEvent(view, assocEvent)
         }
         else {
           data.store(memory,view)
+          FutureEvent(view)
         }
-
-        view
       }
     })
     
+    new EventGroup(futureViews).willTrigger {
 
-    /* Schedule kernel execution */
-    val ev = proc.execute(kernel, task.makeKernelParams(memory))
+      /* Schedule kernel execution */
+      val ev = proc.execute(kernel, task.makeKernelParams(memory))
 
-    /* Schedule notification after kernel execution */
-    ev.willTrigger {
-      this ! TaskComplete(task)
+      /* Schedule notification after kernel execution */
+      ev.willTrigger {
+        this ! TaskComplete(task)
+      }
     }
   }
 

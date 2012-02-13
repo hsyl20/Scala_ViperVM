@@ -49,7 +49,7 @@ class DefaultScheduler(platform:Platform) extends Scheduler(platform) with Loggi
 
       case TaskComplete(task) => {
         val ev = events(task)
-          events -= task
+        events -= task
 
         info("[DefaultScheduler] Completed task %s".format(task))	
 

@@ -9,6 +9,10 @@
 TODO list
 =========
 
+addShutdownHook:
+  release entities...
+
+
 Data duplication
  - memcpy
  - knem

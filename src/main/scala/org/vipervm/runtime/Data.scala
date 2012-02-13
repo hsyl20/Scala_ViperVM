@@ -16,21 +16,15 @@ package org.vipervm.runtime
 import org.vipervm.platform.{BufferView,MemoryNode}
 import scala.collection.mutable.HashMap
 
-sealed abstract class DataState
-case object InvalidData extends DataState
-case object ValidData   extends DataState
-
 abstract class Data {
   type ViewType <: BufferView
 
-  protected var views: HashMap[MemoryNode,(ViewType,DataState)] = HashMap.empty
+  protected var views: HashMap[MemoryNode,ViewType] = HashMap.empty
 
   /** Indicate whether this data has been computed */
   def isDefined:Boolean = !views.isEmpty
 
-  def viewIn(memory:MemoryNode):Option[ViewType] = views.get(memory).map(_._1)
-
-  def stateIn(memory:MemoryNode):Option[DataState] = views.get(memory).map(_._2)
+  def viewIn(memory:MemoryNode):Option[ViewType] = views.get(memory)
 
   def allocate(memory:MemoryNode):ViewType
 
@@ -39,13 +33,13 @@ abstract class Data {
    */
   def allocateStore(memory:MemoryNode):ViewType = {
     val view = allocate(memory)
-    store(memory,view,InvalidData)
+    store(memory,view)
     view
   }
 
-  def store(memory:MemoryNode,view:ViewType,state:DataState = InvalidData):Unit = {
+  def store(memory:MemoryNode,view:ViewType):Unit = {
     views.synchronized {
-      views.update(memory,(view,state))
+      views.update(memory,view)
     }
   }
 

@@ -19,27 +19,21 @@ import scala.collection.mutable.HashMap
 abstract class Data {
   type ViewType <: BufferView
 
-  protected var views: HashMap[MemoryNode,ViewType] = HashMap.empty
+  protected var fviews: HashMap[MemoryNode,ViewType] = HashMap.empty
 
   /** Indicate whether this data has been computed */
   def isDefined:Boolean = !views.isEmpty
 
-  def viewIn(memory:MemoryNode):Option[ViewType] = views.get(memory)
+  def views:Map[MemoryNode,ViewType] = fviews.toMap
+
+  def viewIn(memory:MemoryNode):Option[ViewType] = fviews.get(memory)
 
   def allocate(memory:MemoryNode):ViewType
 
-  /**
-   * Allocate a view and store it in the ViewSet
-   */
-  def allocateStore(memory:MemoryNode):ViewType = {
-    val view = allocate(memory)
-    store(memory,view)
-    view
-  }
-
+  /** Store a view containing valid contents for this data */
   def store(memory:MemoryNode,view:ViewType):Unit = {
-    views.synchronized {
-      views.update(memory,view)
+    fviews.synchronized {
+      fviews.update(memory,view)
     }
   }
 

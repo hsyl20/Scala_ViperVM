@@ -70,16 +70,28 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
 
     info("[Worker %s] Execute task: %s".format(this,task))
 
-    /* Schedule required data transfers */
-    task.params.foreach { _ match {
-      case DataValue(data) => {
-        val view = data.viewIn(memory).getOrElse(data.allocateStore(memory))
-        //TODO: update view with valid contents
-        //TODO: check size
-      }
-      case _ => ()
-    }}
+    val datas = task.params.collect{ case DataValue(d) => d }
 
+    val views = datas.map(data => data.viewIn(memory) match {
+      case Some(v) => v
+      case None => {
+        /* Allocate required buffers and views */
+        //FIXME: support "no space left on device" exception
+        val view = data.allocate(memory)
+
+        /* Test if the view is read or written into */
+        //TODO
+
+        /* Schedule required data transfer to update the view */
+        //TODO
+
+        /* Schedule data-view association */
+        data.store(memory,view)
+
+        view
+      }
+    })
+    
     /* Select kernel */
     val kernel = task.kernel.peer match {
       case k:MetaKernel => k.getKernelsFor(proc).head

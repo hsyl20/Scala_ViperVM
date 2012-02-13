@@ -13,26 +13,25 @@
 
 package org.vipervm.runtime.data
 
-import org.vipervm.runtime.data.Primitives._
-import org.vipervm.platform.{BufferView2D,MemoryNode}
-import org.vipervm.runtime.Data
+object Primitives {
+  abstract class Primitive[A] {
+    val size:Int
+  }
 
-/**
- * 2D matrix
- */
-class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) extends Data {
-  type ViewType = BufferView2D
+  implicit object FloatPrimitive extends Primitive[Float] {
+    val size = 4
+  }
 
-  def allocate(memory:MemoryNode):BufferView2D = {
-    //TODO: manage padding correctly
-    val buffer = memory.allocate(elem.size*width*height)
-    new BufferView2D(buffer, 0, elem.size*width, height, 0)
+  implicit object DoublePrimitive extends Primitive[Double] {
+    val size = 8
+  }
+
+  implicit object IntPrimitive extends Primitive[Int] {
+    val size = 4
+  }
+
+  implicit object LongPrimitive extends Primitive[Long] {
+    val size = 8
   }
 }
 
-object Matrix2D {
-  def filled[A : Primitive](width:Long, height:Long, value:A) = {
-    val m = new Matrix2D[A](width,height)
-
-  }
-}

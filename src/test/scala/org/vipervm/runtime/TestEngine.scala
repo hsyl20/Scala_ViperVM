@@ -26,9 +26,9 @@ import org.vipervm.runtime.scheduling.DefaultScheduler
 class TestEngine extends FunSuite {
 
   test("Basic expression") {
-    val a = new Matrix2D(4, 128,128)
-    val b = new Matrix2D(4, 128,128)
-    val c = new Matrix2D(4, 128, 128)
+    val a = new Matrix2D[Float](128,128)
+    val b = new Matrix2D[Float](128,128)
+    val c = new Matrix2D[Float](128, 128)
     val matmul = new FMatMulKernel
     val matadd = new FMatAddKernel
 

@@ -23,7 +23,7 @@ class TMatAddKernel extends TaskKernel {
   
   def makeKernelParams(params:Seq[Value],memory:MemoryNode):Seq[KernelParameter] = {
     params match {
-      case Seq(DataValue(a:Matrix2D), DataValue(b:Matrix2D), DataValue(c:Matrix2D)) => {
+      case Seq(DataValue(a:Matrix2D[_]), DataValue(b:Matrix2D[_]), DataValue(c:Matrix2D[_])) => {
         val w = a.width.toInt
         val h = a.height.toInt
         val b1 = a.viewIn(memory).get.buffer
@@ -41,8 +41,8 @@ class FMatAddKernel extends FunctionalKernel {
   val peer = new TMatAddKernel
 
   def createTask(args:Seq[FutureValue]):FutureEvent[Task] = args.map(_.value) match {
-    case Seq(aa@DataValue(a:Matrix2D), bb@DataValue(b:Matrix2D)) => {
-      val c = DataValue(new Matrix2D(a.elemSize, a.width, a.height))
+    case Seq(aa@DataValue(a:Matrix2D[_]), bb@DataValue(b:Matrix2D[_])) => {
+      val c = DataValue(new Matrix2D[Float](a.width, a.height))
       val task = Task(peer, List(aa,bb,c), c)
       FutureEvent(task)
     }

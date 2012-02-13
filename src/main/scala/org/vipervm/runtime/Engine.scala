@@ -29,8 +29,7 @@ class Engine(scheduler:Scheduler) {
     case TmVar(name)   => context.values(name)
     case TmApp(TmKernel(name),args)  => {
       val k = context.kernels(name)
-      //val params = args.par.map(x => eval(x,context)).seq
-      val params = args.map(x => evaluate(x,context))
+      val params = args.par.map(x => evaluate(x,context)).seq
       submit(k, params, context)
     }
     case _ => ???

@@ -70,6 +70,12 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
 
     info("[Worker %s] Execute task: %s".format(this,task))
 
+    /* Select kernel */
+    val kernel = task.kernel.peer match {
+      case k:MetaKernel => k.getKernelsFor(proc).head
+      case k => k
+    }
+
     val datas = task.params.collect{ case DataValue(d) => d }
 
     val views = datas.map(data => data.viewIn(memory) match {
@@ -80,23 +86,34 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
         val view = data.allocate(memory)
 
         /* Test if the view is read or written into */
-        //TODO
+        if (data.isDefined) {
 
-        /* Schedule required data transfer to update the view */
-        //TODO
+          /* Schedule required data transfer to update the view */
+          val sources = data.views
 
-        /* Schedule data-view association */
-        data.store(memory,view)
+          /* Select source */
+          val source = sources.head._2
+
+          /* Select link */
+          //FIXME: We need to support multi-hop links
+          val link = scheduler.platform.linkBetween(source,view).get
+          
+          val transfer = link.copy(source,view)
+
+          //FIXME: we need to be asynchronous
+          transfer.syncWait
+
+          /* Schedule data-view association */
+          data.store(memory,view)
+        }
+        else {
+          data.store(memory,view)
+        }
 
         view
       }
     })
     
-    /* Select kernel */
-    val kernel = task.kernel.peer match {
-      case k:MetaKernel => k.getKernelsFor(proc).head
-      case k => k
-    }
 
     /* Schedule kernel execution */
     val ev = proc.execute(kernel, task.makeKernelParams(memory))

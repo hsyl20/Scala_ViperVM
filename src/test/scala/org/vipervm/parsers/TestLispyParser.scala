@@ -31,9 +31,9 @@ import org.vipervm.parser.LispyParser
 class TestLispyParser extends FunSuite {
 
   test("Basic expression") {
-    val a = new Matrix2D[Float](128,128)
-    val b = new Matrix2D[Float](128,128)
-    val c = new Matrix2D[Float](128, 128)
+    val a = new Matrix2D[Float](32,32)
+    val b = new Matrix2D[Float](32,32)
+    val c = new Matrix2D[Float](32,32)
     val matmul = new FMatMulKernel
     val matadd = new FMatAddKernel
 
@@ -52,10 +52,9 @@ class TestLispyParser extends FunSuite {
         (matmul a c))
       """)
 
-    val rand = new Random
-    a.initialize(platform, (x,y) => rand.nextFloat )
-    b.initialize(platform, (x,y) => rand.nextFloat )
-    c.initialize(platform, (x,y) => rand.nextFloat )
+    a.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
+    b.initialize(platform, (x,y) => 2.0f )
+    c.initialize(platform, (x,y) => 2.0f )
 
     val result = engine.evaluate(prog.get,context)
 

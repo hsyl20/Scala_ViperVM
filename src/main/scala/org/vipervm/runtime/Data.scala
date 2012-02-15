@@ -22,7 +22,9 @@ abstract class Data {
   protected var fviews: HashMap[MemoryNode,ViewType] = HashMap.empty
 
   /** Indicate whether this data has been computed */
-  def isDefined:Boolean = !views.isEmpty
+  def isDefined:Boolean = fviews.synchronized {
+    !fviews.isEmpty
+  }
 
   def views:Map[MemoryNode,ViewType] = fviews.toMap
 
@@ -31,7 +33,8 @@ abstract class Data {
   def allocate(memory:MemoryNode):ViewType
 
   /** Store a view containing valid contents for this data */
-  def store(memory:MemoryNode,view:ViewType):Unit = {
+  def store(view:ViewType):Unit = {
+    val memory = view.buffer.memory
     fviews.synchronized {
       fviews.update(memory,view)
     }

@@ -103,14 +103,14 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
           /* Schedule data-view association */
           val assocEvent = new UserEvent
           transfer.willTrigger {
-            data.store(memory,view)
+            data.store(view)
             assocEvent.complete
           }
 
           FutureEvent(view, assocEvent)
         }
         else {
-          data.store(memory,view)
+          data.store(view)
           FutureEvent(view)
         }
       }

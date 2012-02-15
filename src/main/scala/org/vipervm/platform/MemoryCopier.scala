@@ -52,6 +52,16 @@ trait Copy1DSupport extends MemoryCopier {
         AsyncGC.add(ev, source, target)
         ev
       }
+      case (src:BufferView2D,tgt:BufferView2D) if (src.rowPadding == 0 && tgt.rowPadding == 0) => {
+        if (src.width != tgt.width || src.height != tgt.height)
+          throw new Exception("Invalid copy: different view dimensions: (%d,%d) vs (%d,%d)".format(
+            src.width,src.height, tgt.width, tgt.height))
+        val tempSrc = BufferView1D(src.buffer,src.offset,src.width*src.height)
+        val tempTgt = BufferView1D(tgt.buffer,tgt.offset,tgt.width*tgt.height)
+        val ev = copy1D(link,tempSrc,tempTgt)
+        AsyncGC.add(ev, source, target, tempSrc, tempTgt)
+        ev
+      }
       case _ => super.copy(link,source,target)
     }
   }

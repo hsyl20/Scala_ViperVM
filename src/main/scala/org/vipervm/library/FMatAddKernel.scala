@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests
+package org.vipervm.library
 
 import org.vipervm.platform._
 import org.vipervm.runtime._

@@ -23,6 +23,8 @@ import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 import org.vipervm.platform.FutureEvent._
 import org.vipervm.platform.Barrier._
 
+import org.vipervm.library._
+
 import java.util.Random
 import scala.util.continuations._
 

@@ -14,24 +14,29 @@
 package org.vipervm.runtime.data
 
 object Primitives {
-  abstract class Primitive[A] {
+  sealed abstract class Primitive[A] {
     val size:Int
+    val typ:String
   }
 
-  implicit object FloatPrimitive extends Primitive[Float] {
+  implicit case object FloatPrimitive extends Primitive[Float] {
     val size = 4
+    val typ = "float"
   }
 
-  implicit object DoublePrimitive extends Primitive[Double] {
+  implicit case object DoublePrimitive extends Primitive[Double] {
     val size = 8
+    val typ = "double"
   }
 
-  implicit object IntPrimitive extends Primitive[Int] {
+  implicit case object IntPrimitive extends Primitive[Int] {
     val size = 4
+    val typ = "int"
   }
 
-  implicit object LongPrimitive extends Primitive[Long] {
+  implicit case object LongPrimitive extends Primitive[Long] {
     val size = 8
+    val typ = "long"
   }
 }
 

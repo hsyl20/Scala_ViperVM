@@ -15,9 +15,10 @@ package org.vipervm.tests.parsers
 
 import org.scalatest.FunSuite
 
+import scala.util.Random
 import org.vipervm.tests.runtime._
 
-import org.vipervm.platform.Platform
+import org.vipervm.platform.{Platform,HostBuffer,BufferView2D}
 import org.vipervm.platform.opencl.OpenCLDriver
 import org.vipervm.platform.host.DefaultHostDriver
 
@@ -51,9 +52,21 @@ class TestLispyParser extends FunSuite {
         (matmul a c))
       """)
 
-    val fe = engine.evaluate(prog.get,context)
+    val rand = new Random
+    a.initialize(platform, (x,y) => rand.nextFloat )
+    b.initialize(platform, (x,y) => rand.nextFloat )
+    c.initialize(platform, (x,y) => rand.nextFloat )
 
-    fe.syncWait
+    val result = engine.evaluate(prog.get,context)
+
+    result.syncWait
+
+    val r = result.value match {
+      case DataValue(d) => d
+      case _ => throw new Exception("Invalid value returned")
+    }
+    
+    println(r.asInstanceOf[Matrix2D[Float]].print(platform)())
   }
 
 }

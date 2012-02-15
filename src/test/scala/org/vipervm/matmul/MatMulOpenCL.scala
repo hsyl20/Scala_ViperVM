@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests.platform
+package org.vipervm.tests
 
 import org.scalatest.fixture.FixtureFunSuite
 
@@ -27,30 +27,31 @@ import java.util.Random
 import scala.util.continuations._
 
 
-class OpenCL extends FixtureFunSuite {
+class TestMatMulOpenCL extends FixtureFunSuite {
 
   type FixtureParam = Common
 
   def withFixture(test: OneArgTest) {
-    val common = new Common
+    val common = new Common{}
     try {
       test(common)
     }
     finally {
       import common._
-      mem.free(inBuf)
-      mem.free(outBuf)
+      mem.free(aBuf)
+      mem.free(bBuf)
+      mem.free(cBuf)
 
-      hostMem.free(hostBuf)
-      hostMem.free(hostOutBuf)
+      hostMem.free(hostaBuf)
+      hostMem.free(hostbBuf)
+      hostMem.free(hostcBuf)
     }
   }
 
 
-  class Common {
-    val n = 100
-    val factor = 10
-    val kernel = new DummyKernel
+  trait Common {
+    val n = 32
+    val kernel = new MatMulKernel
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
@@ -72,48 +73,55 @@ class OpenCL extends FixtureFunSuite {
     /* Select a memory in which the processor can compute */
     val mem = proc.memory
 
-    val inBuf = mem.allocate(n * 4)
-    val outBuf = mem.allocate(n * 4)
+    val aBuf = mem.allocate(n * n * 4)
+    val bBuf = mem.allocate(n * n * 4)
+    val cBuf = mem.allocate(n * n * 4)
 
     val hostMem = platform.hostMemory
-    val hostBuf = hostMem.allocate(n * 4)
-    val hostOutBuf = hostMem.allocate(n * 4)
+    val hostaBuf = hostMem.allocate(n * n * 4)
+    val hostbBuf = hostMem.allocate(n * n * 4)
+    val hostcBuf = hostMem.allocate(n * n * 4)
+
+    val fba = hostaBuf.byteBuffer.asFloatBuffer; 
+    val fbb = hostbBuf.byteBuffer.asFloatBuffer; 
+    val fbc = hostcBuf.byteBuffer.asFloatBuffer; 
 
     val rand = new Random
-    val fb = hostBuf.byteBuffer.asFloatBuffer; 
-    for (i <- 0 until n) {
-      fb.put(i, rand.nextFloat)
+    for (i <- 0 until (n*n)) {
+      fba.put(i, rand.nextFloat*10f)
+      fbb.put(i, rand.nextFloat*10f)
+      fbc.put(i, 0f)
     }
 
-    val writeLink = platform.linkBetween(hostBuf, inBuf).getOrElse {
+    val writeLink = platform.linkBetween(hostaBuf, aBuf).getOrElse {
       throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
     }
 
-    val hostView = BufferView1D(hostBuf, 0, n * 4L)
-    val hostOutView = BufferView1D(hostOutBuf, 0, n * 4L)
-    val inView = BufferView1D(inBuf, 0, n * 4L)
-    val outView = BufferView1D(outBuf, 0, n * 4L)
+    val hostaView = BufferView1D(hostaBuf, 0, n * n * 4L)
+    val hostbView = BufferView1D(hostbBuf, 0, n * n * 4L)
+    val hostcView = BufferView1D(hostcBuf, 0, n * n * 4L)
+    val aView = BufferView1D(aBuf, 0, n * n * 4L)
+    val bView = BufferView1D(bBuf, 0, n * n * 4L)
+    val cView = BufferView1D(cBuf, 0, n * n * 4L)
 
     val params = Seq(
-      BufferKernelParameter(inBuf),
-      BufferKernelParameter(outBuf),
-      IntKernelParameter(factor),
-      LongKernelParameter(n)
+      IntKernelParameter(n),
+      BufferKernelParameter(aBuf),
+      BufferKernelParameter(bBuf),
+      BufferKernelParameter(cBuf)
     )
 
-    val readLink = platform.linkBetween(outBuf, hostOutBuf).getOrElse {
+    val readLink = platform.linkBetween(aBuf, hostaBuf).getOrElse {
       throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
     }
 
     def check:Boolean = {
-      val fbout = hostOutBuf.byteBuffer.asFloatBuffer; 
-
       var chk = true
-      for (i <- 0 until n) {
-        val a = factor * fb.get(i)
-        val b = fbout.get(i)
-        if (a - b > 0.001) {
-          println("Invalid value computed: %f vs %f".format(a,b))
+      for (i <- 0 until n; j <- 0 until n) {
+        val s = (for (k <- 0 until n) yield fba.get(i*n+k) * fbb.get(k*n+j)).sum
+        val t = fbc.get(j+i*n)
+        if (math.abs(s - t) > 0.001) {
+          println("Invalid value computed: %f vs %f".format(s,t))
           chk = false
         }
       }
@@ -126,13 +134,14 @@ class OpenCL extends FixtureFunSuite {
   test("Low-Level Synchronous OpenCL") { common => 
     import common._
 
-    val writeEvent = writeLink.copy(hostView,inView)
-    writeEvent.syncWait
+    val writeEventA = writeLink.copy(hostaView,aView)
+    val writeEventB = writeLink.copy(hostbView,bView)
+    EventGroup(writeEventA, writeEventB).syncWait
 
     val event = proc.execute(kernel,params)
     event.syncWait
 
-    val readEvent = readLink.copy(outView,hostOutView)
+    val readEvent = readLink.copy(cView,hostcView)
     readEvent.syncWait
 
     if (!check)
@@ -143,13 +152,15 @@ class OpenCL extends FixtureFunSuite {
   test("Low-Level Asynchronous OpenCL") { common => 
     import common._
 
-    val writeEvent = writeLink.copy(hostView,inView)
-    val chk = writeEvent fold {
+    val writeEventA = writeLink.copy(hostaView,aView)
+    val writeEventB = writeLink.copy(hostbView,bView)
+
+    val chk = EventGroup(writeEventA, writeEventB).fold {
 
       val event = proc.execute(kernel,params)
       event fold {
 
-        val readEvent = readLink.copy(outView,hostOutView)
+        val readEvent = readLink.copy(cView,hostcView)
         readEvent fold {
           check
         }
@@ -169,13 +180,14 @@ class OpenCL extends FixtureFunSuite {
       /* Type of the returned value */
       type R = Boolean 
 
-      val writeEvent = writeLink.copy(hostView,inView)
-      barrier[R](writeEvent)
+      val writeEventA = writeLink.copy(hostaView,aView)
+      val writeEventB = writeLink.copy(hostbView,bView)
+      barrier[R](EventGroup(writeEventA, writeEventB))
 
       val event = proc.execute(kernel,params)
       barrier[R](event)
 
-      val readEvent = readLink.copy(outView,hostOutView)
+      val readEvent = readLink.copy(cView,hostcView)
       barrier[R](readEvent)
 
       FutureEvent(check)

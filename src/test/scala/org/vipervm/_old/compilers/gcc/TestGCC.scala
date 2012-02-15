@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.compilers.gcc.tests
+package org.vipervm.tests.compilers.gcc
 
 import org.scalatest.FunSuite
 

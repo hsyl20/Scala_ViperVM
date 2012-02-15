@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests.runtime
+package org.vipervm.tests
 
 import org.scalatest.FunSuite
 
@@ -23,18 +23,34 @@ import org.vipervm.runtime._
 import org.vipervm.runtime.data._
 import org.vipervm.runtime.scheduling.DefaultScheduler
 
-class TestEngine extends FunSuite {
+import org.vipervm.parser.LispyParser
 
-  test("Basic expression") {
-    val a = new Matrix2D[Float](128,128)
-    val b = new Matrix2D[Float](128,128)
-    val c = new Matrix2D[Float](128, 128)
-    val matmul = new FMatMulKernel
-    val matadd = new FMatAddKernel
+class TestMatMul extends FunSuite {
 
+  test("R = AxB + AxC using AST") {
     val prog = TmApp(TmKernel("matadd"), Vector(
       TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("b"))),
       TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("c")))))
+
+    testMatMul(prog)
+  }
+
+  test("R = AxB + AxC using Lispy parser") {
+    val prog = LispyParser.parse("""
+      (matadd 
+        (matmul a b)
+        (matmul a c))
+      """)
+    testMatMul(prog.get)
+  }
+
+
+  def testMatMul(prog:Term):Unit = {
+    val a = new Matrix2D[Float](32,32)
+    val b = new Matrix2D[Float](32,32)
+    val c = new Matrix2D[Float](32,32)
+    val matmul = new FMatMulKernel
+    val matadd = new FMatAddKernel
 
     val context = Context(
       Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
@@ -44,9 +60,22 @@ class TestEngine extends FunSuite {
 
     val sched = new DefaultScheduler(platform)
     val engine = new Engine(sched)
-    val fe = engine.evaluate(prog,context)
 
-    fe.syncWait
+    a.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
+    b.initialize(platform, (x,y) => 2.0f )
+    c.initialize(platform, (x,y) => 2.0f )
+
+    val result = engine.evaluate(prog,context)
+
+    result.syncWait
+
+    val r = result.value match {
+      case DataValue(d) => d
+      case _ => throw new Exception("Invalid value returned")
+    }
+    
+    println(r.asInstanceOf[Matrix2D[Float]].print(platform)())
   }
+
 
 }

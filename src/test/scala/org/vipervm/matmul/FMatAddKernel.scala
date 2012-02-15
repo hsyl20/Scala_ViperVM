@@ -11,9 +11,8 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests.runtime
+package org.vipervm.tests
 
-import org.vipervm.tests.platform.MatAddKernel
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D

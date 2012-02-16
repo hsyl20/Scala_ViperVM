@@ -16,8 +16,11 @@ package org.vipervm.runtime.scheduling
 import grizzled.slf4j.Logging
 import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup}
 import org.vipervm.runtime._
-import scala.actors.Actor
+import org.vipervm.runtime.interpreter.DataValue
+
 import org.vipervm.utils._
+
+import scala.actors.Actor
 import scala.concurrent.Lock
 
 /**

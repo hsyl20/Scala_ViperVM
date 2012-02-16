@@ -11,31 +11,31 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.interpreter
 
-import grizzled.slf4j.Logging
 import org.vipervm.platform.{Event,FutureEvent}
-import org.vipervm.utils._
+import org.vipervm.runtime.FunctionalKernel
 import org.vipervm.runtime.scheduling.Scheduler
+import org.vipervm.utils._
 
 import scala.collection.mutable
 
 /**
  * An engine execute a given functional program
  */
-class Engine(scheduler:Scheduler) {
+class Interpreter(scheduler:Scheduler) {
 
-  def evaluate(expr:Term, context:Context):FutureValue = expr match {
-    case TmVar(name)   => context.values(name)
+  def evaluate(expr:Term, symbols:SymbolTable):FutureValue = expr match {
+    case TmVar(name)   => symbols.values(name)
     case TmApp(TmKernel(name),args)  => {
-      val k = context.kernels(name)
-      val params = args.par.map(x => evaluate(x,context)).seq
-      submit(k, params, context)
+      val k = symbols.kernels(name)
+      val params = args.par.map(x => evaluate(x,symbols)).seq
+      submit(k, params, symbols)
     }
     case _ => ???
   }
 
-  private def submit(fkernel:FunctionalKernel, params:Vector[FutureValue], context:Context):FutureValue = {
+  private def submit(fkernel:FunctionalKernel, params:Vector[FutureValue], symbols:SymbolTable):FutureValue = {
 
     val ftask = fkernel.createTask(params)
     //We explicitly wait for task creation (even if it requires access to param
@@ -50,11 +50,5 @@ class Engine(scheduler:Scheduler) {
   }
 }
 
-sealed abstract class Term
-case class TmVar(name:String) extends Term
-case class TmKernel(name:String) extends Term
-case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term
-
-case class Context(values:Map[String,FutureValue], kernels:Map[String,FunctionalKernel])
 
 

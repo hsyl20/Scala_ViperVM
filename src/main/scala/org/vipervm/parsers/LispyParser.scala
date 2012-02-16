@@ -16,6 +16,7 @@ package org.vipervm.parser
 import scala.util.parsing.combinator.syntactical._
 
 import org.vipervm.runtime._
+import org.vipervm.runtime.interpreter._
 
 object LispyParser extends StandardTokenParsers {
 

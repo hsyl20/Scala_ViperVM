@@ -14,6 +14,7 @@
 package org.vipervm.runtime
 
 import org.vipervm.platform.{Kernel,KernelParameter,FutureEvent}
+import org.vipervm.runtime.interpreter.FutureValue
 
 /**
  * A functional kernel

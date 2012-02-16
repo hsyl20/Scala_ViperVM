@@ -14,6 +14,7 @@
 package org.vipervm.runtime
 
 import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
+import org.vipervm.runtime.interpreter.Value
 
 /**
  * Indicate how to convert task parameters to kernel parameters for a given kernel

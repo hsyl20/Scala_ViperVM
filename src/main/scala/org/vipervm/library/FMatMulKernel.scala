@@ -16,6 +16,7 @@ package org.vipervm.library
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D
+import org.vipervm.runtime.interpreter.{Value,DataValue,FutureValue}
 
 class TMatMulKernel extends TaskKernel {
   val peer = new MatMulKernel

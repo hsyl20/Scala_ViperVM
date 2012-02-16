@@ -15,6 +15,7 @@ package org.vipervm.library
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.interpreter.{Value,DataValue,FutureValue}
 import org.vipervm.runtime.data.Matrix2D
 
 class TMatAddKernel extends TaskKernel {

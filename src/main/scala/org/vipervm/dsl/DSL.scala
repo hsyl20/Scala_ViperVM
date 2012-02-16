@@ -3,13 +3,13 @@ package org.vipervm.dsl
 import org.vipervm.utils._
 import org.vipervm.runtime.data.Primitives._
 import org.vipervm.runtime.data
-import org.vipervm.runtime.{TmVar,TmApp,TmKernel,Term,Context,DataValue}
+import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
 
 abstract class Matrix2D[A:Primitive] {
   val term:Term
-  val context:Context
+  val symbols:SymbolTable
   val peer:Option[data.Matrix2D[A]]
 
   lazy val addkernel = new FMatAddKernel
@@ -17,20 +17,20 @@ abstract class Matrix2D[A:Primitive] {
 
   def +(m:Matrix2D[A]):Matrix2D[A] = {
     val myt = term
-    val myc = context
+    val myc = symbols
     new Matrix2D[A] {
       val term = TmApp(TmKernel("matadd"), Vector(myt, m.term))
-      val context = Context(myc.values ++ m.context.values, myc.kernels ++ m.context.kernels + ("matadd" -> addkernel))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.kernels ++ m.symbols.kernels + ("matadd" -> addkernel))
       val peer = None
     }
   }
 
   def *(m:Matrix2D[A]):Matrix2D[A] = {
     val myt = term
-    val myc = context
+    val myc = symbols
     new Matrix2D[A] {
       val term = TmApp(TmKernel("matmul"), Vector(myt, m.term))
-      val context = Context(myc.values ++ m.context.values, myc.kernels ++ m.context.kernels + ("matmul" -> mulkernel))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.kernels ++ m.symbols.kernels + ("matmul" -> mulkernel))
       val peer = None
     }
   }
@@ -45,7 +45,7 @@ object Matrix2D {
     new Matrix2D[A] {
       val term = TmVar(name)
       val peer = Some(new data.Matrix2D[A](width,height))
-      val context = Context(Map(name -> DataValue(peer.get)), Map.empty)
+      val symbols = SymbolTable(Map(name -> DataValue(peer.get)), Map.empty)
     }
   }
 }

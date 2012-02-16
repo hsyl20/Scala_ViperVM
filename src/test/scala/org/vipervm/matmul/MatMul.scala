@@ -23,6 +23,8 @@ import org.vipervm.runtime._
 import org.vipervm.runtime.data._
 import org.vipervm.runtime.scheduling.DefaultScheduler
 
+import org.vipervm.runtime.interpreter._
+
 import org.vipervm.library._
 
 import org.vipervm.parser.LispyParser
@@ -55,19 +57,19 @@ class TestMatMul extends FunSuite {
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMulEx(platform,prog.term, prog.context, a.peer.get, b.peer.get, c.peer.get)
+    testMatMulEx(platform,prog.term, prog.symbols, a.peer.get, b.peer.get, c.peer.get)
   }
 
 
-  private def testMatMulEx(platform:Platform,prog:Term,context:Context, a:Matrix2D[Float],b:Matrix2D[Float],c:Matrix2D[Float]):Unit = {
+  private def testMatMulEx(platform:Platform,prog:Term,symbols:SymbolTable, a:Matrix2D[Float],b:Matrix2D[Float],c:Matrix2D[Float]):Unit = {
     a.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
     b.initialize(platform, (x,y) => 2.0f )
     c.initialize(platform, (x,y) => 2.0f )
 
     val sched = new DefaultScheduler(platform)
-    val engine = new Engine(sched)
+    val engine = new Interpreter(sched)
 
-    val result = engine.evaluate(prog,context)
+    val result = engine.evaluate(prog,symbols)
 
     result.syncWait
 
@@ -86,13 +88,13 @@ class TestMatMul extends FunSuite {
     val matmul = new FMatMulKernel
     val matadd = new FMatAddKernel
 
-    val context = Context(
+    val symbols = SymbolTable(
       Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMulEx(platform,prog,context,a,b,c)
+    testMatMulEx(platform,prog,symbols,a,b,c)
   }
 
 

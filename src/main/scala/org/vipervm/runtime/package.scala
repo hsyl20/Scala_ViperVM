@@ -14,6 +14,7 @@
 package org.vipervm
 
 import org.vipervm.platform.{Buffer,DummyEvent}
+import org.vipervm.runtime.interpreter.{FutureValue,Value}
 
 package object runtime {
 

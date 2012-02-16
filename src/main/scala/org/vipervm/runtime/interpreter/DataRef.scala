@@ -11,17 +11,16 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.interpreter
 
-import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
-import org.vipervm.runtime.interpreter.Value
+class DataRef[T] {
+  
+  private var fvalue:T = null.asInstanceOf[T]
 
-/**
- * A functional kernel with its parameters
- */
-case class Task(kernel:TaskKernel, params:Seq[Value], result:Value) {
+  def value_=(value:T):Unit = fvalue = value
 
-  def makeKernelParams(memory:MemoryNode):Seq[KernelParameter] = kernel.makeKernelParams(params, memory)
+  def apply():T = fvalue
 
-  def canExecuteOn(proc:Processor):Boolean = kernel.canExecuteOn(proc)
+  def value:T = fvalue
 }
+

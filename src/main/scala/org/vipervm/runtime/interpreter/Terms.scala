@@ -11,17 +11,9 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.interpreter
 
-import org.vipervm.platform.{Kernel,KernelParameter,MemoryNode,Processor}
-import org.vipervm.runtime.interpreter.Value
-
-/**
- * A functional kernel with its parameters
- */
-case class Task(kernel:TaskKernel, params:Seq[Value], result:Value) {
-
-  def makeKernelParams(memory:MemoryNode):Seq[KernelParameter] = kernel.makeKernelParams(params, memory)
-
-  def canExecuteOn(proc:Processor):Boolean = kernel.canExecuteOn(proc)
-}
+sealed abstract class Term
+case class TmVar(name:String) extends Term
+case class TmKernel(name:String) extends Term
+case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term

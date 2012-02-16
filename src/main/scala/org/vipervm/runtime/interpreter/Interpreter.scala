@@ -21,7 +21,7 @@ import org.vipervm.utils._
 import scala.collection.mutable
 
 /**
- * An engine execute a given functional program
+ * Interpreter for functional programs
  */
 class Interpreter(scheduler:Scheduler) {
 

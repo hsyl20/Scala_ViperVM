@@ -70,7 +70,7 @@ class TestMatMul extends FunSuite {
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMul(platform,prog,symbols,a,b,c)
+    testMatMul(platform,prog.get,symbols,a,b,c)
   }
 
   test("R = A*B + A*C using DSL") {

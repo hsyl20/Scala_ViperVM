@@ -39,8 +39,8 @@ class TestMatMul extends FunSuite {
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = new FMatMulKernel
-    val matadd = new FMatAddKernel
+    val matmul = new MatMulFunction
+    val matadd = new MatAddFunction
 
     val symbols = SymbolTable(
       Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
@@ -61,8 +61,8 @@ class TestMatMul extends FunSuite {
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = new FMatMulKernel
-    val matadd = new FMatAddKernel
+    val matmul = new MatMulFunction
+    val matadd = new MatAddFunction
 
     val symbols = SymbolTable(
       Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),

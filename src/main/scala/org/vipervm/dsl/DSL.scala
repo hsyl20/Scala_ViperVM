@@ -12,15 +12,15 @@ abstract class Matrix2D[A:Primitive] {
   val symbols:SymbolTable
   val peer:Option[data.Matrix2D[A]]
 
-  lazy val addkernel = new FMatAddKernel
-  lazy val mulkernel = new FMatMulKernel
+  lazy val addFunc = new MatAddFunction
+  lazy val mulFunc = new MatMulFunction
 
   def +(m:Matrix2D[A]):Matrix2D[A] = {
     val myt = term
     val myc = symbols
     new Matrix2D[A] {
       val term = TmApp(TmKernel("matadd"), Vector(myt, m.term))
-      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.kernels ++ m.symbols.kernels + ("matadd" -> addkernel))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.functions ++ m.symbols.functions + ("matadd" -> addFunc))
       val peer = None
     }
   }
@@ -30,7 +30,7 @@ abstract class Matrix2D[A:Primitive] {
     val myc = symbols
     new Matrix2D[A] {
       val term = TmApp(TmKernel("matmul"), Vector(myt, m.term))
-      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.kernels ++ m.symbols.kernels + ("matmul" -> mulkernel))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.functions ++ m.symbols.functions + ("matmul" -> mulFunc))
       val peer = None
     }
   }

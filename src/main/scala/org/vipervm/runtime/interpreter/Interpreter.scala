@@ -14,7 +14,7 @@
 package org.vipervm.runtime.interpreter
 
 import org.vipervm.platform.{Event,FutureEvent}
-import org.vipervm.runtime.FunctionalKernel
+import org.vipervm.runtime.Function
 import org.vipervm.runtime.scheduling.Scheduler
 import org.vipervm.utils._
 
@@ -28,16 +28,16 @@ class Interpreter(scheduler:Scheduler) {
   def evaluate(expr:Term, symbols:SymbolTable):FutureValue = expr match {
     case TmVar(name)   => symbols.values(name)
     case TmApp(TmKernel(name),args)  => {
-      val k = symbols.kernels(name)
+      val k = symbols.functions(name)
       val params = args.par.map(x => evaluate(x,symbols)).seq
       submit(k, params, symbols)
     }
     case _ => ???
   }
 
-  private def submit(fkernel:FunctionalKernel, params:Vector[FutureValue], symbols:SymbolTable):FutureValue = {
+  private def submit(function:Function, params:Vector[FutureValue], symbols:SymbolTable):FutureValue = {
 
-    val ftask = fkernel.createTask(params)
+    val ftask = function.createTask(params)
     //We explicitly wait for task creation (even if it requires access to param
     //values)
     val task = ftask()

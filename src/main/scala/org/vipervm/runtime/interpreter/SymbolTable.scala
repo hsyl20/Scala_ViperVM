@@ -13,6 +13,6 @@
 
 package org.vipervm.runtime.interpreter
 
-import org.vipervm.runtime.FunctionalKernel
+import org.vipervm.runtime.Function
 
-case class SymbolTable(values:Map[String,FutureValue], kernels:Map[String,FunctionalKernel])
+case class SymbolTable(values:Map[String,FutureValue], functions:Map[String,Function])

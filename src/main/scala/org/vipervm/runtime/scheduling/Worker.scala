@@ -21,22 +21,11 @@ import org.vipervm.runtime.scheduling.Messages._
 import org.vipervm.utils._
 
 import scala.actors.Actor
-import scala.concurrent.Lock
-
-sealed abstract class DataState
-/** Data is present in memory */
-case object DataAvailable extends DataState
-/** Data isn't present in memory */
-case object DataUnavailable extends DataState
-/** Data is being transferred into memory */
-case object DataIncoming extends DataState
-/** Data is being transferred into another memory to prepare its eviction */
-case object DataOutgoing extends DataState
 
 /**
  * There is one worker per device.
  */
-class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging {
+class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with Logging {
 
   private var tasks:List[Task] = Nil
   private var currentTask:Option[Task] = None
@@ -69,7 +58,7 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
     case TaskComplete(task) => {
       assert(task == currentTask.get)
       
-      info("[Worker %s] Task complete: %s".format(this,task))
+      info("[Worker %d] Task complete: %s".format(id,task))
 
       /* Notify scheduler */
       scheduler ! TaskComplete(task)

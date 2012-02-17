@@ -21,7 +21,7 @@ import org.vipervm.runtime.scheduling.Messages._
 class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
 
   /* Create a worker per processor */
-  private val workers = platform.processors.map(new Worker(_,this))
+  private val workers = platform.processors.zipWithIndex.map(x => new Worker(x._1,this,x._2))
   /* Events associated with task completion */
   private var events:Map[Task,Event] = Map.empty
 

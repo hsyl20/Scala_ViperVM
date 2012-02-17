@@ -11,9 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests
-
-import org.scalatest.FunSuite
+package org.vipervm.apps
 
 import org.vipervm.platform.Platform
 import org.vipervm.platform.opencl.OpenCLDriver
@@ -28,26 +26,14 @@ import org.vipervm.runtime.interpreter._
 import org.vipervm.library._
 
 import org.vipervm.parsers.LispyParser
+import org.vipervm.dsl._
 
-class TestPolicies extends FunSuite {
+object Sample {
+  class SampleApp {
 
-  test("R = A*B + A*C using DefaultScheduler") {
-    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-    val sched = new DefaultScheduler(platform)
-
-    testMatMul(platform, sched)
-  }
-
-  test("R = A*B + A*C using DataAffinity scheduler policy") {
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
     val sched = new DefaultScheduler(platform) with DataAffinityPolicy
 
-    testMatMul(platform, sched)
-  }
-
-
-  private def testMatMul(platform:Platform, sched:Scheduler):Unit = {
-    import org.vipervm.dsl._
     val a = Matrix2D[Float](32,32)
     val b = Matrix2D[Float](32,32)
     val c = Matrix2D[Float](32,32)
@@ -62,6 +48,10 @@ class TestPolicies extends FunSuite {
     val result = interp.evaluate(program)
 
     result.syncWait
+
   }
 
+  def main(args:Array[String]):Unit = {
+    new SampleApp
+  }
 }

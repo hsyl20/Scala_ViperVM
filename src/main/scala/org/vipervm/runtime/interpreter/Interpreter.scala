@@ -14,7 +14,7 @@
 package org.vipervm.runtime.interpreter
 
 import org.vipervm.platform.{Event,FutureEvent,FutureData}
-import org.vipervm.runtime.Function
+import org.vipervm.runtime.{Function,Task}
 import org.vipervm.runtime.scheduling.Scheduler
 import org.vipervm.utils._
 
@@ -46,9 +46,13 @@ class Interpreter(scheduler:Scheduler) {
     val result = task.result
     val deps = params
 
-    val event = scheduler.submitTask(task,deps)
+    val event = submitTask(task,deps)
     
     new FutureData(result,event)
+  }
+
+  protected def submitTask(task:Task,deps:Seq[Event]):Event = {
+    scheduler.submitTask(task,deps)
   }
 }
 

@@ -1,6 +1,8 @@
 import sbt._
 import Keys._
 
+import com.github.retronym.SbtOneJar
+
 object MyProject extends Build {
   val buildOrganization = "org.vipervm"
   val buildName         = "ViperVM"
@@ -11,7 +13,7 @@ object MyProject extends Build {
 
   val replTaskKey = TaskKey[Unit]("run-repl", "Read-Eval-Print-Loop")
 
-  val mySettings = Defaults.defaultSettings ++ Seq (
+  val mySettings = Defaults.defaultSettings ++ SbtOneJar.oneJarSettings ++ Seq (
     organization := buildOrganization,
     name         := buildName,
     version      := buildVersion,
@@ -38,7 +40,8 @@ object MyProject extends Build {
     fullRunTask(replTaskKey, Test, "org.vipervm.fp.REPL"),
     fork in replTaskKey := true,
     outputStrategy in replTaskKey := Some(StdoutOutput),
-    connectInput in replTaskKey := true
+    connectInput in replTaskKey := true,
+    mainClass in SbtOneJar.oneJar := Some("org.vipervm.apps.Sample")
   )
 
   val myResolvers = Seq(
@@ -56,8 +59,6 @@ object MyProject extends Build {
     "org.clapper" %% "grizzled-slf4j" % "0.6.6",
     "org.scalaz" %% "scalaz-full" % "6.0.3",
     "org.scalatest" %% "scalatest" % "1.6.1",
-    "org.neo4j" % "neo4j" % "1.5",
-    "org.neo4s" %% "neo4s" % "0.1-SNAPSHOT",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

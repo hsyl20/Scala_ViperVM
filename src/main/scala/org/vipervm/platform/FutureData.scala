@@ -13,16 +13,6 @@
 
 package org.vipervm.platform
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-abstract class Kernel extends Prototyped {
-
-  /**
-   * Test if this kernel can be executed by the given processor
-   */
-  def canExecuteOn(proc:Processor): Boolean
-
+class FutureData(val data:Data, event:Event) extends FutureEvent(data,event) {
+  def this(data:Data) = this(data,DummyEvent)
 }

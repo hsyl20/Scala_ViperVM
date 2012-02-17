@@ -14,8 +14,7 @@
 package org.vipervm.runtime.data
 
 import org.vipervm.runtime.data.Primitives._
-import org.vipervm.platform.{Platform,BufferView2D,MemoryNode,HostBuffer,FutureEvent,UserEvent}
-import org.vipervm.runtime.Data
+import org.vipervm.platform._
 
 /**
  * 2D matrix

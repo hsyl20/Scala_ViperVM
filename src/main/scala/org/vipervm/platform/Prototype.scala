@@ -11,20 +11,15 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.data
+package org.vipervm.platform
 
-import org.vipervm.platform.{BufferView2D,MemoryNode}
-import org.vipervm.runtime.Data
-
-/**
- * Strided 2D raw data
- */
-class Strided2DRawData(width:Long,height:Long) extends Data {
-  type ViewType = BufferView2D
-
-  def allocate(memory:MemoryNode):BufferView2D = {
-    //TODO: manage padding correctly
-    val buffer = memory.allocate(width*height)
-    new BufferView2D(buffer, 0, width, height, 0)
-  }
+object Prototype {
+  def apply(ps:Parameter[_]*):List[Parameter[_]] = ps.toList
 }
+
+case class Parameter[A](mode:AccessMode, storage:Storage, name:String = "", description:String = "")
+
+sealed abstract class Storage
+case object HostStorage extends Storage
+case object DeviceStorage extends Storage
+

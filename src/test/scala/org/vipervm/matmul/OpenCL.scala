@@ -50,7 +50,7 @@ class OpenCL extends FixtureFunSuite {
 
 
   class Common {
-    val n = 100
+    val n = 100L
     val factor = 10
     val kernel = new DummyKernel
 
@@ -82,9 +82,9 @@ class OpenCL extends FixtureFunSuite {
     val hostOutBuf = hostMem.allocate(n * 4)
 
     val rand = new Random
-    val fb = hostBuf.byteBuffer.asFloatBuffer; 
-    for (i <- 0 until n) {
-      fb.put(i, rand.nextFloat)
+    val fb = hostBuf.peer
+    for (i <- 0L until n) {
+      fb.setFloat(i*4, rand.nextFloat)
     }
 
     val writeLink = platform.linkBetween(hostBuf, inBuf).getOrElse {
@@ -96,24 +96,19 @@ class OpenCL extends FixtureFunSuite {
     val inView = BufferView1D(inBuf, 0, n * 4L)
     val outView = BufferView1D(outBuf, 0, n * 4L)
 
-    val params = Seq(
-      BufferKernelParameter(inBuf),
-      BufferKernelParameter(outBuf),
-      IntKernelParameter(factor),
-      LongKernelParameter(n)
-    )
+    val params = Seq(inBuf, outBuf, factor, n)
 
     val readLink = platform.linkBetween(outBuf, hostOutBuf).getOrElse {
       throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
     }
 
     def check:Boolean = {
-      val fbout = hostOutBuf.byteBuffer.asFloatBuffer; 
+      val fbout = hostOutBuf.peer
 
       var chk = true
-      for (i <- 0 until n) {
-        val a = factor * fb.get(i)
-        val b = fbout.get(i)
+      for (i <- 0L until n) {
+        val a = factor * fb.getFloat(i*4)
+        val b = fbout.getFloat(i*4)
         if (a - b > 0.001) {
           println("Invalid value computed: %f vs %f".format(a,b))
           chk = false

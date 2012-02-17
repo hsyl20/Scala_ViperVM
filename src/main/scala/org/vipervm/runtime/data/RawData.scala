@@ -13,8 +13,7 @@
 
 package org.vipervm.runtime.data
 
-import org.vipervm.platform.{BufferView1D,MemoryNode}
-import org.vipervm.runtime.Data
+import org.vipervm.platform._
 
 /**
  * Contiguous raw data

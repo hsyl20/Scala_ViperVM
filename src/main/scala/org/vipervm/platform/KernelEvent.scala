@@ -13,4 +13,4 @@
 
 package org.vipervm.platform
 
-class KernelEvent(val kernel:Kernel, val args:Seq[KernelParameter], val processor:Processor, event:Event) extends BindedEvent(event)
+class KernelEvent(val kernel:Kernel, val args:Seq[Any], val processor:Processor, event:Event) extends BindedEvent(event)

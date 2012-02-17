@@ -1,3 +1,16 @@
+/*                                                  *\
+** \ \     / _)                   \ \     /   \  |  **
+**  \ \   /   |  __ \    _ \   __| \ \   /   |\/ |  **
+**   \ \ /    |  |   |   __/  |     \ \ /    |   |  **
+**    \_/    _|  .__/  \___| _|      \_/    _|  _|  **
+**              _|                                  **
+**                                                  **
+**       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
+**                                                  **
+**            http://www.vipervm.org                **
+**                     GPLv3                        **
+\*                                                  */
+
 package org.vipervm.dsl
 
 import org.vipervm.utils._
@@ -7,7 +20,7 @@ import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
 
-abstract class Matrix2D[A:Primitive] {
+abstract class Matrix2D[A:Primitive] extends Program {
   val term:Term
   val symbols:SymbolTable
   val peer:Option[data.Matrix2D[A]]
@@ -45,7 +58,7 @@ object Matrix2D {
     new Matrix2D[A] {
       val term = TmVar(name)
       val peer = Some(new data.Matrix2D[A](width,height))
-      val symbols = SymbolTable(Map(name -> DataValue(peer.get)), Map.empty)
+      val symbols = SymbolTable(Map(name -> peer.get), Map.empty)
     }
   }
 }

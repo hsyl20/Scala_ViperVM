@@ -11,13 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.interpreter
+package org.vipervm.platform.jvm
 
-import org.vipervm.runtime.Data
+sealed abstract class JVMKernelParameter
+case class JVMBufferKernelParameter(buffer:JVMBuffer) extends JVMKernelParameter
+case class JVMIntKernelParameter(value:Int)        extends JVMKernelParameter
+case class JVMLongKernelParameter(value:Long)      extends JVMKernelParameter
+case class JVMDoubleKernelParameter(value:Double)  extends JVMKernelParameter
+case class JVMFloatKernelParameter(value:Float)    extends JVMKernelParameter
 
-sealed abstract class Value
-
-case class DoubleValue(value:DataRef[Double]) extends Value
-case class FloatValue(value:DataRef[Float]) extends Value
-case class IntValue(value:DataRef[Int]) extends Value
-case class DataValue(value:Data) extends Value

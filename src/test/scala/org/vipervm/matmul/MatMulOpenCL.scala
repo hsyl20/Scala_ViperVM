@@ -84,15 +84,15 @@ class TestMatMulOpenCL extends FixtureFunSuite {
     val hostbBuf = hostMem.allocate(n * n * 4)
     val hostcBuf = hostMem.allocate(n * n * 4)
 
-    val fba = hostaBuf.byteBuffer.asFloatBuffer; 
-    val fbb = hostbBuf.byteBuffer.asFloatBuffer; 
-    val fbc = hostcBuf.byteBuffer.asFloatBuffer; 
+    val fba = hostaBuf.peer
+    val fbb = hostbBuf.peer
+    val fbc = hostcBuf.peer
 
     val rand = new Random
     for (i <- 0 until (n*n)) {
-      fba.put(i, rand.nextFloat*10f)
-      fbb.put(i, rand.nextFloat*10f)
-      fbc.put(i, 0f)
+      fba.setFloat(i*4, rand.nextFloat*10f)
+      fbb.setFloat(i*4, rand.nextFloat*10f)
+      fbc.setFloat(i*4, 0f)
     }
 
     val writeLink = platform.linkBetween(hostaBuf, aBuf).getOrElse {
@@ -106,12 +106,7 @@ class TestMatMulOpenCL extends FixtureFunSuite {
     val bView = BufferView1D(bBuf, 0, n * n * 4L)
     val cView = BufferView1D(cBuf, 0, n * n * 4L)
 
-    val params = Seq(
-      IntKernelParameter(n),
-      BufferKernelParameter(aBuf),
-      BufferKernelParameter(bBuf),
-      BufferKernelParameter(cBuf)
-    )
+    val params = Seq(n, aBuf, bBuf, cBuf)
 
     val readLink = platform.linkBetween(aBuf, hostaBuf).getOrElse {
       throw new Exception("Transfer between host and OpenCL memory impossible. Link not available")
@@ -120,8 +115,8 @@ class TestMatMulOpenCL extends FixtureFunSuite {
     def check:Boolean = {
       var chk = true
       for (i <- 0 until n; j <- 0 until n) {
-        val s = (for (k <- 0 until n) yield fba.get(i*n+k) * fbb.get(k*n+j)).sum
-        val t = fbc.get(j+i*n)
+        val s = (for (k <- 0 until n) yield fba.getFloat((i*n+k)*4) * fbb.getFloat((k*n+j)*4)).sum
+        val t = fbc.getFloat((j+i*n)*4)
         if (math.abs(s - t) > 0.001) {
           println("Invalid value computed: %f vs %f".format(s,t))
           chk = false

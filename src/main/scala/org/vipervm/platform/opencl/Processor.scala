@@ -56,7 +56,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
   /**
    * Execute the kernel with the specified parameters
    */
-  def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
+  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
 
     /* Check params */
     val config = kernel.configure(this, args) match {
@@ -72,11 +72,11 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
 
       /* Set parameters */
       for ((a,idx) <- config.parameters.zipWithIndex) a match {
-        case BufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, new PointerByReference(b.peer.peer).getPointer)
-        case IntKernelParameter(v) => k.setArg(idx, 4, new IntByReference(v).getPointer)
-        case LongKernelParameter(v) => k.setArg(idx, 8, new LongByReference(v).getPointer)
-        case DoubleKernelParameter(v) => k.setArg(idx, 8, new DoubleByReference(v).getPointer)
-        case FloatKernelParameter(v) => k.setArg(idx, 4, new FloatByReference(v).getPointer)
+        case OpenCLBufferKernelParameter(b) => k.setArg(idx, Pointer.SIZE, new PointerByReference(b.peer.peer).getPointer)
+        case OpenCLIntKernelParameter(v) => k.setArg(idx, 4, new IntByReference(v).getPointer)
+        case OpenCLLongKernelParameter(v) => k.setArg(idx, 8, new LongByReference(v).getPointer)
+        case OpenCLDoubleKernelParameter(v) => k.setArg(idx, 8, new DoubleByReference(v).getPointer)
+        case OpenCLFloatKernelParameter(v) => k.setArg(idx, 4, new FloatByReference(v).getPointer)
       }
 
       /* Enqueue kernel */

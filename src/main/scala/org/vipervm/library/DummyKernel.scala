@@ -30,16 +30,34 @@ class DummyKernel extends OpenCLKernel {
   val program = new OpenCLProgram(source)
   val name = "dummy"
 
-  val in = Param[BufferKernelParameter](0, ReadOnly)
-  val out = Param[BufferKernelParameter](1, ReadWrite)
-  val factor = Param[IntKernelParameter](2, ReadOnly)
-  val size = Param[LongKernelParameter](3, ReadOnly)
+  val in = Parameter[Buffer](
+    name = "in",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val out = Parameter[Buffer](
+    name = "out",
+    mode = ReadWrite,
+    storage = DeviceStorage
+  )
+  val factor = Parameter[Int](
+    name = "factor",
+    mode = ReadOnly,
+    storage = HostStorage
+  )
+  val size = Parameter[Long](
+    name = "size",
+    mode = ReadOnly,
+    storage = HostStorage
+  )
 
-  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = {
+  val prototype = Prototype(in,out,factor,size)
+
+  def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
-      globalWorkSize = List(size(params).value, 1, 1),
-      parameters = IndexedSeq(in(params), out(params), factor(params))
+      globalWorkSize = List(params(size), 1, 1),
+      parameters = IndexedSeq(params(in), params(out), params(factor))
     )
 
     Some(config)

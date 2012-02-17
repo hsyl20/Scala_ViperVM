@@ -11,18 +11,20 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.runtime.interpreter
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-abstract class Kernel extends Prototyped {
+trait Program {
+  val term:Term
+  val symbols:SymbolTable
+}
 
-  /**
-   * Test if this kernel can be executed by the given processor
-   */
-  def canExecuteOn(proc:Processor): Boolean
-
+object Program {
+  def apply(term:Term,symbols:SymbolTable):Program = {
+    val t = term
+    val s = symbols
+    new Program {
+      val term = t
+      val symbols = s
+    }
+  }
 }

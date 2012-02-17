@@ -16,7 +16,6 @@ package org.vipervm.runtime.scheduling
 import grizzled.slf4j.Logging
 import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup}
 import org.vipervm.runtime._
-import org.vipervm.runtime.interpreter.DataValue
 
 import org.vipervm.utils._
 
@@ -79,9 +78,11 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
       case k => k
     }
 
-    val datas = task.params.collect{ case DataValue(d) => d }
+    /* Some parameters must be allocated in device memory whilst some other
+       must be allocated in host memory. It depends on the kernel selected */
+    val (hostParams,deviceParams) = task.kernel.paramsPerStorage(task.params)
 
-    val futureViews = datas.map(data => data.viewIn(memory) match {
+    val futureViews = deviceParams.map(data => data.viewIn(memory) match {
       case Some(v) => FutureEvent(v)
       case None => {
         /* Allocate required buffers and views */

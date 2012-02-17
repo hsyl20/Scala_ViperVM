@@ -32,7 +32,7 @@ import org.vipervm.parser.LispyParser
 class TestMatMul extends FunSuite {
 
   test("R = A*B + A*C using AST") {
-    val prog = TmApp(TmKernel("matadd"), Vector(
+    val src = TmApp(TmKernel("matadd"), Vector(
       TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("b"))),
       TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("c")))))
 
@@ -43,16 +43,18 @@ class TestMatMul extends FunSuite {
     val matadd = new MatAddFunction
 
     val symbols = SymbolTable(
-      Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
+      Map("a" -> a, "b" -> b, "c" -> c),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMul(platform,prog,symbols,a,b,c)
+    val program = Program(src,symbols)
+
+    testMatMul(platform, program, a, b, c)
   }
 
   test("R = A*B + A*C using Lispy parser") {
-    val prog = LispyParser.parse("""
+    val src = LispyParser.parse("""
       (matadd 
         (matmul a b)
         (matmul a c))
@@ -65,12 +67,14 @@ class TestMatMul extends FunSuite {
     val matadd = new MatAddFunction
 
     val symbols = SymbolTable(
-      Map("a" -> DataValue(a), "b" -> DataValue(b), "c" -> DataValue(c)),
+      Map("a" -> a, "b" -> b, "c" -> c),
       Map("matmul" -> matmul, "matadd" -> matadd))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMul(platform,prog.get,symbols,a,b,c)
+    val program = Program(src.get,symbols)
+
+    testMatMul(platform, program, a, b, c)
   }
 
   test("R = A*B + A*C using DSL") {
@@ -78,15 +82,15 @@ class TestMatMul extends FunSuite {
     val a = Matrix2D[Float](32,32)
     val b = Matrix2D[Float](32,32)
     val c = Matrix2D[Float](32,32)
-    val prog = a*b + a*c
+    val program = a*b + a*c
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
-    testMatMul(platform,prog.term, prog.symbols, a.peer.get, b.peer.get, c.peer.get)
+    testMatMul(platform, program, a.peer.get, b.peer.get, c.peer.get)
   }
 
 
-  private def testMatMul(platform:Platform, prog:Term, symbols:SymbolTable, a:Matrix2D[Float], b:Matrix2D[Float], c:Matrix2D[Float]):Unit = {
+  private def testMatMul(platform:Platform, program:Program, a:Matrix2D[Float], b:Matrix2D[Float], c:Matrix2D[Float]):Unit = {
     a.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
     b.initialize(platform, (x,y) => 2.0f )
     c.initialize(platform, (x,y) => 2.0f )
@@ -94,16 +98,13 @@ class TestMatMul extends FunSuite {
     val sched = new DefaultScheduler(platform)
     val interp = new Interpreter(sched)
 
-    val result = interp.evaluate(prog,symbols)
+    val result = interp.evaluate(program)
 
     result.syncWait
 
-    val r = result.value match {
-      case DataValue(d) => d
-      case _ => throw new Exception("Invalid value returned")
-    }
+    val r = result.data.asInstanceOf[Matrix2D[Float]]
     
-    println(r.asInstanceOf[Matrix2D[Float]].print(platform)())
+    println(r.print(platform)())
   }
 
 }

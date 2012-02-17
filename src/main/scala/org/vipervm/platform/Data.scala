@@ -11,9 +11,8 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.platform
 
-import org.vipervm.platform.{BufferView,MemoryNode}
 import scala.collection.mutable.HashMap
 
 abstract class Data {

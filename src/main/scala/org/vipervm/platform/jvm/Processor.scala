@@ -23,7 +23,7 @@ class JVMProcessor extends Processor {
 
   def compile(kernel:Kernel):Unit = {}
 
-  def execute(kernel:Kernel, args:Seq[KernelParameter]): KernelEvent = {
+  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
     implicit def ker2ker(k:Kernel):JVMKernel =
       k.asInstanceOf[JVMKernel]
 
@@ -32,11 +32,11 @@ class JVMProcessor extends Processor {
 
     val ev = new JVMEvent(future { 
       kernel.fun(args.map { 
-        case BufferKernelParameter(b) => b.asInstanceOf[JVMBuffer]
-        case IntKernelParameter(v) => v
-        case LongKernelParameter(v) => v
-        case DoubleKernelParameter(v) => v 
-        case FloatKernelParameter(v) => v
+        case JVMBufferKernelParameter(b) => b.asInstanceOf[JVMBuffer]
+        case JVMIntKernelParameter(v) => v
+        case JVMLongKernelParameter(v) => v
+        case JVMDoubleKernelParameter(v) => v 
+        case JVMFloatKernelParameter(v) => v
       })
     })
 

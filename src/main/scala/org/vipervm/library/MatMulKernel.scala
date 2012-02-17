@@ -58,17 +58,36 @@ class MatMulKernel extends OpenCLKernel {
   val program = new OpenCLProgram(source)
   val name = "matrixMul"
 
-  val n = Param[IntKernelParameter](0, ReadOnly)
-  val a = Param[BufferKernelParameter](1, ReadOnly)
-  val b = Param[BufferKernelParameter](2, ReadOnly)
-  val c = Param[BufferKernelParameter](3, ReadWrite)
+  val n = Parameter[Int](
+    name = "n",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Width and height of matrices"
+  )
+  val a = Parameter[Buffer](
+    name = "a",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val b = Parameter[Buffer](
+    name = "b",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val c = Parameter[Buffer](
+    name = "c",
+    mode = ReadWrite,
+    storage = DeviceStorage
+  )
 
-  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = {
+  val prototype = Prototype(n,a,b,c)
+
+  def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
-      globalWorkSize = List(n(params).value, n(params).value, 1),
+      globalWorkSize = List(params(n), params(n), 1),
       localWorkSize = Some(List(32, 32/2, 1)),
-      parameters = IndexedSeq(n(params),a(params), b(params), c(params))
+      parameters = IndexedSeq(params(n),params(a), params(b), params(c))
     )
 
     Some(config)

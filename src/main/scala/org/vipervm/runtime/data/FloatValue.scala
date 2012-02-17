@@ -11,14 +11,26 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.runtime.data
 
-/**
- * Kernel parameter
- */
-sealed abstract class KernelParameter
-case class BufferKernelParameter(buffer:Buffer) extends KernelParameter
-case class IntKernelParameter(value:Int)        extends KernelParameter
-case class LongKernelParameter(value:Long)      extends KernelParameter
-case class DoubleKernelParameter(value:Double)  extends KernelParameter
-case class FloatKernelParameter(value:Float)    extends KernelParameter
+import org.vipervm.platform._
+
+import org.vipervm.utils._
+
+class FloatValue(platform:Platform) extends Value[Float] {
+  type ViewType = BufferView1D
+
+  def allocate(memory:MemoryNode):BufferView1D = {
+    val buffer = memory.allocate(4)
+    new BufferView1D(buffer, 0, 4)
+  }
+
+  /**
+   * Read value that *must* be in host memory
+   */
+  def value:Float = {
+    val view = viewIn(platform.hostMemory).get
+    val buf = view.buffer.asInstanceOf[HostBuffer].peer
+    buf.getFloat(view.offset)
+  }
+}

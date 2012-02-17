@@ -37,6 +37,11 @@ abstract class OpenCLKernel extends Kernel {
 
   private var peers: Map[OpenCLProcessor,cl.Kernel] = Map.empty
 
+  /** Cast parameters */
+  implicit def int2par(value:Int) = OpenCLIntKernelParameter(value)
+  implicit def buf2par(value:Buffer) = OpenCLBufferKernelParameter(value.asInstanceOf[OpenCLBuffer])
+  implicit def long2par(value:Long) = OpenCLLongKernelParameter(value)
+
   /** Source program */
   val program: OpenCLProgram
   /** Kernel name in the program */
@@ -68,7 +73,7 @@ abstract class OpenCLKernel extends Kernel {
   /**
    * Retrieve kernel configuration from parameters. Concrete kernels must implement this
    */
-  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]): Option[OpenCLKernelConfig]
+  def configure(device:OpenCLProcessor, params:Seq[Any]): Option[OpenCLKernelConfig]
 }
 
 /**
@@ -78,7 +83,7 @@ abstract class OpenCLKernel extends Kernel {
  * implementation decide how to break the global work-items into work-groups
  */
 case class OpenCLKernelConfig(
-  val parameters: IndexedSeq[KernelParameter],
+  val parameters: IndexedSeq[OpenCLKernelParameter],
   val globalWorkSize: List[Long],
   val localWorkSize: Option[List[Long]] = None 
 )

@@ -16,6 +16,7 @@ package org.vipervm.library
 import org.vipervm.platform.opencl._
 import org.vipervm.platform.host._
 import org.vipervm.platform._
+import org.vipervm.platform.Parameter._
 import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
 class MatAddKernel extends OpenCLKernel {
@@ -39,18 +40,42 @@ class MatAddKernel extends OpenCLKernel {
   val program = new OpenCLProgram(source)
   val name = "matrixAdd"
 
-  val width = Param[IntKernelParameter](0, ReadOnly)
-  val height = Param[IntKernelParameter](1, ReadOnly)
-  val a = Param[BufferKernelParameter](2, ReadOnly)
-  val b = Param[BufferKernelParameter](3, ReadOnly)
-  val c = Param[BufferKernelParameter](4, ReadWrite)
+  val width = Parameter[Int](
+    name = "width",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Width of matrices"
+  )
+  val height = Parameter[Int](
+    name = "height",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Height of matrices"
+  )
+  val a = Parameter[Buffer](
+    name = "a",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val b = Parameter[Buffer](
+    name = "b",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val c = Parameter[Buffer](
+    name = "c",
+    mode = ReadWrite,
+    storage = DeviceStorage
+  )
 
-  def configure(device:OpenCLProcessor, params:Seq[KernelParameter]) = {
+  val prototype = Prototype(width,height,a,b,c)
+
+  def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
-      globalWorkSize = List(width(params).value, height(params).value, 1),
+      globalWorkSize = List(params(width), params(height), 1),
       localWorkSize = None,
-      parameters = IndexedSeq(width(params),height(params), a(params), b(params), c(params))
+      parameters = IndexedSeq(params(width),params(height), params(a), params(b), params(c))
     )
 
     Some(config)

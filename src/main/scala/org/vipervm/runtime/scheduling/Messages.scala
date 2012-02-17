@@ -13,8 +13,8 @@
 
 package org.vipervm.runtime.scheduling
 
-import org.vipervm.runtime.{Task,Data}
-import org.vipervm.platform.{Event,DataTransfer}
+import org.vipervm.runtime.Task
+import org.vipervm.platform.{Event,Data,DataTransfer}
 
 case class SubmitTask(task:Task,deps:Seq[Event])
 case class TransferComplete(transfer:DataTransfer)

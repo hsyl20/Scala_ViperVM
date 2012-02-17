@@ -11,16 +11,26 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.interpreter
+package org.vipervm.runtime.data
 
-class DataRef[T] {
-  
-  private var fvalue:T = null.asInstanceOf[T]
+import org.vipervm.platform._
 
-  def value_=(value:T):Unit = fvalue = value
+import org.vipervm.utils._
 
-  def apply():T = fvalue
+class IntValue(platform:Platform) extends Value[Int] {
+  type ViewType = BufferView1D
 
-  def value:T = fvalue
+  def allocate(memory:MemoryNode):BufferView1D = {
+    val buffer = memory.allocate(4)
+    new BufferView1D(buffer, 0, 4)
+  }
+
+  /**
+   * Read value that *must* be in host memory
+   */
+  def value:Int = {
+    val view = viewIn(platform.hostMemory).get
+    val buf = view.buffer.asInstanceOf[HostBuffer].peer
+    buf.getInt(view.offset)
+  }
 }
-

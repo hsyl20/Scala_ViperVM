@@ -11,18 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.runtime
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-abstract class Kernel extends Prototyped {
+import org.vipervm.platform.{FutureEvent,FutureData}
 
-  /**
-   * Test if this kernel can be executed by the given processor
-   */
-  def canExecuteOn(proc:Processor): Boolean
+trait Function {
+
+  val peer:TaskKernel
+
+  def createTask(args:Seq[FutureData]): FutureEvent[Task]
 
 }

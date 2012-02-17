@@ -11,15 +11,16 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.data
 
-import org.vipervm.platform.{Kernel,KernelParameter,FutureEvent}
-import org.vipervm.runtime.interpreter.FutureValue
+import org.vipervm.platform._
 
-trait Function {
+/**
+ * A data that can be used in the JVM
+ */
+abstract class Value[A] extends Data {
 
-  val peer:TaskKernel
-
-  def createTask(args:Seq[FutureValue]): FutureEvent[Task]
+  /** Return the value. It needs to be stored in host memory */
+  def value:A
 
 }

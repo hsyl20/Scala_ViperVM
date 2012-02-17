@@ -13,13 +13,13 @@
 
 package org.vipervm
 
-import org.vipervm.platform.{Buffer,DummyEvent}
-import org.vipervm.runtime.interpreter.{FutureValue,Value}
+import org.vipervm.platform.{Buffer,DummyEvent,Data,FutureData}
 
 package object runtime {
 
   implicit def bufferWrapper(buffer:Buffer) = new BufferWrapper(buffer)
 
-  implicit def value2futureValue(value:Value):FutureValue = new FutureValue(value,DummyEvent)
+  implicit def data2futureData(data:Data):FutureData = new FutureData(data,DummyEvent)
+
 }
 

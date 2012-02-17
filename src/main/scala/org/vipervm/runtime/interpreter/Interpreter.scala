@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime.interpreter
 
-import org.vipervm.platform.{Event,FutureEvent}
+import org.vipervm.platform.{Event,FutureEvent,FutureData}
 import org.vipervm.runtime.Function
 import org.vipervm.runtime.scheduling.Scheduler
 import org.vipervm.utils._
@@ -25,7 +25,9 @@ import scala.collection.mutable
  */
 class Interpreter(scheduler:Scheduler) {
 
-  def evaluate(expr:Term, symbols:SymbolTable):FutureValue = expr match {
+  def evaluate(program:Program):FutureData = evaluate(program.term,program.symbols)
+
+  def evaluate(expr:Term, symbols:SymbolTable):FutureData = expr match {
     case TmVar(name)   => symbols.values(name)
     case TmApp(TmKernel(name),args)  => {
       val k = symbols.functions(name)
@@ -35,7 +37,7 @@ class Interpreter(scheduler:Scheduler) {
     case _ => ???
   }
 
-  private def submit(function:Function, params:Vector[FutureValue], symbols:SymbolTable):FutureValue = {
+  private def submit(function:Function, params:Vector[FutureData], symbols:SymbolTable):FutureData = {
 
     val ftask = function.createTask(params)
     //We explicitly wait for task creation (even if it requires access to param
@@ -46,7 +48,7 @@ class Interpreter(scheduler:Scheduler) {
 
     val event = scheduler.submitTask(task,deps)
     
-    new FutureValue(result,event)
+    new FutureData(result,event)
   }
 }
 

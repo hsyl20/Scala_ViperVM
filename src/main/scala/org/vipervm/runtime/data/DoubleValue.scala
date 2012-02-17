@@ -11,18 +11,26 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.runtime.data
 
-/**
- * A kernel 
- *
- * Backends provide concrete implementations
- */
-abstract class Kernel extends Prototyped {
+import org.vipervm.platform._
+
+import org.vipervm.utils._
+
+class DoubleValue(platform:Platform) extends Value[Double] {
+  type ViewType = BufferView1D
+
+  def allocate(memory:MemoryNode):BufferView1D = {
+    val buffer = memory.allocate(8)
+    new BufferView1D(buffer, 0, 8)
+  }
 
   /**
-   * Test if this kernel can be executed by the given processor
+   * Read value that *must* be in host memory
    */
-  def canExecuteOn(proc:Processor): Boolean
-
+  def value:Double = {
+    val view = viewIn(platform.hostMemory).get
+    val buf = view.buffer.asInstanceOf[HostBuffer].peer
+    buf.getDouble(view.offset)
+  }
 }

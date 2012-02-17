@@ -11,6 +11,8 @@
 **                     GPLv3                        **
 \*                                                  */
 
+package org.vipervm.tests.codegen
+
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 

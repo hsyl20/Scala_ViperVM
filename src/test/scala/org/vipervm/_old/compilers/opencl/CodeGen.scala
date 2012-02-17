@@ -11,23 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package demos.codegen
+package org.vipervm.tests.codegen
+
+import org.scalatest.FunSuite
 
 import org.vipervm.codegen.opencl._
 
-class CodeGen {
-   val code = new CLCode {
+class TestCodeGen extends FunSuite {
+
+  test("Basic code generation") {
+    val code = new CLCode {
       'a :- CFloat := "1.0"
       'b :- CFloat := "2.0"
       'c := 'a + 'b
-   }
+    }
 
-   println(code)
-}
-
-
-object Main {
-   def main(args:Array[String]): Unit = {
-      new CodeGen     
-   }
+    println(code)
+  }
 }

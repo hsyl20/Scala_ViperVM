@@ -16,6 +16,7 @@ package org.vipervm.runtime.scheduling
 import scala.actors.Actor
 import org.vipervm.platform.{Event,Platform}
 import org.vipervm.runtime.Task
+import org.vipervm.runtime.scheduling.Messages._
 
 abstract class Scheduler extends Actor {
 

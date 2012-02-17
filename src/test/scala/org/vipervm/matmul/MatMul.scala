@@ -27,7 +27,7 @@ import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
 
-import org.vipervm.parser.LispyParser
+import org.vipervm.parsers.LispyParser
 
 class TestMatMul extends FunSuite {
 

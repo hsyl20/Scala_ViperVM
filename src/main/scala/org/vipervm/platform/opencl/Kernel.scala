@@ -38,9 +38,11 @@ abstract class OpenCLKernel extends Kernel {
   private var peers: Map[OpenCLProcessor,cl.Kernel] = Map.empty
 
   /** Cast parameters */
-  implicit def int2par(value:Int) = OpenCLIntKernelParameter(value)
-  implicit def buf2par(value:Buffer) = OpenCLBufferKernelParameter(value.asInstanceOf[OpenCLBuffer])
-  implicit def long2par(value:Long) = OpenCLLongKernelParameter(value)
+  protected implicit def buf2par(value:Buffer) = OpenCLBufferKernelParameter(value.asInstanceOf[OpenCLBuffer])
+  protected implicit def int2par(value:Int) = OpenCLIntKernelParameter(value)
+  protected implicit def long2par(value:Long) = OpenCLLongKernelParameter(value)
+  protected implicit def float2par(value:Float) = OpenCLFloatKernelParameter(value)
+  protected implicit def double2par(value:Double) = OpenCLDoubleKernelParameter(value)
 
   /** Source program */
   val program: OpenCLProgram

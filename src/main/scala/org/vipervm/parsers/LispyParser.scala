@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.parser
+package org.vipervm.parsers
 
 import scala.util.parsing.combinator.syntactical._
 

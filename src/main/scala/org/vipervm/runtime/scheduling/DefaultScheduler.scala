@@ -16,11 +16,13 @@ package org.vipervm.runtime.scheduling
 import grizzled.slf4j.Logging
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.scheduling.Messages._
 
 class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
 
   /* Create a worker per processor */
   private val workers = platform.processors.map(new Worker(_,this))
+  /* Events associated with task completion */
   private var events:Map[Task,Event] = Map.empty
 
   start
@@ -51,6 +53,10 @@ class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
     }
   }
 
+  /** 
+   * Select the worker that will execute the task amongst valid workers (i.e. for which
+   * there is at least one compatible kernel).
+   */
   def selectWorker(workers:Seq[Worker],task:Task):Worker = workers.head
 
 }

@@ -33,7 +33,6 @@ object MyProject extends Build {
     scalacOptions += "-P:continuations:enable",
 
     /* Tasks */
-    fullRunTask(TaskKey[Unit]("run-demo-codegen", "C Code generation demo"), Test, "demos.codegen.Main"),
     fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Test, "org.vipervm.apps.Profiler"),
     fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Test, "org.vipervm.apps.Info"),
     fullRunTask(replTaskKey, Test, "org.vipervm.fp.REPL"),

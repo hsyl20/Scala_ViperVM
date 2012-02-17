@@ -4,7 +4,7 @@ trait Prototyped {
 
   val prototype:List[Parameter[_]]
 
-  implicit def paramExtractor(params:Seq[Any]) = new {
+  protected implicit def paramExtractor(params:Seq[Any]) = new {
     def apply[A:Manifest](param:Parameter[A]) = try {
       params(prototype.indexOf(param)).asInstanceOf[A]
     }

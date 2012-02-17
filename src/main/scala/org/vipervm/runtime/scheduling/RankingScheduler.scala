@@ -13,16 +13,17 @@
 
 package org.vipervm.runtime.scheduling
 
-import scala.actors.Actor
-import org.vipervm.platform.{Event,Platform}
-import org.vipervm.runtime.Task
+import org.vipervm.platform._
+import org.vipervm.runtime._
 
-abstract class Scheduler extends Actor {
+trait RankingPolicy extends DefaultScheduler {
 
-  val platform:Platform
+  def rankWorker(task:Task)(worker:Worker):Float = 1.0f
 
-  def submitTask(task:Task,deps:Seq[Event]):Event = {
-    (this !? SubmitTask(task,deps)).asInstanceOf[Event]
+  override def selectWorker(workers:Seq[Worker],task:Task):Worker = {
+    val rankedWorker = (workers zip workers.map(rankWorker(task))).sortBy(_._2)
+    rankedWorker.head._1
   }
 
 }
+

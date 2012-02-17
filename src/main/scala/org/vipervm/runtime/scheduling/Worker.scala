@@ -14,13 +14,23 @@
 package org.vipervm.runtime.scheduling
 
 import grizzled.slf4j.Logging
-import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup}
+import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data}
 import org.vipervm.runtime._
 
 import org.vipervm.utils._
 
 import scala.actors.Actor
 import scala.concurrent.Lock
+
+sealed abstract class DataState
+/** Data is present in memory */
+case object DataAvailable extends DataState
+/** Data isn't present in memory */
+case object DataUnavailable extends DataState
+/** Data is being transferred into memory */
+case object DataIncoming extends DataState
+/** Data is being transferred into another memory to prepare its eviction */
+case object DataOutgoing extends DataState
 
 /**
  * There is one worker per device.
@@ -32,9 +42,17 @@ class Worker(val proc:Processor, scheduler:Scheduler) extends Actor with Logging
 
   private val memory = proc.memory
 
+  private var datas:Map[Data,DataState] = Map.empty
+
+  def dataState(data:Data):DataState = (this !? QueryDataState(data)).asInstanceOf[DataState]
+
   start
 
   def act:Unit = loop { react {
+
+    case QueryDataState(data) => {
+      sender ! datas.getOrElse(data, DataUnavailable)
+    }
 
     case ExecuteTask(task) => {
 

@@ -13,16 +13,23 @@
 
 package org.vipervm.runtime.scheduling
 
-import scala.actors.Actor
-import org.vipervm.platform.{Event,Platform}
-import org.vipervm.runtime.Task
+import org.vipervm.platform._
+import org.vipervm.runtime._
 
-abstract class Scheduler extends Actor {
+trait DataAffinityPolicy extends RankingPolicy {
 
-  val platform:Platform
+  val dataAffinityCoef = 1.0f
 
-  def submitTask(task:Task,deps:Seq[Event]):Event = {
-    (this !? SubmitTask(task,deps)).asInstanceOf[Event]
+  private def rankState(state:DataState):Float = state match {
+    case DataUnavailable => -1.0f
+    case DataAvailable => 1.0f
+    case DataIncoming => 0.8f
+    case DataOutgoing => 0.4f
+  }
+
+  override def rankWorker(task:Task)(worker:Worker):Float = {
+    val r = task.params.map(x => rankState(worker.dataState(x))).sum
+    (r * dataAffinityCoef) + super.rankWorker(task)(worker)
   }
 
 }

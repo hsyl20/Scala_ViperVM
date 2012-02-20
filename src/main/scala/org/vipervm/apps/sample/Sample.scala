@@ -30,15 +30,15 @@ import org.vipervm.dsl._
 
 import org.vipervm.profiling.SLF4JProfiler
 
-private class SampleApp {
+private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
   val profiler = new SLF4JProfiler
   val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy
 
-  val a = Matrix2D[Float](32,32)
-  val b = Matrix2D[Float](32,32)
-  val c = Matrix2D[Float](32,32)
+  val a = Matrix2D[Float](size,size)
+  val b = Matrix2D[Float](size,size)
+  val c = Matrix2D[Float](size,size)
   val program = a*b + a*c
 
   a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
@@ -51,14 +51,21 @@ private class SampleApp {
 
   result.syncWait
 
-  val r = result.data.asInstanceOf[data.Matrix2D[Float]]
-  
-  println(r.print(platform)())
+  if (size < 64) {
+    val r = result.data.asInstanceOf[data.Matrix2D[Float]]
+    println(r.print(platform)())
+  }
+  else {
+    println("Printing disabled (size of the matrices too big)")
+  }
+
+  sys.exit(0)
 }
 
 
 object Sample {
   def main(args:Array[String]):Unit = {
-    new SampleApp
+    if (args.length != 0)
+    new SampleApp(args(0).toInt)
   }
 }

@@ -15,7 +15,7 @@ package org.vipervm.profiling
 
 object DummyProfiler extends Profiler {
 
-  def reactions = {
+  def reactions(e:ProfilingEvent):Unit = e match {
     case _ => ()
   }
 }

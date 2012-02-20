@@ -16,9 +16,12 @@ package org.vipervm.profiling
 import scala.actors._
 
 abstract class Profiler extends Actor {
-  def reactions:PartialFunction[Any,Unit]
+  def reactions(e:ProfilingEvent):Unit
 
-  def act = loop { react { reactions }}
+  def act = loop { react { 
+    case e:ProfilingEvent => reactions(e)
+    case e => throw new Exception("Invalid profiling event %s".format(e))
+  }}
 
   start
 }

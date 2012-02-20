@@ -11,14 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.profiling
 
-/**
- * Data transfer
- *
- * @param link    Link handling the transfer
- * @param source  Source buffer view
- * @param target  Target buffer view
- * @param event   Event indicating data transfer completion
- */
-case class DataTransfer(link:Link,source:BufferView,target:BufferView,event:Event) extends BindedEvent(event)
+object DummyProfiler extends Profiler {
+
+  def reactions = {
+    case _ => ()
+  }
+}
+

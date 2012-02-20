@@ -11,14 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform
+package org.vipervm.profiling
 
-/**
- * Data transfer
- *
- * @param link    Link handling the transfer
- * @param source  Source buffer view
- * @param target  Target buffer view
- * @param event   Event indicating data transfer completion
- */
-case class DataTransfer(link:Link,source:BufferView,target:BufferView,event:Event) extends BindedEvent(event)
+import org.vipervm.platform._
+import org.vipervm.runtime._
+
+sealed abstract class ProfilingEvent {
+  val timestamp = System.nanoTime
+}
+
+case class DataTransferStart(data:Data,dataTransfer:DataTransfer) extends ProfilingEvent
+case class DataTransferEnd(data:Data,dataTransfer:DataTransfer) extends ProfilingEvent
+case class TaskAssigned(task:Task,proc:Processor) extends ProfilingEvent
+case class TaskStart(task:Task,kernel:Kernel,proc:Processor) extends ProfilingEvent
+case class TaskCompleted(task:Task,proc:Processor) extends ProfilingEvent

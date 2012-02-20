@@ -13,15 +13,15 @@
 
 package org.vipervm.runtime.scheduling
 
-import grizzled.slf4j.Logging
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.scheduling.Messages._
+import org.vipervm.profiling.{Profiler,DummyProfiler}
 
-class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
+class DefaultScheduler(val platform:Platform, val profiler:Profiler = DummyProfiler) extends Scheduler {
 
   /* Create a worker per processor */
-  private val workers = platform.processors.zipWithIndex.map(x => new Worker(x._1,this,x._2))
+  private val workers = platform.processors.map(x => new Worker(x,this,profiler))
   /* Events associated with task completion */
   private var events:Map[Task,Event] = Map.empty
 
@@ -35,7 +35,6 @@ class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
 
         EventGroup(deps:_*).willTrigger {
           val w = selectWorker(workers.filter(_.canExecute(task)), task)
-          info("[DefaultScheduler] Submit task %s to worker %s".format(task,w))
           w ! ExecuteTask(task)
         }
 
@@ -46,7 +45,6 @@ class DefaultScheduler(val platform:Platform) extends Scheduler with Logging {
         val ev = events(task)
         events -= task
 
-        info("[DefaultScheduler] Completed task %s".format(task))	
         ev.complete
       }
 

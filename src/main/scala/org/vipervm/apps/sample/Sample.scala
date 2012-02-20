@@ -28,29 +28,36 @@ import org.vipervm.library._
 import org.vipervm.parsers.LispyParser
 import org.vipervm.dsl._
 
+import org.vipervm.profiling.SLF4JProfiler
+
+private class SampleApp {
+
+  val platform = Platform(DefaultHostDriver, new OpenCLDriver)
+  val profiler = new SLF4JProfiler
+  val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy
+
+  val a = Matrix2D[Float](32,32)
+  val b = Matrix2D[Float](32,32)
+  val c = Matrix2D[Float](32,32)
+  val program = a*b + a*c
+
+  a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
+  b.peer.get.initialize(platform, (x,y) => 2.0f )
+  c.peer.get.initialize(platform, (x,y) => 2.0f )
+
+  val interp = new Interpreter(sched)
+
+  val result = interp.evaluate(program)
+
+  result.syncWait
+
+  val r = result.data.asInstanceOf[data.Matrix2D[Float]]
+  
+  println(r.print(platform)())
+}
+
+
 object Sample {
-  class SampleApp {
-
-    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-    val sched = new DefaultScheduler(platform) with DataAffinityPolicy
-
-    val a = Matrix2D[Float](32,32)
-    val b = Matrix2D[Float](32,32)
-    val c = Matrix2D[Float](32,32)
-    val program = a*b + a*c
-
-    a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
-    b.peer.get.initialize(platform, (x,y) => 2.0f )
-    c.peer.get.initialize(platform, (x,y) => 2.0f )
-
-    val interp = new Interpreter(sched)
-
-    val result = interp.evaluate(program)
-
-    result.syncWait
-
-  }
-
   def main(args:Array[String]):Unit = {
     new SampleApp
   }

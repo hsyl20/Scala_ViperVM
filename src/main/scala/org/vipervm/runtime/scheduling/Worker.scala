@@ -13,10 +13,11 @@
 
 package org.vipervm.runtime.scheduling
 
-import grizzled.slf4j.Logging
 import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data}
 import org.vipervm.runtime._
 import org.vipervm.runtime.scheduling.Messages._
+
+import org.vipervm.profiling._
 
 import org.vipervm.utils._
 
@@ -25,7 +26,7 @@ import scala.actors.Actor
 /**
  * There is one worker per device.
  */
-class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with Logging {
+class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends Actor {
 
   private var tasks:List[Task] = Nil
   private var currentTask:Option[Task] = None
@@ -45,6 +46,7 @@ class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with
     }
 
     case ExecuteTask(task) => {
+      profiler ! TaskAssigned(task,proc)
 
       if (currentTask.isDefined) {
         tasks ::= task
@@ -58,9 +60,8 @@ class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with
     case TaskComplete(task) => {
       assert(task == currentTask.get)
       
-      info("[Worker %d] Task complete: %s".format(id,task))
+      profiler ! TaskCompleted(task,proc)
 
-      /* Notify scheduler */
       scheduler ! TaskComplete(task)
 
       /* Execute another task, if any */
@@ -78,7 +79,6 @@ class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with
   private def executeTask(task:Task):Unit = {
     currentTask = Some(task)
 
-    info("[Worker %s] Execute task: %s".format(this,task))
 
     /* Select kernel */
     val kernel = task.kernel.peer match {
@@ -111,10 +111,12 @@ class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with
           val link = scheduler.platform.linkBetween(source,view).get
           
           val transfer = link.copy(source,view)
+          profiler ! DataTransferStart(data,transfer)
 
           /* Schedule data-view association */
           val assocEvent = new UserEvent
           transfer.willTrigger {
+            profiler ! DataTransferEnd(data,transfer)
             data.store(view)
             assocEvent.complete
           }
@@ -132,6 +134,8 @@ class Worker(val proc:Processor, scheduler:Scheduler, id:Int) extends Actor with
 
       /* Schedule kernel execution */
       val ev = proc.execute(kernel, task.makeKernelParams(memory))
+
+      profiler ! TaskStart(task,kernel,proc)
 
       /* Schedule notification after kernel execution */
       ev.willTrigger {

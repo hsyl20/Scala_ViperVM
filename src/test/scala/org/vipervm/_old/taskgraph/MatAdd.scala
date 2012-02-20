@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.tests
+package org.vipervm.tests.taskgraph
 
 import org.vipervm.platform.{ReadOnly,ReadWrite}
 import org.vipervm.taskgraph._

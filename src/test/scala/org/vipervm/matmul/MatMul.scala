@@ -27,9 +27,11 @@ import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
 
+import org.vipervm.profiling.SLF4JProfiler
+
 import org.vipervm.parsers.LispyParser
 
-class TestMatMul extends FunSuite {
+class MatMul extends FunSuite {
 
   test("R = A*B + A*C using AST") {
     val src = TmApp(TmKernel("matadd"), Vector(
@@ -95,7 +97,8 @@ class TestMatMul extends FunSuite {
     b.initialize(platform, (x,y) => 2.0f )
     c.initialize(platform, (x,y) => 2.0f )
 
-    val sched = new DefaultScheduler(platform)
+    val profiler = new SLF4JProfiler
+    val sched = new DefaultScheduler(platform,profiler)
     val interp = new Interpreter(sched)
 
     val result = interp.evaluate(program)

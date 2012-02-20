@@ -29,7 +29,7 @@ import java.util.Random
 import scala.util.continuations._
 
 
-class TestMatMulOpenCL extends FixtureFunSuite {
+class MatMulOpenCL extends FixtureFunSuite {
 
   type FixtureParam = Common
 

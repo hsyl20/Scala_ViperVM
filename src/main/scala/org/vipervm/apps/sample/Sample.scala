@@ -33,7 +33,6 @@ import org.vipervm.profiling._
 private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-//  val profiler = new SLF4JProfiler
   val profiler = new SVGProfiler(platform)
   val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy with LoadBalancingPolicy
 
@@ -42,7 +41,7 @@ private class SampleApp(size:Long = 32) {
   val a = Matrix2D[Float](size,size)
   val b = Matrix2D[Float](size,size)
   val c = Matrix2D[Float](size,size)
-  val program = a*b + a*c
+  val program = a*b + a*c + b*c
 
   a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
   b.peer.get.initialize(platform, (x,y) => 2.0f )

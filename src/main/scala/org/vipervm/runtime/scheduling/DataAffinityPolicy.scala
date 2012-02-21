@@ -21,15 +21,15 @@ trait DataAffinityPolicy extends RankingPolicy {
   val dataAffinityCoef = 1.0f
 
   private def rankState(state:DataState):Float = state match {
-    case DataUnavailable => -1.0f
+    case DataUnavailable => 0.0f
     case DataAvailable => 1.0f
     case DataIncoming => 0.8f
     case DataOutgoing => 0.4f
   }
 
-  override def rankWorker(task:Task)(worker:Worker):Float = {
+  override def rankWorker(task:Task,worker:Worker,current:Float):Float = {
     val r = task.params.map(x => rankState(worker.dataState(x))).sum
-    (r * dataAffinityCoef) + super.rankWorker(task)(worker)
+    super.rankWorker(task, worker, current + r * dataAffinityCoef)
   }
 
 }

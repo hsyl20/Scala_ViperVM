@@ -21,12 +21,12 @@ trait LoadBalancingPolicy extends RankingPolicy {
   val loadBalancingCoef = 1.0f
 
   private def rankStatus(status:LoadStatus):Float = {
-    1.0f/status.taskCount.toFloat
+    1.0f / (status.taskCount.toFloat + 1.0f)
   }
 
-  override def rankWorker(task:Task)(worker:Worker):Float = {
+  override def rankWorker(task:Task,worker:Worker,current:Float):Float = {
     val r = rankStatus(worker.loadStatus)
-    (r * loadBalancingCoef) + super.rankWorker(task)(worker)
+    super.rankWorker(task, worker, current + r * loadBalancingCoef)
   }
 
 }

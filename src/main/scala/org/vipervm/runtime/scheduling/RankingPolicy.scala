@@ -18,10 +18,11 @@ import org.vipervm.runtime._
 
 trait RankingPolicy extends DefaultScheduler {
 
-  def rankWorker(task:Task)(worker:Worker):Float = 1.0f
+  def rankWorker(task:Task,worker:Worker,current:Float):Float = current
 
   override def selectWorker(workers:Seq[Worker],task:Task):Worker = {
-    val rankedWorker = (workers zip workers.map(rankWorker(task))).sortBy(_._2).reverse
+    val rankedWorker = (workers zip workers.map(w => rankWorker(task,w,1.0f))).sortBy(_._2).reverse
+    rankedWorker.foreach(println)
     rankedWorker.head._1
   }
 

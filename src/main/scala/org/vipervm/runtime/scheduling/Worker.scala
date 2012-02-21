@@ -48,7 +48,7 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends
     }
 
     case QueryLoadStatus => {
-      sender ! LoadStatus(tasks.length)
+      sender ! LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))
     }
 
     case ExecuteTask(task) => {

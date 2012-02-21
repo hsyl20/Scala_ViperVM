@@ -2,6 +2,8 @@ import sbt._
 import Keys._
 
 import com.github.retronym.SbtOneJar
+import sbtassembly.Plugin._
+import AssemblyKeys._
 
 object MyProject extends Build {
   val buildOrganization = "org.vipervm"
@@ -13,7 +15,7 @@ object MyProject extends Build {
 
   val replTaskKey = TaskKey[Unit]("run-repl", "Read-Eval-Print-Loop")
 
-  val mySettings = Defaults.defaultSettings ++ SbtOneJar.oneJarSettings ++ Seq (
+  val mySettings = Defaults.defaultSettings ++ SbtOneJar.oneJarSettings ++ assemblySettings ++ Seq (
     organization := buildOrganization,
     name         := buildName,
     version      := buildVersion,
@@ -42,7 +44,13 @@ object MyProject extends Build {
     fork in replTaskKey := true,
     outputStrategy in replTaskKey := Some(StdoutOutput),
     connectInput in replTaskKey := true,
-    mainClass in SbtOneJar.oneJar := Some("org.vipervm.apps.Sample")
+
+    /* One-jar options */
+    mainClass in SbtOneJar.oneJar := Some("org.vipervm.apps.Sample"),
+
+    /* Assembly options */
+    mainClass in assembly := Some("org.vipervm.apps.Sample"),
+    test in assembly := {}
   )
 
   val myResolvers = Seq(
@@ -62,6 +70,7 @@ object MyProject extends Build {
     "org.scalatest" %% "scalatest" % "1.6.1",
     "batik" % "batik-svggen" % "1.6-1",
     "batik" % "batik-swing" % "1.6-1",
+    "batik" % "batik-css" % "1.6-1",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

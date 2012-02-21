@@ -37,12 +37,18 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends
 
   def dataState(data:Data):DataState = (this !? QueryDataState(data)).asInstanceOf[DataState]
 
+  def loadStatus:LoadStatus = (this !? QueryLoadStatus).asInstanceOf[LoadStatus]
+
   start
 
   def act:Unit = loop { react {
 
     case QueryDataState(data) => {
       sender ! datas.getOrElse(data, DataUnavailable)
+    }
+
+    case QueryLoadStatus => {
+      sender ! LoadStatus(tasks.length)
     }
 
     case ExecuteTask(task) => {

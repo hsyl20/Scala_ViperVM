@@ -11,19 +11,24 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform.host
+package org.vipervm.runtime.scheduling
 
-import org.vipervm.platform._
+import org.vipervm.runtime._
+import org.vipervm.runtime.scheduling.Messages.LoadStatus
 
-class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends HostProcessor {
+trait LoadBalancingPolicy extends RankingPolicy {
 
-  type MemoryNodeType = DefaultHostMemoryNode
+  val loadBalancingCoef = 1.0f
 
-  val memories = List(mem)
-
-  def compile(kernel:Kernel):Unit = {}
-
-  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
-    throw new Exception("Unable to execute kernels (not implemented)")
+  private def rankStatus(status:LoadStatus):Float = {
+    1.0f/status.taskCount.toFloat
   }
+
+  override def rankWorker(task:Task)(worker:Worker):Float = {
+    val r = rankStatus(worker.loadStatus)
+    (r * loadBalancingCoef) + super.rankWorker(task)(worker)
+  }
+
 }
+
+

@@ -34,7 +34,7 @@ private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 //  val profiler = new SLF4JProfiler
-  val profiler = new SVGProfiler
+  val profiler = new SVGProfiler(platform)
   val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy
 
   val frame = Profiler.dynamicRendering(profiler)
@@ -62,7 +62,7 @@ private class SampleApp(size:Long = 32) {
     println("Printing disabled (size of the matrices too big)")
   }
 
-  profiler.print
+  profiler.save("profile.svg")
 }
 
 

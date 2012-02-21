@@ -14,12 +14,14 @@
 package org.vipervm.profiling
 
 import org.vipervm.runtime.Task
-import org.vipervm.platform.DataTransfer
+import org.vipervm.platform.{Platform,DataTransfer,Processor}
 import java.awt._
+import java.io.{PrintWriter,FileWriter}
 
 import java.io.{OutputStream,OutputStreamWriter,FileOutputStream}
 import org.apache.batik.svggen.SVGGraphics2D
 import org.apache.batik.dom.svg.SVGDOMImplementation
+import org.apache.batik.dom.util._
 import org.apache.batik.swing.JSVGCanvas
 import org.apache.batik.swing.svg.JSVGComponent
 
@@ -27,7 +29,7 @@ import org.w3c.dom.Document
 import org.w3c.dom.DOMImplementation
 import org.w3c.dom.svg.SVGDocument
 
-class SVGProfiler extends Profiler {
+class SVGProfiler(platform:Platform) extends Profiler {
 
   private var firstTimeStamp:Option[Long] = None
 
@@ -48,6 +50,8 @@ class SVGProfiler extends Profiler {
 
   private var transfers:Map[DataTransfer,Long] = Map.empty
   private var tasks:Map[Task,Long] = Map.empty
+  private val procs = platform.processors.zipWithIndex.toMap
+  private val mems = platform.memories.zipWithIndex.toMap
 
   protected def reactions(e:ProfilingEvent):Unit = {
     val fst = firstTimeStamp.getOrElse {
@@ -65,8 +69,10 @@ class SVGProfiler extends Profiler {
         g.setPaint(Color.blue)
         val left = position(transfers(dt))
         val right = position(e.timestamp)
+        val top = 100 + mems(dt.source.buffer.memory) * 25
+        val bottom = 100 + mems(dt.target.buffer.memory) * 25
         if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,400))
-        g.fill(new Rectangle(left, 100, right-left, 20))
+        g.drawLine(left,top,right,bottom)
         transfers -= dt
       }
       case TaskAssigned(task, proc) => {
@@ -78,22 +84,30 @@ class SVGProfiler extends Profiler {
         g.setPaint(Color.green)
         val left = position(tasks(task))
         val right = position(e.timestamp)
+        val top = 130 + procs(proc) * 25
         if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,400))
-        g.fill(new Rectangle(left, 130, right-left, 20))
+        g.fill(new Rectangle(left, top, right-left, 20))
         tasks -= task
       }
     }
 
     g.getRoot(document.getRootElement)
-
+    canvas.setSVGDocument(document)
   }
 
-  def save(filename:String):Unit = stream(new FileOutputStream(filename))
+  def save(filename:String):Unit = {
+    val writer = new PrintWriter(new FileWriter(filename))
+    stream(writer)
+    writer.close
+  }
 
-  def print:Unit = stream(System.out)
+  def print:Unit = {
+    val writer = new PrintWriter(System.out)
+    stream(writer)
+    writer.close
+  }
 
-  def stream(stream:OutputStream):Unit = {
-    val out = new OutputStreamWriter(stream, "UTF-8")
-    g.stream(out, true)
+  def stream(writer:PrintWriter):Unit = {
+    DOMUtilities.writeDocument(document,writer)
   }
 }

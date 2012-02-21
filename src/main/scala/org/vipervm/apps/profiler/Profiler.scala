@@ -13,18 +13,23 @@
 
 package org.vipervm.apps
 
+import org.vipervm.profiling.SVGProfiler
 import scala.swing._
 
+class ProfilerFrame(root:Component) extends MainFrame {
+  title = "ViperVM Profiler"
+  contents = root
+}
+
 object Profiler {
-  private class ProfilerFrame extends MainFrame {
-    title = "Scala demo"
-    contents = new Button {
-      text = "Pouche mi!"
-    }
+  def main(args:Array[String]): Unit = {
   }
 
-  def main(args:Array[String]): Unit = {
-    val frame = new ProfilerFrame
+  def dynamicRendering(profiler:SVGProfiler):Unit = {
+    val canvas = Component.wrap(profiler.canvas)
+    canvas.visible = true
+    canvas.preferredSize = new Dimension(400,400)
+    val frame = new ProfilerFrame(canvas)
     frame.visible = true
   }
 }

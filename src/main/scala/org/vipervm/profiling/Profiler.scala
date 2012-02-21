@@ -16,7 +16,7 @@ package org.vipervm.profiling
 import scala.actors._
 
 abstract class Profiler extends Actor {
-  def reactions(e:ProfilingEvent):Unit
+  protected def reactions(e:ProfilingEvent):Unit
 
   def act = loop { react { 
     case e:ProfilingEvent => reactions(e)

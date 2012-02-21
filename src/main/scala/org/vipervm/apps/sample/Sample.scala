@@ -28,13 +28,16 @@ import org.vipervm.library._
 import org.vipervm.parsers.LispyParser
 import org.vipervm.dsl._
 
-import org.vipervm.profiling.SLF4JProfiler
+import org.vipervm.profiling._
 
 private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-  val profiler = new SLF4JProfiler
+//  val profiler = new SLF4JProfiler
+  val profiler = new SVGProfiler
   val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy
+
+  val frame = Profiler.dynamicRendering(profiler)
 
   val a = Matrix2D[Float](size,size)
   val b = Matrix2D[Float](size,size)
@@ -59,13 +62,18 @@ private class SampleApp(size:Long = 32) {
     println("Printing disabled (size of the matrices too big)")
   }
 
-  sys.exit(0)
+  profiler.print
 }
 
 
 object Sample {
   def main(args:Array[String]):Unit = {
-    if (args.length != 0)
-    new SampleApp(args(0).toInt)
+    if (args.length != 0) {
+      new SampleApp(args(0).toInt)
+    }
+    else {
+      new SampleApp
+    }
+
   }
 }

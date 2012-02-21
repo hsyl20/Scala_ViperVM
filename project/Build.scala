@@ -37,6 +37,7 @@ object MyProject extends Build {
     /* Tasks */
     fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Test, "org.vipervm.apps.Profiler"),
     fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Test, "org.vipervm.apps.Info"),
+    fullRunTask(TaskKey[Unit]("run-sample", "Sample application"), Test, "org.vipervm.apps.Sample"),
     fullRunTask(replTaskKey, Test, "org.vipervm.fp.REPL"),
     fork in replTaskKey := true,
     outputStrategy in replTaskKey := Some(StdoutOutput),
@@ -59,6 +60,8 @@ object MyProject extends Build {
     "org.clapper" %% "grizzled-slf4j" % "0.6.6",
     "org.scalaz" %% "scalaz-full" % "6.0.3",
     "org.scalatest" %% "scalatest" % "1.6.1",
+    "batik" % "batik-svggen" % "1.6-1",
+    "batik" % "batik-swing" % "1.6-1",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

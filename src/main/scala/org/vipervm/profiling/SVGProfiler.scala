@@ -43,8 +43,6 @@ class SVGProfiler(platform:Platform) extends Profiler {
   private val g = new SVGGraphics2D(document)
   val canvas = new JSVGCanvas
   canvas.setSVGDocument(document)
-  canvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC)
-
   g.setSVGCanvasSize(new Dimension(400,400))
 
   val factor = 5e-8

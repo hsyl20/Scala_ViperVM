@@ -18,6 +18,8 @@ import org.vipervm.profiling._
 
 class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfiler) extends DataManager {
 
+  protected var pendingConfigs:Map[DataConfig,UserEvent] = Map.empty
+
   protected def prepareInternal(config:DataConfig):Event = {
 
     val invalidData = config.filterNot { case (data,mem) => data.viewIn(mem).isDefined }
@@ -36,7 +38,9 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
 
         /* Select source and link */
         //FIXME: We need to support multi-hop links
-        val source = directSources.head
+        val source = directSources.headOption.getOrElse {
+          throw new Exception("No direct source for one data. Multi-hop links not implemented (todo)")
+        }
         val link = platform.linkBetween(source,view).getOrElse(
           throw new Exception("No direct link between data. Multi-hop links not implemented (todo)")
         )

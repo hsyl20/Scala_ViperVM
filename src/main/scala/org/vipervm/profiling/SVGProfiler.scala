@@ -17,6 +17,7 @@ import org.vipervm.runtime.Task
 import org.vipervm.platform.{Platform,DataTransfer,Processor}
 import java.awt._
 import java.io.{PrintWriter,FileWriter}
+import javax.swing.SwingUtilities
 
 import java.io.{OutputStream,OutputStreamWriter,FileOutputStream}
 import org.apache.batik.svggen.SVGGraphics2D
@@ -92,7 +93,16 @@ class SVGProfiler(platform:Platform) extends Profiler {
     }
 
     g.getRoot(document.getRootElement)
-    canvas.setSVGDocument(document)
+    updateCanvas
+  }
+
+  def updateCanvas:Unit = {
+    val r = new Runnable {
+      def run:Unit = {
+        canvas.setSVGDocument(document)
+      }
+    }
+    SwingUtilities.invokeLater(r)
   }
 
   def save(filename:String):Unit = {

@@ -18,10 +18,12 @@ import org.vipervm.runtime._
 import org.vipervm.runtime.scheduling.Messages._
 import org.vipervm.profiling.{Profiler,DummyProfiler}
 
-class DefaultScheduler(val platform:Platform, val profiler:Profiler = DummyProfiler) extends Scheduler {
+class DefaultScheduler(val dataManager:DataManager, val profiler:Profiler = DummyProfiler) extends Scheduler {
+
+  val platform = dataManager.platform
 
   /* Create a worker per processor */
-  private val workers = platform.processors.map(x => new Worker(x,this,profiler))
+  private val workers = platform.processors.map(x => new Worker(x,this,profiler,dataManager))
   /* Events associated with task completion */
   private var events:Map[Task,Event] = Map.empty
 

@@ -15,6 +15,7 @@ package org.vipervm.runtime.data
 
 import org.vipervm.runtime.data.Primitives._
 import org.vipervm.platform._
+import org.vipervm.runtime.DataManager
 
 /**
  * 2D matrix
@@ -46,33 +47,12 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
     store(view)
   }
 
-  private def retrieveOnHost(platform:Platform):FutureEvent[ViewType] = {
-    if (!isDefined)
-      throw new Exception("Trying to retrieve uninitialized data")
+  def print(dataManager:DataManager):FutureEvent[String] = {
+    val platform = dataManager.platform
+    val memConf = Seq(this -> platform.hostMemory)
 
-    viewIn(platform.hostMemory) match {
-      case Some(v) => FutureEvent(v)
-      case None => {
-        val view = allocate(platform.hostMemory)
-
-        val sources = views
-        val source = sources.head._2
-        val link = platform.linkBetween(source,view).get
-        val transfer = link.copy(source,view)
-        val assocEvent = new UserEvent
-        transfer.willTrigger {
-          store(view)
-          assocEvent.complete
-        }
-        FutureEvent(view, assocEvent)
-      }
-    }
-  }
-
-  def print(platform:Platform):FutureEvent[String] = {
-    val fview = retrieveOnHost(platform)
-    fview.fold {
-      val view = fview()
+    dataManager.withConfig(memConf) {
+      val view = viewIn(platform.hostMemory).get
       val buf = view.buffer.asInstanceOf[HostBuffer].peer
     
       val result = new StringBuilder
@@ -88,7 +68,7 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
         result.append("\n")
       }
 
-      FutureEvent(result.mkString)
+      result.mkString
     }
   }
 }

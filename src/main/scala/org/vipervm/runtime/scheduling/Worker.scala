@@ -26,7 +26,7 @@ import scala.actors.Actor
 /**
  * There is one worker per device.
  */
-class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends Actor {
+class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler, dataManager:DataManager) extends Actor {
 
   private var tasks:List[Task] = Nil
   private var currentTask:Option[Task] = None
@@ -92,51 +92,11 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends
       case k => k
     }
 
-    /* Some parameters must be allocated in device memory whilst some other
-       must be allocated in host memory. It depends on the kernel selected */
-    val (hostParams,deviceParams) = task.kernel.paramsPerStorage(task.params)
+    val memConf = task.kernel.memoryConfig(task.params,memory,scheduler.platform.hostMemory)
 
-    val futureViews = deviceParams.map(data => data.viewIn(memory) match {
-      case Some(v) => FutureEvent(v)
-      case None => {
-        /* Allocate required buffers and views */
-        //FIXME: support "no space left on device" exception
-        val view = data.allocate(memory)
+    val event = dataManager.prepare(memConf)
 
-        /* Test if the view is read or written into */
-       if (data.isDefined) {
-
-          /* Schedule required data transfer to update the view */
-          val sources = data.views
-
-          /* Select source */
-          val source = sources.head._2
-
-          /* Select link */
-          //FIXME: We need to support multi-hop links
-          val link = scheduler.platform.linkBetween(source,view).get
-          
-          val transfer = link.copy(source,view)
-          profiler ! DataTransferStart(data,transfer)
-
-          /* Schedule data-view association */
-          val assocEvent = new UserEvent
-          transfer.willTrigger {
-            profiler ! DataTransferEnd(data,transfer)
-            data.store(view)
-            assocEvent.complete
-          }
-
-          FutureEvent(view, assocEvent)
-        }
-        else {
-          data.store(view)
-          FutureEvent(view)
-        }
-      }
-    })
-    
-    new EventGroup(futureViews).willTrigger {
+    event.willTrigger {
 
       /* Schedule kernel execution */
       val ev = proc.execute(kernel, task.makeKernelParams(memory))
@@ -146,6 +106,8 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler) extends
       /* Schedule notification after kernel execution */
       ev.willTrigger {
         this ! TaskComplete(task)
+
+        dataManager.release(memConf)
       }
     }
   }

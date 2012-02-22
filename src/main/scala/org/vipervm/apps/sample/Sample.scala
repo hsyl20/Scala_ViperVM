@@ -34,7 +34,8 @@ private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
   val profiler = new SVGProfiler(platform)
-  val sched = new DefaultScheduler(platform,profiler) with DataAffinityPolicy with LoadBalancingPolicy
+  val dataManager = new DataManager(platform,profiler)
+  val sched = new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy
 
   val frame = Profiler.dynamicRendering(profiler)
 
@@ -55,7 +56,7 @@ private class SampleApp(size:Long = 32) {
 
   if (size < 64) {
     val r = result.data.asInstanceOf[data.Matrix2D[Float]]
-    println(r.print(platform)())
+    println(r.print(dataManager)())
   }
   else {
     println("Printing disabled (size of the matrices too big)")

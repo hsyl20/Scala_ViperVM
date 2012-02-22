@@ -33,14 +33,16 @@ class TestPolicies extends FunSuite {
 
   test("R = A*B + A*C using DefaultScheduler") {
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-    val sched = new DefaultScheduler(platform)
+    val dataManager = new DataManager(platform)
+    val sched = new DefaultScheduler(dataManager)
 
     testMatMul(platform, sched)
   }
 
   test("R = A*B + A*C using DataAffinity scheduler policy") {
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-    val sched = new DefaultScheduler(platform) with DataAffinityPolicy
+    val dataManager = new DataManager(platform)
+    val sched = new DefaultScheduler(dataManager) with DataAffinityPolicy
 
     testMatMul(platform, sched)
   }

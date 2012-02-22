@@ -26,12 +26,11 @@ abstract class TaskKernel extends Prototyped {
 
   def canExecuteOn(proc:Processor) = peer.canExecuteOn(proc)
 
-  /** Split params in two categories: params that need to be stored on host memory
-      and params that need to be stored in device memory.
-      Return a couple (hostParams,deviceParams) */
-  def paramsPerStorage(params:Seq[Data]):(Seq[Data],Seq[Data]) = {
+  def memoryConfig(params:Seq[Data],memory:MemoryNode,hostMemory:MemoryNode):Seq[(Data,MemoryNode)] = {
     if (params.length != prototype.length) throw new Exception("Invalid parameters")
-    val sp = (params zip prototype.map(_.storage)).partition(_._2 == HostStorage)
-    (sp._1.map(_._1), sp._2.map(_._1))
+    params zip prototype.map(_.storage match {
+      case HostStorage => hostMemory
+      case DeviceStorage => memory
+    })
   }
 }

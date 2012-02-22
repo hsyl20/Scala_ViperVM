@@ -22,7 +22,6 @@ trait RankingPolicy extends DefaultScheduler {
 
   override def selectWorker(workers:Seq[Worker],task:Task):Worker = {
     val rankedWorker = (workers zip workers.map(w => rankWorker(task,w,1.0f))).sortBy(_._2).reverse
-    rankedWorker.foreach(println)
     rankedWorker.head._1
   }
 

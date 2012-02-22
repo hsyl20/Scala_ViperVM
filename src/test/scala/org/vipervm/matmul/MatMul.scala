@@ -98,7 +98,8 @@ class MatMul extends FunSuite {
     c.initialize(platform, (x,y) => 2.0f )
 
     val profiler = new SLF4JProfiler
-    val sched = new DefaultScheduler(platform,profiler)
+    val dataManager = new DataManager(platform,profiler)
+    val sched = new DefaultScheduler(dataManager,profiler)
     val interp = new Interpreter(sched)
 
     val result = interp.evaluate(program)
@@ -107,7 +108,7 @@ class MatMul extends FunSuite {
 
     val r = result.data.asInstanceOf[Matrix2D[Float]]
     
-    println(r.print(platform)())
+    println(r.print(dataManager)())
   }
 
 }

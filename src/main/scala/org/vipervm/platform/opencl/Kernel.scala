@@ -32,9 +32,6 @@ abstract class OpenCLKernel extends Kernel {
   private implicit def proc2proc(d:Processor): OpenCLProcessor =
     d.asInstanceOf[OpenCLProcessor]
 
-  private implicit def buf2buf(b:Buffer): OpenCLBuffer =
-    b.asInstanceOf[OpenCLBuffer]
-
   private var peers: Map[OpenCLProcessor,cl.Kernel] = Map.empty
 
   /** Cast parameters */

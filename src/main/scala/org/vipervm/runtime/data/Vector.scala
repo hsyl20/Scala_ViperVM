@@ -15,11 +15,12 @@ package org.vipervm.runtime.data
 
 import org.vipervm.runtime.data.Primitives._
 import org.vipervm.platform._
+import org.vipervm.runtime.DataManager
 
 /**
  * Vector
  */
-class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends Data {
+class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends Data with PrintableData {
   type ViewType = BufferView1D
 
   def allocate(memory:MemoryNode):BufferView1D = {
@@ -46,47 +47,20 @@ class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends Data {
     store(view)
   }
 
-  private def retrieveOnHost(platform:Platform):FutureEvent[ViewType] = {
-    if (!isDefined)
-      throw new Exception("Trying to retrieve uninitialized data")
-
-    viewIn(platform.hostMemory) match {
-      case Some(v) => FutureEvent(v)
-      case None => {
-        val view = allocate(platform.hostMemory)
-
-        val sources = views
-        val source = sources.head._2
-        val link = platform.linkBetween(source,view).get
-        val transfer = link.copy(source,view)
-        val assocEvent = new UserEvent
-        transfer.willTrigger {
-          store(view)
-          assocEvent.complete
-        }
-        FutureEvent(view, assocEvent)
-      }
-    }
-  }
-
-  def print(platform:Platform):FutureEvent[String] = {
-    val fview = retrieveOnHost(platform)
-    fview.fold {
-      val view = fview()
-      val buf = view.buffer.asInstanceOf[HostBuffer].peer
+  override protected def hostPrint(view:ViewType,buffer:HostBuffer):String = {
+    val mem = buffer.peer
     
-      val result = new StringBuilder
+    val result = new StringBuilder
 
-      for (x <- 0L until (view.size/4)) {
-        val index = x*4 + view.offset
-        elem.typ match {
-          case "float" => result.append(buf.getFloat(index) + " ")
-          case "double" => result.append(buf.getDouble(index) + " ")
-        }
+    for (x <- 0L until (view.size/4)) {
+      val index = x*4 + view.offset
+      elem.typ match {
+        case "float" => result.append(mem.getFloat(index) + " ")
+        case "double" => result.append(mem.getDouble(index) + " ")
       }
-
-      FutureEvent(result.mkString)
     }
+
+    result.mkString
   }
 }
 

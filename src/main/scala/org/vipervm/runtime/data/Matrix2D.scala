@@ -20,7 +20,7 @@ import org.vipervm.runtime.DataManager
 /**
  * 2D matrix
  */
-class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) extends Data {
+class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) extends Data with PrintableData {
   type ViewType = BufferView2D
 
   def allocate(memory:MemoryNode):BufferView2D = {
@@ -47,29 +47,23 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
     store(view)
   }
 
-  def print(dataManager:DataManager):FutureEvent[String] = {
-    val platform = dataManager.platform
-    val memConf = Seq(this -> platform.hostMemory)
+  override protected def hostPrint(view:ViewType,buffer:HostBuffer):String = {
+    val mem = buffer.peer
 
-    dataManager.withConfig(memConf) {
-      val view = viewIn(platform.hostMemory).get
-      val buf = view.buffer.asInstanceOf[HostBuffer].peer
-    
-      val result = new StringBuilder
+    val result = new StringBuilder
 
-      for (y <- 0L until view.height) {
-        for (x <- 0L until (view.width/4)) {
-          val index = x*4 + y * (view.width + view.rowPadding) + view.offset
-          elem.typ match {
-            case "float" => result.append(buf.getFloat(index) + " ")
-            case "double" => result.append(buf.getDouble(index) + " ")
-          }
+    for (y <- 0L until view.height) {
+      for (x <- 0L until (view.width/4)) {
+        val index = x*4 + y * (view.width + view.rowPadding) + view.offset
+        elem.typ match {
+          case "float" => result.append(mem.getFloat(index) + " ")
+          case "double" => result.append(mem.getDouble(index) + " ")
         }
-        result.append("\n")
       }
-
-      result.mkString
+      result.append("\n")
     }
+
+    result.mkString
   }
 }
 

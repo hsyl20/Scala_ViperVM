@@ -16,10 +16,32 @@ package org.vipervm.runtime
 import org.vipervm.platform.{Platform,MemoryNode,Event,Data,EventGroup,FutureEvent,UserEvent,Storage}
 import org.vipervm.profiling._
 
-class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) {
+import scala.actors._
+import DataManager.DataConfig
 
-  /** Prepare a memory node for the given kernel and parameters */
-  def prepare(config:Seq[(Data,MemoryNode)]):Event = {
+object DataManager {
+  type DataConfig = Seq[(Data,MemoryNode)]
+}
+
+case class DataConfigRelease(config:DataConfig)
+case class DataConfigPrepare(config:DataConfig)
+
+class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) extends Actor {
+
+  def act = loop { react {
+    case DataConfigPrepare(config) => sender ! prepareInternal(config)
+    case DataConfigRelease(config) => releaseInternal(config)
+  }}
+
+  start
+
+  /** Prepare the given configuration */
+  def prepare(config:DataConfig):Event = (this !? DataConfigPrepare(config)).asInstanceOf[Event]
+
+  /** Release the given configuration */
+  def release(config:DataConfig):Unit = this ! DataConfigRelease(config)
+
+  private def prepareInternal(config:DataConfig):Event = {
 
     val invalidData = config.filterNot { case (data,mem) => data.viewIn(mem).isDefined }
 
@@ -33,13 +55,14 @@ class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) {
 
         /* Schedule required data transfer to update the view */
         val sources = data.views
+        val directSources = sources.filter(src => platform.linkBetween(src,view).isDefined)
 
-        /* Select source */
-        val source = sources.head._2
-
-        /* Select link */
+        /* Select source and link */
         //FIXME: We need to support multi-hop links
-        val link = platform.linkBetween(source,view).get
+        val source = directSources.head
+        val link = platform.linkBetween(source,view).getOrElse(
+          throw new Exception("No direct link between data. Multi-hop links not implemented (todo)")
+        )
         
         val transfer = link.copy(source,view)
         profiler ! DataTransferStart(data,transfer)
@@ -61,10 +84,10 @@ class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) {
     }})
   }
 
-  def release(config:Seq[(Data,MemoryNode)]):Unit = {
-  }
+  private def releaseInternal(config:DataConfig):Unit = { }
 
-  def withConfig[A](config:Seq[(Data,MemoryNode)])(body: => A):FutureEvent[A] = {
+
+  def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
     prepare(config) willTrigger {
       val result = body
       release(config)

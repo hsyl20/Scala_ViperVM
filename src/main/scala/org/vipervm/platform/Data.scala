@@ -14,6 +14,7 @@
 package org.vipervm.platform
 
 import scala.collection.mutable.HashMap
+import scala.collection.breakOut
 
 abstract class Data {
   type ViewType <: BufferView
@@ -25,7 +26,9 @@ abstract class Data {
     !fviews.isEmpty
   }
 
-  def views:Map[MemoryNode,ViewType] = fviews.toMap
+  def views:Seq[ViewType] = fviews.synchronized {
+    fviews.values.map(identity)(breakOut)
+  }
 
   def viewIn(memory:MemoryNode):Option[ViewType] = fviews.get(memory)
 

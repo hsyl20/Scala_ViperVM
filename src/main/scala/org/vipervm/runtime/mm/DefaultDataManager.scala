@@ -11,14 +11,36 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.mm
 
-import org.vipervm.platform.{Platform,MemoryNode,Event,Data,EventGroup,FutureEvent,UserEvent}
+import org.vipervm.platform.{Platform,MemoryNode,Event,Data,EventGroup,FutureEvent,UserEvent,Link,BufferView}
 import org.vipervm.profiling._
+
 
 class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfiler) extends DataManager {
 
-  protected var pendingConfigs:Map[DataConfig,UserEvent] = Map.empty
+  protected var memConfigs:Map[(MemoryNode,Data),DataState] = Map.empty
+  
+  protected var pendingConfigs:List[DataConfig] = Nil
+
+  def addConfig(config:DataConfig):Unit = {
+    config.foreach { case (data,mem) => addData(data,mem) }
+    pendingConfigs ::= config
+  }
+
+  def addData(data:Data,memory:MemoryNode):Unit = {
+    val state = dataState(memory,data)
+    val newState = state.copy(futureUsers = state.futureUsers + 1)
+    updateDataState(memory,data,newState)
+  }
+
+  protected def queryDataStateInternal(memory:MemoryNode,data:Data):DataState = {
+    memConfigs.getOrElse(memory -> data, DataState())
+  }
+
+  protected def updateDataStateInternal(memory:MemoryNode,data:Data,state:DataState):Unit = {
+    memConfigs += (memory -> data) -> state 
+  }
 
   protected def prepareInternal(config:DataConfig):Event = {
 

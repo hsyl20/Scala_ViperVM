@@ -22,7 +22,7 @@ import org.vipervm.platform.host.DefaultHostDriver
 import org.vipervm.runtime._
 import org.vipervm.runtime.data._
 import org.vipervm.runtime.scheduling._
-
+import org.vipervm.runtime.mm._
 import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._

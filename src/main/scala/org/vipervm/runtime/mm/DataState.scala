@@ -11,15 +11,14 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.scheduling
+package org.vipervm.runtime.mm
 
-sealed abstract class DataState
-/** Data is present in memory */
-case object DataAvailable extends DataState
-/** Data isn't present in memory */
-case object DataUnavailable extends DataState
-/** Data is being transferred into memory */
-case object DataIncoming extends DataState
-/** Data is being transferred into another memory to prepare its eviction */
-case object DataOutgoing extends DataState
-
+/**
+ * State of a data in a memory
+ *
+ * @param available Data is available in memory
+ * @param uploading Data is being uploaded into memory
+ * @param users Number of users of this data
+ * @param futureUsers Number of future users of this data
+ */
+case class DataState(available:Boolean=false, uploading:Boolean=false, users:Int=0, futureUsers:Int=0)

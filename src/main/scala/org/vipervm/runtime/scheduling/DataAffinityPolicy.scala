@@ -15,16 +15,17 @@ package org.vipervm.runtime.scheduling
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.mm._
 
 trait DataAffinityPolicy extends RankingPolicy {
 
   val dataAffinityCoef = 1.0f
 
-  private def rankState(state:DataState):Float = state match {
-    case DataUnavailable => 0.0f
-    case DataAvailable => 1.0f
-    case DataIncoming => 0.8f
-    case DataOutgoing => 0.4f
+  private def rankState(state:DataState):Float = {
+    if (!state.available && !state.uploading && state.futureUsers == 0) 0.0f
+    else if (!state.available && !state.uploading && state.futureUsers != 0) 0.2f
+    else if (!state.available && state.uploading) 0.5f
+    else 1.0f
   }
 
   override def rankWorker(task:Task,worker:Worker,current:Float):Float = {

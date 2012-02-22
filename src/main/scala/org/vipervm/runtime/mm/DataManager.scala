@@ -11,7 +11,7 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime
+package org.vipervm.runtime.mm
 
 import scala.actors._
 import org.vipervm.platform.{Platform,MemoryNode,Event,Data,FutureEvent}
@@ -21,10 +21,14 @@ abstract class DataManager extends Actor {
   type DataConfig = Seq[(Data,MemoryNode)]
   case class DataConfigRelease(config:DataConfig)
   case class DataConfigPrepare(config:DataConfig)
+  case class QueryDataState(memory:MemoryNode,data:Data)
+  case class UpdateDataState(memory:MemoryNode,data:Data,state:DataState)
 
   def act = loop { react {
     case DataConfigPrepare(config) => sender ! prepareInternal(config)
     case DataConfigRelease(config) => releaseInternal(config)
+    case QueryDataState(memory,data) => sender ! queryDataStateInternal(memory,data)
+    case UpdateDataState(memory,data,state) => updateDataStateInternal(memory,data,state)
   }}
 
   start
@@ -34,6 +38,11 @@ abstract class DataManager extends Actor {
 
   /** Release the given configuration */
   def release(config:DataConfig):Unit = this ! DataConfigRelease(config)
+
+  /** Return the state of a data in a memory */
+  def dataState(memory:MemoryNode,data:Data):DataState = (this !? QueryDataState(memory,data)).asInstanceOf[DataState]
+
+  protected def updateDataState(memory:MemoryNode,data:Data,state:DataState):Unit = this ! UpdateDataState(memory,data,state)
 
   /** Asynchronously perform an operation using a given configuration */
   def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
@@ -46,6 +55,8 @@ abstract class DataManager extends Actor {
 
   protected def prepareInternal(config:DataConfig):Event
   protected def releaseInternal(config:DataConfig):Unit
+  protected def queryDataStateInternal(memory:MemoryNode,data:Data):DataState
+  protected def updateDataStateInternal(memory:MemoryNode,data:Data,state:DataState):Unit
 
   val platform:Platform
 }

@@ -14,7 +14,7 @@
 package org.vipervm.runtime.data
 
 import org.vipervm.platform._
-import org.vipervm.runtime.DataManager
+import org.vipervm.runtime.mm.DataManager
 
 /**
  * Data that can be printed

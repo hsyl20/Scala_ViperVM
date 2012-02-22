@@ -21,10 +21,6 @@ object Messages {
   case class TaskComplete(task:Task)
   case class SubmitTask(task:Task,deps:Seq[Event])
   case class TransferComplete(transfer:DataTransfer)
-  case class QueryDataState(data:Data)
   case object QueryLoadStatus
   case class LoadStatus(taskCount:Int)
-
-  case class DiscardData(data:Data)
-  case class RetrieveData(data:Data)
 }

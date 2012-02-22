@@ -15,7 +15,7 @@ package org.vipervm.runtime.data
 
 import org.vipervm.runtime.data.Primitives._
 import org.vipervm.platform._
-import org.vipervm.runtime.DataManager
+import org.vipervm.runtime.mm.DataManager
 
 /**
  * 2D matrix

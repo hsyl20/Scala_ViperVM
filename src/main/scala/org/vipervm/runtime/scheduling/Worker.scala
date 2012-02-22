@@ -16,7 +16,7 @@ package org.vipervm.runtime.scheduling
 import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data}
 import org.vipervm.runtime._
 import org.vipervm.runtime.scheduling.Messages._
-
+import org.vipervm.runtime.mm._
 import org.vipervm.profiling._
 
 import org.vipervm.utils._
@@ -33,19 +33,13 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler, dataMan
 
   private val memory = proc.memory
 
-  private var datas:Map[Data,DataState] = Map.empty
-
-  def dataState(data:Data):DataState = (this !? QueryDataState(data)).asInstanceOf[DataState]
+  def dataState(data:Data):DataState = dataManager.dataState(memory,data)
 
   def loadStatus:LoadStatus = (this !? QueryLoadStatus).asInstanceOf[LoadStatus]
 
   start
 
   def act:Unit = loop { react {
-
-    case QueryDataState(data) => {
-      sender ! datas.getOrElse(data, DataUnavailable)
-    }
 
     case QueryLoadStatus => {
       sender ! LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))

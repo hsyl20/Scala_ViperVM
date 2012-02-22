@@ -13,20 +13,14 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Platform,MemoryNode,Event,Data,EventGroup,FutureEvent,UserEvent,Storage}
-import org.vipervm.profiling._
-
 import scala.actors._
-import DataManager.DataConfig
+import org.vipervm.platform.{Platform,MemoryNode,Event,Data,FutureEvent}
 
-object DataManager {
+abstract class DataManager extends Actor {
+
   type DataConfig = Seq[(Data,MemoryNode)]
-}
-
-case class DataConfigRelease(config:DataConfig)
-case class DataConfigPrepare(config:DataConfig)
-
-class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) extends Actor {
+  case class DataConfigRelease(config:DataConfig)
+  case class DataConfigPrepare(config:DataConfig)
 
   def act = loop { react {
     case DataConfigPrepare(config) => sender ! prepareInternal(config)
@@ -41,52 +35,7 @@ class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) exte
   /** Release the given configuration */
   def release(config:DataConfig):Unit = this ! DataConfigRelease(config)
 
-  private def prepareInternal(config:DataConfig):Event = {
-
-    val invalidData = config.filterNot { case (data,mem) => data.viewIn(mem).isDefined }
-
-    new EventGroup( invalidData.map { case (data,memory) => {
-      /* Allocate required buffers and views */
-      //FIXME: support "no space left on device" exception
-      val view = data.allocate(memory)
-
-      /* Test if the view is read or written into */
-      if (data.isDefined) {
-
-        /* Schedule required data transfer to update the view */
-        val sources = data.views
-        val directSources = sources.filter(src => platform.linkBetween(src,view).isDefined)
-
-        /* Select source and link */
-        //FIXME: We need to support multi-hop links
-        val source = directSources.head
-        val link = platform.linkBetween(source,view).getOrElse(
-          throw new Exception("No direct link between data. Multi-hop links not implemented (todo)")
-        )
-        
-        val transfer = link.copy(source,view)
-        profiler ! DataTransferStart(data,transfer)
-
-        /* Schedule data-view association */
-        val assocEvent = new UserEvent
-        transfer.willTrigger {
-          profiler ! DataTransferEnd(data,transfer)
-          data.store(view)
-          assocEvent.complete
-        }
-
-        FutureEvent(view, assocEvent)
-      }
-      else {
-        data.store(view)
-        FutureEvent(view)
-      }
-    }})
-  }
-
-  private def releaseInternal(config:DataConfig):Unit = { }
-
-
+  /** Asynchronously perform an operation using a given configuration */
   def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
     prepare(config) willTrigger {
       val result = body
@@ -94,4 +43,10 @@ class DataManager(val platform:Platform, profiler:Profiler = DummyProfiler) exte
       result
     }
   }
+
+  protected def prepareInternal(config:DataConfig):Event
+  protected def releaseInternal(config:DataConfig):Unit
+
+  val platform:Platform
 }
+

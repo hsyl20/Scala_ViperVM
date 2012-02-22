@@ -34,7 +34,7 @@ private class SampleApp(size:Long = 32) {
 
   val platform = Platform(DefaultHostDriver, new OpenCLDriver)
   val profiler = new SVGProfiler(platform)
-  val dataManager = new DataManager(platform,profiler)
+  val dataManager = new DefaultDataManager(platform,profiler)
   val sched = new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy
 
   val frame = Profiler.dynamicRendering(profiler)

@@ -98,7 +98,7 @@ class MatMul extends FunSuite {
     c.initialize(platform, (x,y) => 2.0f )
 
     val profiler = new SLF4JProfiler
-    val dataManager = new DataManager(platform,profiler)
+    val dataManager = new DefaultDataManager(platform,profiler)
     val sched = new DefaultScheduler(dataManager,profiler)
     val interp = new Interpreter(sched)
 

@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf *.c *.log *.dot *.pdf a.out
+rm -rf *.c *.log *.dot *.pdf a.out *.svg

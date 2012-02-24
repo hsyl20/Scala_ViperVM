@@ -42,11 +42,11 @@ private class SampleApp(size:Long = 32) {
   val a = Matrix2D[Float](size,size)
   val b = Matrix2D[Float](size,size)
   val c = Matrix2D[Float](size,size)
-  val program = a*b + a*c + b*c
+  val program = a*b + a*c
 
-  a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
-  b.peer.get.initialize(platform, (x,y) => 2.0f )
-  c.peer.get.initialize(platform, (x,y) => 2.0f )
+  a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
+  b.peer.get.initialize(dataManager, (x,y) => 2.0f )
+  c.peer.get.initialize(dataManager, (x,y) => 2.0f )
 
   val interp = new Interpreter(sched)
 

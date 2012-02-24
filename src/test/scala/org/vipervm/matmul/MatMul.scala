@@ -93,12 +93,13 @@ class MatMul extends FunSuite {
 
 
   private def testMatMul(platform:Platform, program:Program, a:Matrix2D[Float], b:Matrix2D[Float], c:Matrix2D[Float]):Unit = {
-    a.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
-    b.initialize(platform, (x,y) => 2.0f )
-    c.initialize(platform, (x,y) => 2.0f )
-
     val profiler = new SLF4JProfiler
     val dataManager = new DefaultDataManager(platform,profiler)
+
+    a.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
+    b.initialize(dataManager, (x,y) => 2.0f )
+    c.initialize(dataManager, (x,y) => 2.0f )
+
     val sched = new DefaultScheduler(dataManager,profiler)
     val interp = new Interpreter(sched)
 

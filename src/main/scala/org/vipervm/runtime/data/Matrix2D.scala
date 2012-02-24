@@ -29,22 +29,20 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
     new BufferView2D(buffer, 0, elem.size*width, height, 0)
   }
 
-  def initialize(platform:Platform,f:(Long,Long)=>A):Unit = {
+  def initialize(dataManager:DataManager,f:(Long,Long)=>A):Unit = {
     if (isDefined)
       throw new Exception("Trying to initialize a data already initialized")
 
-    val view = allocate(platform.hostMemory)
-    val buf = view.buffer.asInstanceOf[HostBuffer].peer
-    
-    for (y <- 0L until view.height; x <- 0L until (view.width/4)) {
-      val index = x*4 + y * (view.width + view.rowPadding) + view.offset
-      elem.typ match {
-        case "float" => buf.setFloat(index, f.asInstanceOf[(Long,Long)=>Float](x,y))
-        case "double" => buf.setDouble(index, f.asInstanceOf[(Long,Long)=>Double](x,y))
+    onHost(dataManager) { (view,buf) => {
+      for (y <- 0L until view.height; x <- 0L until (view.width/4)) {
+        val index = x*4 + y * (view.width + view.rowPadding) + view.offset
+        elem.typ match {
+          case "float" => buf.peer.setFloat(index, f.asInstanceOf[(Long,Long)=>Float](x,y))
+          case "double" => buf.peer.setDouble(index, f.asInstanceOf[(Long,Long)=>Double](x,y))
+        }
       }
-    }
+    }}.syncWait
 
-    store(view)
   }
 
   override protected def hostPrint(view:ViewType,buffer:HostBuffer):String = {

@@ -23,12 +23,14 @@ abstract class DataManager extends Actor {
   case class DataConfigPrepare(config:DataConfig)
   case class QueryDataState(memory:MemoryNode,data:Data)
   case class UpdateDataState(memory:MemoryNode,data:Data,state:DataState)
+  case object Notification
 
   def act = loop { react {
     case DataConfigPrepare(config) => sender ! prepareInternal(config)
     case DataConfigRelease(config) => releaseInternal(config)
     case QueryDataState(memory,data) => sender ! queryDataStateInternal(memory,data)
     case UpdateDataState(memory,data,state) => updateDataStateInternal(memory,data,state)
+    case Notification => reaction
   }}
 
   start
@@ -44,6 +46,9 @@ abstract class DataManager extends Actor {
 
   protected def updateDataState(memory:MemoryNode,data:Data,state:DataState):Unit = this ! UpdateDataState(memory,data,state)
 
+  /** Indicate to the data manager that an event occured */
+  protected def notification:Unit = this ! Notification
+
   /** Asynchronously perform an operation using a given configuration */
   def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
     prepare(config) willTrigger {
@@ -57,6 +62,8 @@ abstract class DataManager extends Actor {
   protected def releaseInternal(config:DataConfig):Unit
   protected def queryDataStateInternal(memory:MemoryNode,data:Data):DataState
   protected def updateDataStateInternal(memory:MemoryNode,data:Data,state:DataState):Unit
+  protected def reaction:Unit
+
 
   val platform:Platform
 }

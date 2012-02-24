@@ -16,17 +16,21 @@ package org.vipervm.runtime.data
 import org.vipervm.platform._
 import org.vipervm.runtime.mm.DataManager
 
-/**
- * Data that can be printed
- */
-trait PrintableData extends HostableData {
-  
-  protected def hostPrint(view:ViewType,buffer:HostBuffer):String
 
-  /** 
-   * Return a string representing the data
-   */
-  def print(dataManager:DataManager):FutureEvent[String] = {
-    onHost(dataManager)(hostPrint)
+/**
+ * Data that can be used on host
+ */
+trait HostableData extends Data {
+  
+  def onHost[A](dataManager:DataManager)(body: (ViewType,HostBuffer) => A):FutureEvent[A] = {
+    val platform = dataManager.platform
+    val memConf = Seq(this -> platform.hostMemory)
+
+    dataManager.withConfig(memConf) {
+      val view = viewIn(platform.hostMemory).get
+      val buf = view.buffer.asInstanceOf[HostBuffer]
+
+      body(view,buf)
+    }
   }
 }

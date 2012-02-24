@@ -29,22 +29,20 @@ class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends Data with Pri
     new BufferView1D(buffer, 0, elem.size*size)
   }
 
-  def initialize(platform:Platform,f:(Long)=>A):Unit = {
+  def initialize(dataManager:DataManager,f:(Long)=>A):Unit = {
     if (isDefined)
       throw new Exception("Trying to initialize a data already initialized")
 
-    val view = allocate(platform.hostMemory)
-    val buf = view.buffer.asInstanceOf[HostBuffer].peer
-    
-    for (x <- 0L until (view.size/4)) {
-      val index = x*4 + view.offset
-      elem.typ match {
-        case "float" => buf.setFloat(index, f.asInstanceOf[(Long)=>Float](x))
-        case "double" => buf.setDouble(index, f.asInstanceOf[(Long)=>Double](x))
+    onHost(dataManager) { (view,buf) => {
+      for (x <- 0L until (view.size/4)) {
+        val index = x*4 + view.offset
+        elem.typ match {
+          case "float" => buf.peer.setFloat(index, f.asInstanceOf[(Long)=>Float](x))
+          case "double" => buf.peer.setDouble(index, f.asInstanceOf[(Long)=>Double](x))
+        }
       }
-    }
+    }}
 
-    store(view)
   }
 
   override protected def hostPrint(view:ViewType,buffer:HostBuffer):String = {

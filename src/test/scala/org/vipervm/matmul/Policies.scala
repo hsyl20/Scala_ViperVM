@@ -36,7 +36,7 @@ class TestPolicies extends FunSuite {
     val dataManager = new DefaultDataManager(platform)
     val sched = new DefaultScheduler(dataManager)
 
-    testMatMul(platform, sched)
+    testMatMul(platform, dataManager, sched)
   }
 
   test("R = A*B + A*C using DataAffinity scheduler policy") {
@@ -44,20 +44,20 @@ class TestPolicies extends FunSuite {
     val dataManager = new DefaultDataManager(platform)
     val sched = new DefaultScheduler(dataManager) with DataAffinityPolicy
 
-    testMatMul(platform, sched)
+    testMatMul(platform, dataManager, sched)
   }
 
 
-  private def testMatMul(platform:Platform, sched:Scheduler):Unit = {
+  private def testMatMul(platform:Platform, dataManager:DataManager, sched:Scheduler):Unit = {
     import org.vipervm.dsl._
     val a = Matrix2D[Float](32,32)
     val b = Matrix2D[Float](32,32)
     val c = Matrix2D[Float](32,32)
     val program = a*b + a*c
 
-    a.peer.get.initialize(platform, (x,y) => if (x == y) 1.0f else 0.0f )
-    b.peer.get.initialize(platform, (x,y) => 2.0f )
-    c.peer.get.initialize(platform, (x,y) => 2.0f )
+    a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
+    b.peer.get.initialize(dataManager, (x,y) => 2.0f )
+    c.peer.get.initialize(dataManager, (x,y) => 2.0f )
 
     val interp = new Interpreter(sched)
 

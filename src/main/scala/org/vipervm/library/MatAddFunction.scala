@@ -17,9 +17,10 @@ import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D
 
-class TMatAddKernel extends TaskKernel {
-  val peer = new MatAddKernel
-  
+object MatAddMetaKernel extends KernelSet {
+
+  val kernels = Seq(MatAddOpenCLKernel)
+
   val a = Parameter[Matrix2D[Float]](
     name = "a",
     mode = ReadOnly,
@@ -49,7 +50,7 @@ class TMatAddKernel extends TaskKernel {
 }
 
 class MatAddFunction extends Function {
-  val peer = new TMatAddKernel
+  val peer = MatAddMetaKernel
 
   def createTask(args:Seq[FutureData]):FutureEvent[Task] = args.map(_.data) match {
     case Seq(a:Matrix2D[_], b:Matrix2D[_]) => {

@@ -19,10 +19,10 @@ import org.vipervm.platform.{Kernel,Processor}
  * A kernel set is a set of kernels accomplishing the same task and
  * that can be run on different devices
  *
- * Added kernels must support kernel set prototype (i.e. kernel parameters)
- * @param prototype Prototype for every kernel in this set
  */
-class KernelSet(kernels:Seq[Kernel]) extends MetaKernel {
+trait KernelSet extends MetaKernel {
+
+  val kernels:Seq[Kernel]
 
   //TODO: check that prototypes of all kernels are the same
 

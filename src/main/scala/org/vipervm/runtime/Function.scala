@@ -17,7 +17,7 @@ import org.vipervm.platform.{FutureEvent,FutureData}
 
 trait Function {
 
-  val peer:TaskKernel
+  val peer:MetaKernel
 
   def createTask(args:Seq[FutureData]): FutureEvent[Task]
 

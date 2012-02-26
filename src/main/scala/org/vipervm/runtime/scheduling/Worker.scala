@@ -81,10 +81,7 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler, dataMan
 
 
     /* Select kernel */
-    val kernel = task.kernel.peer match {
-      case k:MetaKernel => k.getKernelsFor(proc).head
-      case k => k
-    }
+    val kernel = task.kernel.getKernelsFor(proc).head
 
     val memConf = task.kernel.memoryConfig(task.params,memory,scheduler.platform.hostMemory)
 

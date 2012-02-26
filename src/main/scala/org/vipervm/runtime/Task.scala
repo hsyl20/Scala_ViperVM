@@ -18,7 +18,7 @@ import org.vipervm.platform._
 /**
  * A functional kernel with its parameters
  */
-case class Task(kernel:TaskKernel, params:Seq[Data], result:Data) {
+case class Task(kernel:MetaKernel, params:Seq[Data], result:Data) {
 
   def makeKernelParams(memory:MemoryNode):Seq[Any] = kernel.makeKernelParams(params, memory)
 

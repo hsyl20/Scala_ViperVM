@@ -16,41 +16,53 @@ package org.vipervm.library
 import org.vipervm.platform.opencl._
 import org.vipervm.platform.host._
 import org.vipervm.platform._
-import org.vipervm.platform.Parameter._
 import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
-class MatAddKernel extends OpenCLKernel {
+object MatMulOpenCLKernel extends OpenCLKernel {
   val source = """
-    __kernel void matrixAdd(
-       const int width,
-       const int height,
+    #define BS 32
+    __kernel void matrixMul(
+       const int N,
        __global float* A,
        __global float* B, 
        __global float* C) {
+        __local float atile[BS+1][BS+1];
+        __local float btile[BS+1][BS+1];
+        int bx = get_group_id(0); 
+        int by = get_group_id(1); 
         int gx = get_global_id(0);
         int gy = get_global_id(1);
+        int tx = get_local_id(0);
+        int ty = get_local_id(1);
 
-	if (gx < width && gy < height) {
-	  C[gy*width+gx] = A[gy*width+gx] + B[gy*width+gx];
-	}
+        float sum = 0.0;
+        const int UT = N / BS;
+        int k,t,i;
 
+        for (t=0; t<UT; t++) {
+          btile[tx][ty] = B[gx + BS*N*t + N*ty];
+          btile[tx][ty+BS/2] = B[gx + BS*N*t + (BS/2)*N + N*ty];
+          atile[ty][tx] = A[N*gy+t*BS+tx];
+          barrier(CLK_LOCAL_MEM_FENCE);
+
+          for (k=0; k<BS; k++) {		
+           sum += atile[ty][k] * btile[tx][k];
+          }	   
+
+        }	    
+
+        C[gy*N+gx] = sum;
     }
   """
 
   val program = new OpenCLProgram(source)
-  val name = "matrixAdd"
+  val name = "matrixMul"
 
-  val width = Parameter[Int](
-    name = "width",
+  val n = Parameter[Int](
+    name = "n",
     mode = ReadOnly,
     storage = HostStorage,
-    description = "Width of matrices"
-  )
-  val height = Parameter[Int](
-    name = "height",
-    mode = ReadOnly,
-    storage = HostStorage,
-    description = "Height of matrices"
+    description = "Width and height of matrices"
   )
   val a = Parameter[Buffer](
     name = "a",
@@ -68,14 +80,14 @@ class MatAddKernel extends OpenCLKernel {
     storage = DeviceStorage
   )
 
-  val prototype = Prototype(width,height,a,b,c)
+  val prototype = Prototype(n,a,b,c)
 
   def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
-      globalWorkSize = List(params(width), params(height), 1),
-      localWorkSize = None,
-      parameters = IndexedSeq(params(width),params(height), params(a), params(b), params(c))
+      globalWorkSize = List(params(n), params(n), 1),
+      localWorkSize = Some(List(32, 32/2, 1)),
+      parameters = IndexedSeq(params(n),params(a), params(b), params(c))
     )
 
     Some(config)

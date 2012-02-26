@@ -53,7 +53,7 @@ class MatMulOpenCL extends FixtureFunSuite {
 
   trait Common {
     val n = 32
-    val kernel = new MatMulKernel
+    val kernel = MatMulOpenCLKernel
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 

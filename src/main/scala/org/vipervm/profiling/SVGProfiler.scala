@@ -34,6 +34,9 @@ class SVGProfiler(platform:Platform) extends Profiler {
 
   private var firstTimeStamp:Option[Long] = None
 
+  val initSize = new Dimension(800,600)
+  val barHeight = 25
+
   val document = {
     val domImpl = SVGDOMImplementation.getDOMImplementation()
     val svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI
@@ -43,14 +46,32 @@ class SVGProfiler(platform:Platform) extends Profiler {
   private val g = new SVGGraphics2D(document)
   val canvas = new JSVGCanvas
   canvas.setSVGDocument(document)
-  g.setSVGCanvasSize(new Dimension(400,400))
+  g.setSVGCanvasSize(initSize)
+
+
+
+  val memTops = (platform.memories zip platform.memories.map( mem =>
+    (1 + platform.processorsThatCanWorkIn(mem).length) * barHeight
+  ).scanLeft(0)(_+_).map(_+150)).toMap
+
+  val procTops = platform.memories.flatMap( mem => {
+    val procs = platform.processorsThatCanWorkIn(mem)
+    val top = memTops(mem)
+    procs.zipWithIndex.map { case (p,t) =>
+      (p,t*barHeight + top + barHeight)
+    }
+  }).toMap
+
+  /* Draw legend */
+  procTops.zipWithIndex.foreach { case ((proc,top),idx) => {
+    g.drawString("%d) %s".format(idx,proc.toString), 0.0f, (1+idx)*barHeight)
+    g.drawString("%d)".format(idx), 0.0f, top + barHeight/2)
+  }}
 
   val factor = 5e-8
 
   private var transfers:Map[DataTransfer,Long] = Map.empty
   private var tasks:Map[Task,Long] = Map.empty
-  private val procs = platform.processors.zipWithIndex.toMap
-  private val mems = platform.memories.zipWithIndex.toMap
 
   protected def reactions(e:ProfilingEvent):Unit = {
     val fst = firstTimeStamp.getOrElse {
@@ -68,9 +89,9 @@ class SVGProfiler(platform:Platform) extends Profiler {
         g.setPaint(Color.blue)
         val left = position(transfers(dt))
         val right = position(e.timestamp)
-        val top = 100 + mems(dt.source.buffer.memory) * 25
-        val bottom = 100 + mems(dt.target.buffer.memory) * 25
-        if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,400))
+        val top = memTops(dt.source.buffer.memory) + (barHeight/2)
+        val bottom = memTops(dt.target.buffer.memory) + (barHeight/2)
+        if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,g.getSVGCanvasSize.height))
         g.drawLine(left,top,right,bottom)
         transfers -= dt
       }
@@ -83,9 +104,9 @@ class SVGProfiler(platform:Platform) extends Profiler {
         g.setPaint(Color.green)
         val left = position(tasks(task))
         val right = position(e.timestamp)
-        val top = 130 + procs(proc) * 25
-        if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,400))
-        g.fill(new Rectangle(left, top, right-left, 20))
+        val top = procTops(proc) + 2
+        if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,g.getSVGCanvasSize.height))
+        g.fill(new Rectangle(left, top, right-left, barHeight-4))
         tasks -= task
       }
     }

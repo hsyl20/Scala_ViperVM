@@ -83,8 +83,17 @@ class SVGProfiler(platform:Platform) extends Profiler {
       g.drawLine(start,scaleTop-4,start, scaleTop)
       g.drawLine(start, scaleTop, end, scaleTop)
       g.drawLine(end,scaleTop,end,scaleTop-4)
-      g.drawString(text, end.toFloat, (scaleTop+25).toFloat)
+      val metrics = g.getFontMetrics(g.getFont)
+      val textWidth = metrics.stringWidth(text)
+      g.drawString(text, end.toFloat-(textWidth/2.0f), (scaleTop+25).toFloat)
+      val right = end + (textWidth/2)
+      if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
   }
+
+  def resizeCanvas(size:Dimension, old:Dimension = g.getSVGCanvasSize):Unit = {
+    g.setSVGCanvasSize(size)
+  }
+
 
   protected var scaleRightTimeStamp:Long = 0L
 
@@ -103,10 +112,6 @@ class SVGProfiler(platform:Platform) extends Profiler {
       scaleRightTimeStamp = newEnd
     }
 
-    def resizeCanvas(size:Dimension, old:Dimension = g.getSVGCanvasSize):Unit = {
-      g.setSVGCanvasSize(size)
-    }
-
     def position(time:Long) = ((time - fst) * scale + margin).toInt
     def time(position:Int) = ((position - margin).toDouble / scale) + fst
 
@@ -116,7 +121,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
         transfers += (dt -> e.timestamp)
       }
       case DataTransferEnd(data,dt) => {
-        val color = new Color(0.0f, 0.0f, 1.0f, 0.6f)
+        val color = new Color(0.0f, 0.0f, 1.0f, 0.5f)
         g.setPaint(color)
         val stroke = new BasicStroke(2.0f)
         g.setStroke(stroke)
@@ -134,7 +139,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
         tasks += (task -> e.timestamp)
       }
       case TaskCompleted(task, proc) => {
-        val color = new Color(0.0f, 1.0f, 0.0f)
+        val color = new Color(0.0f, 1.0f, 0.0f,0.5f)
         g.setPaint(color)
         val stroke = new BasicStroke(1.0f)
         g.setStroke(stroke)
@@ -143,7 +148,6 @@ class SVGProfiler(platform:Platform) extends Profiler {
         val top = procTops(proc) + 2
         if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
         val shape = new RoundRectangle2D.Float(left, top, right-left, barHeight-4, 10.0f, 10.0f) 
-        //g.draw(shape)
         g.fill(shape)
         tasks -= task
       }

@@ -13,10 +13,10 @@
 
 package org.vipervm.platform.jvm
 
-import scala.actors.Futures._
+import akka.dispatch.{Future,Await,ExecutionContext}
 import org.vipervm.platform._
 
-class JVMProcessor(hostDriver:HostDriver) extends Processor {
+class JVMProcessor(hostDriver:HostDriver,dispatcher:ExecutionContext) extends Processor {
   type MemoryNodeType = HostMemoryNode
 
   val memories = hostDriver.memories
@@ -29,13 +29,13 @@ class JVMProcessor(hostDriver:HostDriver) extends Processor {
 
     val ev = new UserEvent
 
-    future { 
+    Future {
       kernel.fun(args)
       ev.complete
-    }
+    }(dispatcher)
 
     new KernelEvent(kernel, args, this, ev)
   }
 
-  override def toString = "JVM: Scala Actors"
+  override def toString = "JVM: Akka Actors"
 }

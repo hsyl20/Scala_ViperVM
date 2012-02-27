@@ -56,7 +56,8 @@ object MyProject extends Build {
   val myResolvers = Seq(
     "Sun Maven2 Repo" at "http://download.java.net/maven/2",
     "Oracle Maven2 Repo" at "http://download.oracle.com/maven",
-    "Scala-Tools Snapshots" at "http://scala-tools.org/repo-snapshots"
+    "Scala-Tools Snapshots" at "http://scala-tools.org/repo-snapshots",
+    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   )
 
   val myDependencies = Seq (
@@ -71,6 +72,7 @@ object MyProject extends Build {
     "batik" % "batik-svggen" % "1.6-1",
     "batik" % "batik-swing" % "1.6-1",
     "batik" % "batik-css" % "1.6-1",
+    "com.typesafe.akka" % "akka-actor" % "2.0-RC2",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

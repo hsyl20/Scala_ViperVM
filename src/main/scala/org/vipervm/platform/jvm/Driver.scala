@@ -14,6 +14,7 @@
 package org.vipervm.platform.jvm
 
 import org.vipervm.platform._
+import akka.actor.ActorSystem
 
 /**
  * JVM platform driver
@@ -21,7 +22,10 @@ import org.vipervm.platform._
  */
 class JVMDriver(hostDriver:HostDriver) extends Driver {
 
-  val processors = Seq(new JVMProcessor(hostDriver))
+  val procCount = Runtime.getRuntime.availableProcessors
+  val dispatcher = ActorSystem().dispatcher
+
+  val processors = (0 to procCount).map(x => new JVMProcessor(hostDriver,dispatcher))
 
   val networks:Seq[Network] = Seq.empty
 

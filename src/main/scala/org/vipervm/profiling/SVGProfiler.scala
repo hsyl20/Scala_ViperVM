@@ -72,7 +72,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
 
   val margin = 30
   val scaleTop = procTops.last._2 + 2*barHeight
-  g.drawString("  secs", 0.0f, (scaleTop+25).toFloat)
+  g.drawString("  msecs", 0.0f, (scaleTop+25).toFloat)
 
   protected def drawScale(start:Int,end:Int,text:String): Unit = {
       val color = new Color(0.0f, 0.0f, 0.0f, 0.6f)
@@ -89,7 +89,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
   protected var scaleRightTimeStamp:Long = 0L
 
   protected def reactions(e:ProfilingEvent):Unit = {
-    val scale = 5e-8
+    val scale = 5e-7
 
     val fst = firstTimeStamp.getOrElse {
       firstTimeStamp = Some(e.timestamp)
@@ -98,8 +98,8 @@ class SVGProfiler(platform:Platform) extends Profiler {
     }
 
     while (e.timestamp > scaleRightTimeStamp) {
-      val newEnd = scaleRightTimeStamp+(1e9.toLong)
-      drawScale(position(scaleRightTimeStamp),position(newEnd), ((newEnd-fst)/(1e9.toLong)).toString)
+      val newEnd = scaleRightTimeStamp+(1e8.toLong)
+      drawScale(position(scaleRightTimeStamp),position(newEnd), ((newEnd-fst)/(1e6.toLong)).toString)
       scaleRightTimeStamp = newEnd
     }
 

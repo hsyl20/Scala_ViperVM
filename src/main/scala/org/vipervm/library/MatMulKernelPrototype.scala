@@ -11,19 +11,32 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform.jvm
+package org.vipervm.library
 
 import org.vipervm.platform._
 
-/**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
- */
+trait MatMulKernelPrototype {
+  val n = Parameter[Int](
+    name = "n",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Width and height of matrices"
+  )
+  val a = Parameter[Buffer](
+    name = "a",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val b = Parameter[Buffer](
+    name = "b",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val c = Parameter[Buffer](
+    name = "c",
+    mode = ReadWrite,
+    storage = DeviceStorage
+  )
 
-abstract class JVMKernel extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc.isInstanceOf[JVMProcessor]
-
-  implicit def buf2buf(b:Buffer):HostBuffer = b.asInstanceOf[HostBuffer]
-
-  def fun(args:Seq[Any]):Unit
+  val prototype = Prototype(n,a,b,c)
 }

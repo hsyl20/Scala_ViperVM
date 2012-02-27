@@ -19,12 +19,12 @@ import org.vipervm.platform._
  * JVM platform driver
  *
  */
-class JVMDriver extends Driver {
+class JVMDriver(hostDriver:HostDriver) extends Driver {
 
-  val processors:Seq[JVMProcessor] = Seq(new JVMProcessor)
+  val processors = Seq(new JVMProcessor(hostDriver))
 
-  val networks:Seq[JVMNetwork] = Seq(new JVMNetwork)
+  val networks:Seq[Network] = Seq.empty
 
-  val memories:Seq[JVMMemoryNode.type] = Seq(JVMMemoryNode)
+  val memories:Seq[MemoryNode] = Seq.empty
 
 }

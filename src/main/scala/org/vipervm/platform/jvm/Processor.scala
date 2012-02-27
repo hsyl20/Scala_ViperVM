@@ -16,10 +16,10 @@ package org.vipervm.platform.jvm
 import scala.actors.Futures._
 import org.vipervm.platform._
 
-class JVMProcessor extends Processor {
-  type MemoryNodeType = JVMMemoryNode.type
+class JVMProcessor(hostDriver:HostDriver) extends Processor {
+  type MemoryNodeType = HostMemoryNode
 
-  val memories = Seq(JVMMemoryNode)
+  val memories = hostDriver.memories
 
   def compile(kernel:Kernel):Unit = {}
 
@@ -27,21 +27,15 @@ class JVMProcessor extends Processor {
     implicit def ker2ker(k:Kernel):JVMKernel =
       k.asInstanceOf[JVMKernel]
 
-    implicit def buf2buf(b:Buffer): JVMBuffer =
-      b.asInstanceOf[JVMBuffer]
+    val ev = new UserEvent
 
-    val ev = new JVMEvent(future { 
-      kernel.fun(args.map { 
-        case JVMBufferKernelParameter(b) => b.asInstanceOf[JVMBuffer]
-        case JVMIntKernelParameter(v) => v
-        case JVMLongKernelParameter(v) => v
-        case JVMDoubleKernelParameter(v) => v 
-        case JVMFloatKernelParameter(v) => v
-      })
-    })
+    future { 
+      kernel.fun(args)
+      ev.complete
+    }
 
     new KernelEvent(kernel, args, this, ev)
   }
 
-  override def toString = "JVM"
+  override def toString = "JVM: Scala Actors"
 }

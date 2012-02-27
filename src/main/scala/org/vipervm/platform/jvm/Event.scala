@@ -17,11 +17,12 @@ import scala.actors._
 import org.vipervm.platform.Event
 
 class JVMEvent[T](peer:Future[T]) extends Event {
-  override def syncWait: Unit = peer.apply
+  override def syncWait: Unit = peer()
 
   override def test:Boolean = {
     if (peer.isSet)
       complete
     completed
   }
+
 }

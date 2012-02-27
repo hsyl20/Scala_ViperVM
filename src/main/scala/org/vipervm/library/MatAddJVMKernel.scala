@@ -11,19 +11,25 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.platform.jvm
+package org.vipervm.library
 
-import org.vipervm.platform._
+import org.vipervm.platform.jvm._
 
-/**
- * Kernel that can be executed on the JVM (Scala,Java,Groovy...)
- */
+object MatAddJVMKernel extends JVMKernel with MatAddKernelPrototype {
 
-abstract class JVMKernel extends Kernel {
-  
-  def canExecuteOn(proc:Processor): Boolean = proc.isInstanceOf[JVMProcessor]
+  def fun(params:Seq[Any]): Unit = {
+    val (w,h) = (params(width), params(height))
+    val (m1,m2,m3) = (params(a).peer,params(b).peer,params(c).peer)
 
-  implicit def buf2buf(b:Buffer):HostBuffer = b.asInstanceOf[HostBuffer]
-
-  def fun(args:Seq[Any]):Unit
+    var i = 0L
+    while (i < h) {
+      var j = 0L
+      while (j < w) {
+        val pos = (i*w+j)*4
+        m3.setFloat(pos,m1.getFloat(pos) + m2.getFloat(pos))
+        j += 1
+      }
+      i += 1
+    }
+  }
 }

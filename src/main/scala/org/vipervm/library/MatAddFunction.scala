@@ -19,7 +19,7 @@ import org.vipervm.runtime.data.Matrix2D
 
 object MatAddMetaKernel extends KernelSet {
 
-  val kernels = Seq(MatAddOpenCLKernel)
+  val kernels = Seq(MatAddOpenCLKernel,MatAddJVMKernel)
 
   val a = Parameter[Matrix2D[Float]](
     name = "a",

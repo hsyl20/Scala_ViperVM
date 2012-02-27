@@ -14,11 +14,8 @@
 package org.vipervm.library
 
 import org.vipervm.platform.opencl._
-import org.vipervm.platform.host._
-import org.vipervm.platform._
-import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
-object MatMulOpenCLKernel extends OpenCLKernel {
+object MatMulOpenCLKernel extends OpenCLKernel with MatMulKernelPrototype {
   val source = """
     #define BS 32
     __kernel void matrixMul(
@@ -57,30 +54,6 @@ object MatMulOpenCLKernel extends OpenCLKernel {
 
   val program = new OpenCLProgram(source)
   val name = "matrixMul"
-
-  val n = Parameter[Int](
-    name = "n",
-    mode = ReadOnly,
-    storage = HostStorage,
-    description = "Width and height of matrices"
-  )
-  val a = Parameter[Buffer](
-    name = "a",
-    mode = ReadOnly,
-    storage = DeviceStorage
-  )
-  val b = Parameter[Buffer](
-    name = "b",
-    mode = ReadOnly,
-    storage = DeviceStorage
-  )
-  val c = Parameter[Buffer](
-    name = "c",
-    mode = ReadWrite,
-    storage = DeviceStorage
-  )
-
-  val prototype = Prototype(n,a,b,c)
 
   def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 

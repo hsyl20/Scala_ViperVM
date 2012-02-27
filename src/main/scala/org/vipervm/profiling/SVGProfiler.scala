@@ -53,17 +53,19 @@ class SVGProfiler(platform:Platform) extends Profiler {
     (1 + platform.processorsThatCanWorkIn(mem).length) * barHeight
   ).scanLeft(0)(_+_).map(_+150)).toMap
 
-  val procTops = platform.memories.flatMap( mem => {
+  val procTopsList = platform.memories.flatMap( mem => {
     val procs = platform.processorsThatCanWorkIn(mem)
     val top = memTops(mem)
     procs.zipWithIndex.map { case (p,t) =>
       (p,t*barHeight + top + barHeight)
     }
-  }).toMap
+  })
+
+  val procTops = procTopsList.toMap
 
   /* Draw legend */
-  procTops.zipWithIndex.foreach { case ((proc,top),idx) => {
-    g.drawString("%d) %s".format(idx,proc.toString), 0.0f, (1+idx)*barHeight)
+  procTopsList.zipWithIndex.foreach { case ((proc,top),idx) => {
+    g.drawString("%d) %s".format(idx,proc.toString), 0.0f, (1+idx)*(barHeight-10))
     g.drawString("%d)".format(idx), 0.0f, top + barHeight/2)
   }}
 
@@ -71,7 +73,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
   private var tasks:Map[Task,Long] = Map.empty
 
   val margin = 30
-  val scaleTop = procTops.last._2 + 2*barHeight
+  val scaleTop = procTopsList.last._2 + 2*barHeight
   g.drawString("  msecs", 0.0f, (scaleTop+25).toFloat)
 
   protected def drawScale(start:Int,end:Int,text:String): Unit = {

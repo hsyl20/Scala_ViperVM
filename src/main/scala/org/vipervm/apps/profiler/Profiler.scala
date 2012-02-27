@@ -28,8 +28,8 @@ object Profiler {
   def dynamicRendering(profiler:SVGProfiler):Unit = {
     val canvas = Component.wrap(profiler.canvas)
     canvas.visible = true
-    canvas.preferredSize = new Dimension(400,400)
     val frame = new ProfilerFrame(canvas)
+    frame.size = new Dimension(800,600)
     frame.visible = true
   }
 }

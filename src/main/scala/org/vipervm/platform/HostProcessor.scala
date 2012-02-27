@@ -15,6 +15,4 @@ package org.vipervm.platform
 
 abstract class HostProcessor extends Processor {
   type MemoryNodeType <: HostMemoryNode
-
-  override def toString:String = "Host: CPU"
 }

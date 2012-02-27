@@ -26,4 +26,9 @@ class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends HostProcessor {
   def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
     throw new Exception("Unable to execute kernels (not implemented)")
   }
+
+  override def toString:String = "Host: Default Host Driver - %d cores".format(
+    Runtime.getRuntime.availableProcessors
+  )
+
 }

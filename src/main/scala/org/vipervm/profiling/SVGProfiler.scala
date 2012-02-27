@@ -15,11 +15,12 @@ package org.vipervm.profiling
 
 import org.vipervm.runtime.Task
 import org.vipervm.platform.{Platform,DataTransfer,Processor}
+
 import java.awt._
-import java.io.{PrintWriter,FileWriter}
+import java.awt.geom.RoundRectangle2D
+import java.io.{PrintWriter,FileWriter,OutputStream,OutputStreamWriter,FileOutputStream}
 import javax.swing.SwingUtilities
 
-import java.io.{OutputStream,OutputStreamWriter,FileOutputStream}
 import org.apache.batik.svggen.SVGGraphics2D
 import org.apache.batik.dom.svg.SVGDOMImplementation
 import org.apache.batik.dom.util._
@@ -86,7 +87,10 @@ class SVGProfiler(platform:Platform) extends Profiler {
         transfers += (dt -> e.timestamp)
       }
       case DataTransferEnd(data,dt) => {
-        g.setPaint(Color.blue)
+        val color = new Color(0.0f, 0.0f, 1.0f, 0.6f)
+        g.setPaint(color)
+        val stroke = new BasicStroke(2.0f)
+        g.setStroke(stroke)
         val left = position(transfers(dt))
         val right = position(e.timestamp)
         val top = memTops(dt.source.buffer.memory) + (barHeight/2)
@@ -101,12 +105,17 @@ class SVGProfiler(platform:Platform) extends Profiler {
         tasks += (task -> e.timestamp)
       }
       case TaskCompleted(task, proc) => {
-        g.setPaint(Color.green)
+        val color = new Color(0.0f, 1.0f, 0.0f)
+        g.setPaint(color)
+        val stroke = new BasicStroke(1.0f)
+        g.setStroke(stroke)
         val left = position(tasks(task))
         val right = position(e.timestamp)
         val top = procTops(proc) + 2
         if (right > g.getSVGCanvasSize.width) g.setSVGCanvasSize(new Dimension(right+20,g.getSVGCanvasSize.height))
-        g.fill(new Rectangle(left, top, right-left, barHeight-4))
+        val shape = new RoundRectangle2D.Float(left, top, right-left, barHeight-4, 10.0f, 10.0f) 
+        //g.draw(shape)
+        g.fill(shape)
         tasks -= task
       }
     }

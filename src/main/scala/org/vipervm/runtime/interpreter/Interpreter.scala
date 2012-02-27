@@ -34,6 +34,11 @@ class Interpreter(scheduler:Scheduler) {
       val params = args.par.map(x => evaluate(x,symbols)).seq
       submit(k, params, symbols)
     }
+    case TmLet(v,e,in) => {
+      val data = evaluate(e,symbols)
+      val nsymbols = symbols.copy(values = symbols.values + (v.name -> data))
+      evaluate(in,nsymbols)
+    }
     case _ => ???
   }
 
@@ -55,6 +60,4 @@ class Interpreter(scheduler:Scheduler) {
     scheduler.submitTask(task,deps)
   }
 }
-
-
 

@@ -11,34 +11,24 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.parsers
+package org.vipervm
 
-import scala.util.parsing.combinator.syntactical._
-
-import org.vipervm.runtime._
 import org.vipervm.runtime.interpreter._
 
-object LispyParser extends StandardTokenParsers {
+package object dsl {
+  def let(bindings:(Program,Program)*) = new {
+    val bs = bindings.map{ case (x,e) => x.term match {
+      case a@TmVar(_) => (a,e)
+      case _ => throw new Exception("Invalid data type")
+    }}
 
-  lexical.delimiters += ("(", ")")
-  lexical.reserved += "let"
-
-  lazy val expr: Parser[Term] = (
-      ("("~>"let"~>"("~>rep("("~>ident~expr<~")")<~")")~expr<~")" ^^ {
-        case lets~in => (lets :\ in) { case ((v~e),in) =>
-          TmLet(TmVar(v),e,in)
-        }
+    def in(prog:Program):Program = new Program {
+      
+      val term = (bs :\ prog.term) { case ((v,e),in) => TmLet(v,e.term,in) }
+      val symbols = (prog.symbols /: bindings.map(_._2.symbols)) {
+        (a,b) => a.copy(a.values ++ b.values, a.functions ++ b.functions)
       }
-    | ("("~>ident)~rep(expr)<~")" ^^ {
-        case k~as => TmApp(TmKernel(k), Vector(as:_*))
-      }
-    | ident ^^ {
-        case d => TmVar(d)
-      }
-  )
-
-  def parse(s:String) = {
-    val tokens = new lexical.Scanner(s)
-    phrase(expr)(tokens)
-  } 
+    }
+  }
 }
+

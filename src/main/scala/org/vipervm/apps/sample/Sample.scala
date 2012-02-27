@@ -42,7 +42,10 @@ private class SampleApp(size:Long = 32) {
   val a = Matrix2D[Float](size,size)
   val b = Matrix2D[Float](size,size)
   val c = Matrix2D[Float](size,size)
-  val program = a*b + a*c
+  val x = Matrix2D[Float](size,size)
+  val y = Matrix2D[Float](size,size)
+
+  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
 
   a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
   b.peer.get.initialize(dataManager, (x,y) => 2.0f )

@@ -17,3 +17,4 @@ sealed abstract class Term
 case class TmVar(name:String) extends Term
 case class TmKernel(name:String) extends Term
 case class TmApp(kernel:TmKernel, args:Vector[Term]) extends Term
+case class TmLet(v:TmVar, e:Term, in:Term) extends Term

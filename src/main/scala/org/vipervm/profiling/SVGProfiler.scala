@@ -79,7 +79,7 @@ class SVGProfiler(platform:Platform) extends Profiler {
       firstTimeStamp.get
     }
 
-    def position(time:Long) = ((time - fst) * factor).toInt
+    def position(time:Long) = ((time - fst) * factor + 20).toInt
 
     e match {
       case DataTransferStart(data,dt) => {

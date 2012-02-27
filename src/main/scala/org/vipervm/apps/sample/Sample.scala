@@ -15,6 +15,7 @@ package org.vipervm.apps
 
 import org.vipervm.platform.Platform
 import org.vipervm.platform.opencl.OpenCLDriver
+import org.vipervm.platform.jvm.JVMDriver
 import org.vipervm.platform.host.DefaultHostDriver
 
 import org.vipervm.runtime._
@@ -26,26 +27,32 @@ import org.vipervm.runtime.interpreter._
 import org.vipervm.library._
 
 import org.vipervm.parsers.LispyParser
-import org.vipervm.dsl._
 
 import org.vipervm.profiling._
 
 private class SampleApp(size:Long = 32) {
 
-  val platform = Platform(DefaultHostDriver, new OpenCLDriver)
+  val host = DefaultHostDriver
+  //val platform = Platform(host, new OpenCLDriver, new JVMDriver(host))
+  val platform = Platform(host, new OpenCLDriver)
   val profiler = new SVGProfiler(platform)
   val dataManager = new DefaultDataManager(platform,profiler)
   val sched = new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy
 
   val frame = Profiler.dynamicRendering(profiler)
 
+  import org.vipervm.dsl._
   val a = Matrix2D[Float](size,size)
   val b = Matrix2D[Float](size,size)
   val c = Matrix2D[Float](size,size)
   val x = Matrix2D[Float](size,size)
   val y = Matrix2D[Float](size,size)
 
-  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
+  def makeTree(init:Matrix2D[Float], height:Int):Matrix2D[Float] = {
+    (init /: (0 to height))((init,_) => init + init)
+  }
+  val program = makeTree(a*b+a*c, 3)
+//  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
 
   a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
   b.peer.get.initialize(dataManager, (x,y) => 2.0f )

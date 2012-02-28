@@ -72,7 +72,7 @@ object MyProject extends Build {
     "batik" % "batik-svggen" % "1.6-1",
     "batik" % "batik-swing" % "1.6-1",
     "batik" % "batik-css" % "1.6-1",
-    "com.typesafe.akka" % "akka-actor" % "2.0-RC2",
+    "com.typesafe.akka" % "akka-actor" % "2.0-RC3",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 

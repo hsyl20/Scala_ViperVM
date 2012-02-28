@@ -11,25 +11,32 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra.kernels.prototypes
 
-import org.vipervm.platform.jvm._
+import org.vipervm.platform._
 
-object MatAddJVMKernel extends JVMKernel with MatAddKernelPrototype {
+trait FloatMatrixMultiplicationPrototype {
+  val n = Parameter[Int](
+    name = "n",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Width and height of matrices"
+  )
+  val a = Parameter[Buffer](
+    name = "a",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val b = Parameter[Buffer](
+    name = "b",
+    mode = ReadOnly,
+    storage = DeviceStorage
+  )
+  val c = Parameter[Buffer](
+    name = "c",
+    mode = ReadWrite,
+    storage = DeviceStorage
+  )
 
-  def fun(params:Seq[Any]): Unit = {
-    val (w,h) = (params(width), params(height))
-    val (m1,m2,m3) = (params(a).peer,params(b).peer,params(c).peer)
-
-    var i = 0L
-    while (i < h) {
-      var j = 0L
-      while (j < w) {
-        val pos = (i*w+j)*4
-        m3.setFloat(pos,m1.getFloat(pos) + m2.getFloat(pos))
-        j += 1
-      }
-      i += 1
-    }
-  }
+  val prototype = Prototype(n,a,b,c)
 }

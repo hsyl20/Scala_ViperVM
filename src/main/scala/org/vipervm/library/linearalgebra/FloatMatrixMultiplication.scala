@@ -11,14 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra
 
+import org.vipervm.library.linearalgebra.kernels.jvm.FloatMatrixMultiplicationJVM
+import org.vipervm.library.linearalgebra.kernels.opencl.FloatMatrixMultiplicationOpenCL
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D
+import org.vipervm.library.linearalgebra.kernels._
 
-object MatMulMetaKernel extends KernelSet {
-  val kernels = Seq(MatMulOpenCLKernel,MatMulJVMKernel)
+object FloatMatrixMultiplicationMetaKernel extends KernelSet {
+  val kernels = Seq(FloatMatrixMultiplicationOpenCL,FloatMatrixMultiplicationJVM)
   
   val a = Parameter[Matrix2D[Float]](
     name = "a",
@@ -48,8 +51,8 @@ object MatMulMetaKernel extends KernelSet {
 }
 
 
-class MatMulFunction extends Function {
-  val peer = MatMulMetaKernel
+object FloatMatrixMultiplication extends Function {
+  val peer = FloatMatrixMultiplicationMetaKernel
 
   def createTask(args:Seq[FutureData]):FutureEvent[Task] = args.map(_.data) match {
     case Seq(a:Matrix2D[_], b:Matrix2D[_]) => {

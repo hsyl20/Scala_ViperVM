@@ -11,15 +11,18 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra
 
+import org.vipervm.library.linearalgebra.kernels.jvm.FloatMatrixAdditionJVM
+import org.vipervm.library.linearalgebra.kernels.opencl.FloatMatrixAdditionOpenCL
 import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.data.Matrix2D
+import org.vipervm.library.linearalgebra.kernels._
 
-object MatAddMetaKernel extends KernelSet {
+object FloatMatrixAdditionMetaKernel extends KernelSet {
 
-  val kernels = Seq(MatAddOpenCLKernel,MatAddJVMKernel)
+  val kernels = Seq(FloatMatrixAdditionOpenCL,FloatMatrixAdditionJVM)
 
   val a = Parameter[Matrix2D[Float]](
     name = "a",
@@ -49,8 +52,8 @@ object MatAddMetaKernel extends KernelSet {
   }
 }
 
-class MatAddFunction extends Function {
-  val peer = MatAddMetaKernel
+object FloatMatrixAddition extends Function {
+  val peer = FloatMatrixAdditionMetaKernel
 
   def createTask(args:Seq[FutureData]):FutureEvent[Task] = args.map(_.data) match {
     case Seq(a:Matrix2D[_], b:Matrix2D[_]) => {

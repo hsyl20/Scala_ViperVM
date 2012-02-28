@@ -18,15 +18,15 @@ import org.vipervm.runtime.data.Primitives._
 import org.vipervm.runtime.data
 import org.vipervm.runtime.interpreter._
 
-import org.vipervm.library._
+import org.vipervm.library.linearalgebra._
 
 abstract class Matrix2D[A:Primitive] extends Program {
   val term:Term
   val symbols:SymbolTable
   val peer:Option[data.Matrix2D[A]]
 
-  lazy val addFunc = new MatAddFunction
-  lazy val mulFunc = new MatMulFunction
+  val addFunc = FloatMatrixAddition
+  val mulFunc = FloatMatrixMultiplication
 
   def +(m:Matrix2D[A]):Matrix2D[A] = {
     val myt = term

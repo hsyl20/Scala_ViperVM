@@ -11,11 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra.kernels.prototypes
 
 import org.vipervm.platform._
 
-trait MatAddKernelPrototype {
+trait FloatMatrixAdditionPrototype {
   val width = Parameter[Int](
     name = "width",
     mode = ReadOnly,

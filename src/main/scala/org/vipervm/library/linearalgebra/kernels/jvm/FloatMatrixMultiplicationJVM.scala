@@ -11,11 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra.kernels.jvm
 
+import org.vipervm.library.linearalgebra.kernels.prototypes._
 import org.vipervm.platform.jvm._
 
-object MatMulJVMKernel extends JVMKernel with MatMulKernelPrototype {
+object FloatMatrixMultiplicationJVM extends JVMKernel with FloatMatrixMultiplicationPrototype {
 
   def fun(params:Seq[Any]): Unit = {
     val w = params(n)

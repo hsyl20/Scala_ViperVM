@@ -11,11 +11,13 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra.kernels.opencl
+
+import org.vipervm.library.linearalgebra.kernels.prototypes._
 
 import org.vipervm.platform.opencl._
 
-object MatMulOpenCLKernel extends OpenCLKernel with MatMulKernelPrototype {
+object FloatMatrixMultiplicationOpenCL extends OpenCLKernel with FloatMatrixMultiplicationPrototype {
   val source = """
     #define BS 32
     __kernel void matrixMul(

@@ -25,7 +25,7 @@ import org.vipervm.runtime.scheduling.DefaultScheduler
 import org.vipervm.runtime.mm._
 import org.vipervm.runtime.interpreter._
 
-import org.vipervm.library._
+import org.vipervm.library.linearalgebra._
 
 import org.vipervm.profiling.SLF4JProfiler
 
@@ -41,8 +41,8 @@ class MatMul extends FunSuite {
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = new MatMulFunction
-    val matadd = new MatAddFunction
+    val matmul = FloatMatrixMultiplication
+    val matadd = FloatMatrixAddition
 
     val symbols = SymbolTable(
       Map("a" -> a, "b" -> b, "c" -> c),
@@ -65,8 +65,8 @@ class MatMul extends FunSuite {
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = new MatMulFunction
-    val matadd = new MatAddFunction
+    val matmul = FloatMatrixMultiplication
+    val matadd = FloatMatrixAddition
 
     val symbols = SymbolTable(
       Map("a" -> a, "b" -> b, "c" -> c),

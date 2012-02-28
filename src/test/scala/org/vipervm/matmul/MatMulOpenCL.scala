@@ -23,7 +23,7 @@ import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 import org.vipervm.platform.FutureEvent._
 import org.vipervm.platform.Barrier._
 
-import org.vipervm.library._
+import org.vipervm.library.linearalgebra.kernels.opencl._
 
 import java.util.Random
 import scala.util.continuations._
@@ -53,7 +53,7 @@ class MatMulOpenCL extends FixtureFunSuite {
 
   trait Common {
     val n = 32
-    val kernel = MatMulOpenCLKernel
+    val kernel = FloatMatrixMultiplicationOpenCL
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 

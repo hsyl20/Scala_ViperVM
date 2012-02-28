@@ -11,11 +11,12 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.library
+package org.vipervm.library.linearalgebra.kernels.opencl
 
+import org.vipervm.library.linearalgebra.kernels.prototypes._
 import org.vipervm.platform.opencl._
 
-object MatAddOpenCLKernel extends OpenCLKernel with MatAddKernelPrototype {
+object FloatMatrixAdditionOpenCL extends OpenCLKernel with FloatMatrixAdditionPrototype {
   val source = """
     __kernel void matrixAdd(
        const int width,

@@ -30,6 +30,7 @@ object Profiler {
     canvas.visible = true
     val frame = new ProfilerFrame(canvas)
     frame.size = new Dimension(800,600)
+    frame.peer.getRootPane.setDoubleBuffered(true)
     frame.visible = true
   }
 }

@@ -173,7 +173,7 @@ class MatMulOpenCL extends FixtureFunSuite {
   test("Low-Level Asynchronous OpenCL Using Continuations") { common =>
     import common._
 
-    val chk = reset {
+    val chk = sequence {
       /* Type of the returned value */
       type R = Boolean 
 

@@ -21,7 +21,7 @@ import org.vipervm.platform.host.DefaultHostDriver
 import org.vipervm.runtime._
 import org.vipervm.runtime.data._
 import org.vipervm.runtime.scheduling._
-import org.vipervm.runtime.mm.DefaultDataManager
+import org.vipervm.runtime.mm.{DefaultDataManager,DataManager}
 import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
@@ -35,9 +35,14 @@ private class SampleApp(size:Long = 32) {
   val host = DefaultHostDriver
   //val platform = Platform(host, new OpenCLDriver, new JVMDriver(host))
   val platform = Platform(host, new OpenCLDriver)
-  val profiler = new SVGProfiler(platform)
-  val dataManager = new DefaultDataManager(platform,profiler)
-  val sched = new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy
+  val profiler = SVGProfiler(platform)
+  val dataManager = DefaultDataManager(platform,profiler)
+  val sched = Scheduler {
+    new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy {
+      override val loadBalancingCoef = 5.0f
+    }
+  }
+  //val sched = DefaultScheduler(dataManager,profiler)
 
   val frame = Profiler.dynamicRendering(profiler)
 
@@ -53,6 +58,7 @@ private class SampleApp(size:Long = 32) {
   }
   val program = makeTree(a*b+a*c, 3)
 //  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
+//  val program = a*b + a*c
 
   a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
   b.peer.get.initialize(dataManager, (x,y) => 2.0f )

@@ -18,7 +18,7 @@ import org.vipervm.runtime.scheduling.Messages.LoadStatus
 
 trait LoadBalancingPolicy extends RankingPolicy {
 
-  val loadBalancingCoef = 1.0f
+  val loadBalancingCoef = 4.0f
 
   private def rankStatus(status:LoadStatus):Float = {
     1.0f / (status.taskCount.toFloat + 1.0f)

@@ -13,8 +13,8 @@
 
 package org.vipervm.profiling
 
-import org.vipervm.runtime.Task
-import org.vipervm.platform.{Platform,DataTransfer,Processor}
+import org.vipervm.platform._
+import org.vipervm.runtime._
 
 import java.awt._
 import java.awt.geom.RoundRectangle2D
@@ -31,7 +31,15 @@ import org.w3c.dom.Document
 import org.w3c.dom.DOMImplementation
 import org.w3c.dom.svg.SVGDocument
 
-class SVGProfiler(platform:Platform) extends Profiler {
+import akka.actor.{TypedActor,ActorSystem,TypedProps}
+
+trait SVGProfiler extends Profiler {
+  def save(filename:String):Unit
+  def stream(writer:PrintWriter):Unit
+  def canvas:JSVGCanvas
+}
+
+private class SVGProfilerImpl(platform:Platform) extends SVGProfiler {
 
   private var firstTimeStamp:Option[Long] = None
 
@@ -77,19 +85,19 @@ class SVGProfiler(platform:Platform) extends Profiler {
   g.drawString("  msecs", 0.0f, (scaleTop+25).toFloat)
 
   protected def drawScale(start:Int,end:Int,text:String): Unit = {
-      val color = new Color(0.0f, 0.0f, 0.0f, 0.6f)
-      g.setPaint(color)
-      val stroke = new BasicStroke(1.0f)
-      g.setStroke(stroke)
+    val color = new Color(0.0f, 0.0f, 0.0f, 0.6f)
+    g.setPaint(color)
+    val stroke = new BasicStroke(1.0f)
+    g.setStroke(stroke)
 
-      g.drawLine(start,scaleTop-4,start, scaleTop)
-      g.drawLine(start, scaleTop, end, scaleTop)
-      g.drawLine(end,scaleTop,end,scaleTop-4)
-      val metrics = g.getFontMetrics(g.getFont)
-      val textWidth = metrics.stringWidth(text)
-      g.drawString(text, end.toFloat-(textWidth/2.0f), (scaleTop+25).toFloat)
-      val right = end + (textWidth/2)
-      if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
+    g.drawLine(start,scaleTop-4,start, scaleTop)
+    g.drawLine(start, scaleTop, end, scaleTop)
+    g.drawLine(end,scaleTop,end,scaleTop-4)
+    val metrics = g.getFontMetrics(g.getFont)
+    val textWidth = metrics.stringWidth(text)
+    g.drawString(text, end.toFloat-(textWidth/2.0f), (scaleTop+25).toFloat)
+    val right = end + (textWidth/2)
+    if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
   }
 
   def resizeCanvas(size:Dimension, old:Dimension = g.getSVGCanvasSize):Unit = {
@@ -99,67 +107,76 @@ class SVGProfiler(platform:Platform) extends Profiler {
 
   protected var scaleRightTimeStamp:Long = 0L
 
-  protected def reactions(e:ProfilingEvent):Unit = {
-    val scale = 5e-7
+  protected val scale = 5e-7
 
-    val fst = firstTimeStamp.getOrElse {
-      firstTimeStamp = Some(e.timestamp)
-      scaleRightTimeStamp = firstTimeStamp.get
-      firstTimeStamp.get
+  def first(current:Long):Long = {
+    firstTimeStamp.getOrElse {
+      firstTimeStamp = Some(current)
+      scaleRightTimeStamp = current
+      current
     }
+  }
 
-    while (e.timestamp > scaleRightTimeStamp) {
-      val newEnd = scaleRightTimeStamp+(1e8.toLong)
-      drawScale(position(scaleRightTimeStamp),position(newEnd), ((newEnd-fst)/(1e6.toLong)).toString)
+  def drawScaleTo(time:Long):Unit = {
+    while (time > scaleRightTimeStamp) {
+      val newEnd = scaleRightTimeStamp + 1e8.toLong
+      drawScale(position(scaleRightTimeStamp), position(newEnd), ((newEnd-first(time))/1e6.toLong).toString)
       scaleRightTimeStamp = newEnd
     }
-
-    def position(time:Long) = ((time - fst) * scale + margin).toInt
-    def time(position:Int) = ((position - margin).toDouble / scale) + fst
+  }
 
 
-    e match {
-      case DataTransferStart(data,dt) => {
-        transfers += (dt -> e.timestamp)
-      }
-      case DataTransferEnd(data,dt) => {
-        val color = new Color(0.0f, 0.0f, 1.0f, 0.5f)
-        g.setPaint(color)
-        val stroke = new BasicStroke(2.0f)
-        g.setStroke(stroke)
-        val left = position(transfers(dt))
-        val right = position(e.timestamp)
-        val top = memTops(dt.source.buffer.memory) + (barHeight/2)
-        val bottom = memTops(dt.target.buffer.memory) + (barHeight/2)
-        if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
-        g.drawLine(left,top,right,bottom)
-        transfers -= dt
-      }
-      case TaskAssigned(task, proc) => {
-      }
-      case TaskStart(task,kernel,proc) => {
-        tasks += (task -> e.timestamp)
-      }
-      case TaskCompleted(task, proc) => {
-        val color = new Color(0.0f, 1.0f, 0.0f,0.5f)
-        g.setPaint(color)
-        val stroke = new BasicStroke(1.0f)
-        g.setStroke(stroke)
-        val left = position(tasks(task))
-        val right = position(e.timestamp)
-        val top = procTops(proc) + 2
-        if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
-        val shape = new RoundRectangle2D.Float(left, top, right-left, barHeight-4, 10.0f, 10.0f) 
-        g.fill(shape)
-        tasks -= task
-      }
-    }
+  private def position(time:Long) = ((time - first(time)) * scale + margin).toInt
+  private def time(position:Int) = ((position - margin).toDouble / scale) + first(0L)
+    
+  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+    transfers += (dataTransfer -> timestamp)
+  }
 
-    g.getRoot(document.getRootElement)
+  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+    val color = new Color(0.0f, 0.0f, 1.0f, 0.5f)
+    g.setPaint(color)
+    val stroke = new BasicStroke(2.0f)
+    g.setStroke(stroke)
+    val left = position(transfers(dataTransfer))
+    val right = position(timestamp)
+    val top = memTops(dataTransfer.source.buffer.memory) + (barHeight/2)
+    val bottom = memTops(dataTransfer.target.buffer.memory) + (barHeight/2)
+    if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
+    g.drawLine(left,top,right,bottom)
+    transfers -= dataTransfer
+
+    drawScaleTo(timestamp)
     updateCanvas
   }
 
-  def updateCanvas:Unit = {
+  def taskAssigned(task:Task,proc:Processor,timestamp:Long):Unit = {
+  }
+
+  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long):Unit = {
+    tasks += (task -> timestamp)
+  }
+
+  def taskCompleted(task:Task,proc:Processor,timestamp:Long):Unit = {
+    val color = new Color(0.0f, 1.0f, 0.0f,0.5f)
+    g.setPaint(color)
+    val stroke = new BasicStroke(1.0f)
+    g.setStroke(stroke)
+    val left = position(tasks(task))
+    val right = position(timestamp)
+    val top = procTops(proc) + 2
+    if (right > g.getSVGCanvasSize.width) resizeCanvas(new Dimension(right+20,g.getSVGCanvasSize.height))
+    val shape = new RoundRectangle2D.Float(left, top, right-left, barHeight-4, 10.0f, 10.0f) 
+    g.fill(shape)
+    tasks -= task
+
+    drawScaleTo(timestamp)
+    updateCanvas
+  }
+
+  private def updateCanvas:Unit = {
+    g.getRoot(document.getRootElement)
+
     val r = new Runnable {
       def run:Unit = {
         canvas.setSVGDocument(document)
@@ -183,4 +200,15 @@ class SVGProfiler(platform:Platform) extends Profiler {
   def stream(writer:PrintWriter):Unit = {
     DOMUtilities.writeDocument(document,writer)
   }
+}
+
+
+object SVGProfiler {
+  
+  protected val factory = TypedActor.get(ActorSystem())
+
+  def apply(platform:Platform):SVGProfiler = {
+    factory.typedActorOf( TypedProps(classOf[SVGProfiler],new SVGProfilerImpl(platform)))
+  }
+
 }

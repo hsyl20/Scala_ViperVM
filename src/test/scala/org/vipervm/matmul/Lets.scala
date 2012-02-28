@@ -97,8 +97,8 @@ class MatMulLets extends FunSuite {
 
 
   private def testMatMul(platform:Platform, program:Program, a:Matrix2D[Float], b:Matrix2D[Float], c:Matrix2D[Float]):Unit = {
-    val profiler = new SLF4JProfiler
-    val dataManager = new DefaultDataManager(platform,profiler)
+    val profiler = SLF4JProfiler()
+    val dataManager = DefaultDataManager(platform,profiler)
 
     a.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
     b.initialize(dataManager, (x,y) => 2.0f )

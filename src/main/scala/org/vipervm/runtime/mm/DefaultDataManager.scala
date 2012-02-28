@@ -16,40 +16,59 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform._
 import org.vipervm.profiling._
 
+import akka.actor.TypedActor
 
-class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfiler) extends DataManager {
+private class DefaultDataManager(val platform:Platform, profiler:Profiler) extends DataManager {
+
+  private val self = TypedActor.self[DataManager]
 
   protected var dataStates:Map[(MemoryNode,Data),DataState] = Map.empty
   
   protected var configs:Map[DataConfig,(Int,Event)] = Map.empty
 
-  protected def queryDataStateInternal(memory:MemoryNode,data:Data):DataState = {
+  def dataState(data:Data,memory:MemoryNode):DataState = {
+    dataStateInternal(data,memory)
+  }
+
+  protected def dataStateInternal(data:Data,memory:MemoryNode):DataState = {
     dataStates.getOrElse(memory -> data, DataState())
   }
 
-  protected def updateDataStateInternal(memory:MemoryNode,data:Data,state:DataState):Unit = {
-    dataStates += (memory -> data) -> state
-    notification
+  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit = {
+    updateDataStateInternal(data,memory,state)
   }
 
-  protected def releaseInternal(config:DataConfig):Unit = {
+  protected def updateDataStateInternal(data:Data,memory:MemoryNode,state:DataState):Unit = {
+    dataStates += (memory -> data) -> state
+    self.wakeUp
+  }
+
+  def release(config:DataConfig):Unit = {
     //TODO: check config state and release data...
 
     val (count,event) = configs(config)
     if (count == 1) configs -= config
     else configs += config -> (count-1 -> event)
 
-    notification
+    self.wakeUp
   }
 
-  protected def prepareInternal(config:DataConfig):Event = {
+  def prepare(config:DataConfig):Event = {
     val (count,event) = configs.getOrElse(config, (0,new UserEvent))
     configs += config -> (count+1 -> event)
-    notification
+    self.wakeUp
     event
   }
 
-  protected def reaction:Unit = {
+  def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
+    prepare(config) willTrigger {
+      val result = body
+      self.release(config)
+      result
+    }
+  }
+
+  def wakeUp:Unit = {
     /* Skip already complete configs */
     val confs = configs.collect { case (conf,(_,ev)) if !ev.test => conf }
 
@@ -65,7 +84,7 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
 
     /* Skip data available or being transferred */
     val metaConf2 = metaConf.filterNot { case (data,mem) => {
-      val state = queryDataStateInternal(mem,data)
+      val state = dataStateInternal(data,mem)
       state.available || state.uploading
     }}
 
@@ -75,8 +94,8 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
     scratchData.foreach { case (data,mem) => {
       val view = data.allocate(mem)
       data.store(view)
-      val state = queryDataStateInternal(mem,data)
-      updateDataStateInternal(mem, data, state.copy(available = true))
+      val state = dataStateInternal(data,mem)
+      updateDataStateInternal(data, mem, state.copy(available = true))
     }}
 
     /* Split between those requiring a hop in host memory and the other */
@@ -94,7 +113,7 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
 
     /* Check that no uploading is taking place to the host for indirect transfers */
     val findirects = indirects.filterNot { case (data,_) =>
-      queryDataStateInternal(platform.hostMemory,data).uploading
+      dataStateInternal(data, platform.hostMemory).uploading
     }
 
     /* Schedule indirect transfers to the host */
@@ -108,7 +127,7 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
 
   def isComplete(config:DataConfig):Boolean = {
     config.map {
-      case (data,mem) => queryDataStateInternal(mem,data).available
+      case (data,mem) => dataStateInternal(data,mem).available
     }.reduceLeft(_&&_)
   }
 
@@ -121,16 +140,16 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
   protected def transfer(data:Data,source:BufferView,target:BufferView,link:Link):DataTransfer = {
     val mem = target.buffer.memory
     val tr = link.copy(source,target)
-    profiler ! DataTransferStart(data,tr)
+    profiler.transferStart(data,tr)
 
-    val state = queryDataStateInternal(mem,data)
-    updateDataStateInternal(mem, data, state.copy(uploading = true))
+    val state = dataStateInternal(data,mem)
+    updateDataStateInternal(data, mem, state.copy(uploading = true))
 
     tr.willTrigger {
-      profiler ! DataTransferEnd(data,tr)
+      profiler.transferEnd(data,tr)
       data.store(target.asInstanceOf[data.ViewType])
-      val state = dataState(mem,data)
-      updateDataState(mem, data, state.copy(uploading = false, available = true))
+      val state = dataState(data,mem)
+      updateDataState(data, mem, state.copy(uploading = false, available = true))
     }
 
     tr
@@ -141,6 +160,16 @@ class DefaultDataManager(val platform:Platform, profiler:Profiler = DummyProfile
     val src = directSources.head
     val link = platform.linkBetween(src,target).get
     (src,link)
+  }
+
+}
+
+object DefaultDataManager {
+
+  def apply(platform:Platform,profiler:Profiler = DummyProfiler()):DataManager = {
+    DataManager {
+      new DefaultDataManager(platform,profiler)
+    }
   }
 
 }

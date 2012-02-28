@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime.scheduling
 
-import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data}
+import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data,MemoryNode}
 import org.vipervm.runtime._
 import org.vipervm.runtime.scheduling.Messages._
 import org.vipervm.runtime.mm._
@@ -21,62 +21,65 @@ import org.vipervm.profiling._
 
 import org.vipervm.utils._
 
-import scala.actors.Actor
+import akka.actor.TypedActor
+
+
+trait Worker {
+  val self = TypedActor.self[Worker]
+
+  def loadStatus:LoadStatus
+  def dataState(data:Data):DataState
+  def executeTask(task:Task):Unit
+  def completedTask(task:Task):Unit
+  def canExecute(task:Task):Boolean
+}
 
 /**
- * There is one worker per device.
+ * Defaut worker (typed actor)
  */
-class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler, dataManager:DataManager) extends Actor {
+class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataManager:DataManager) extends Worker with Serializable {
 
-  private var tasks:List[Task] = Nil
-  private var currentTask:Option[Task] = None
+  import TypedActor.dispatcher
 
-  private val memory = proc.memory
+  var tasks:List[Task] = Nil
+  var currentTask:Option[Task] = None
 
-  def dataState(data:Data):DataState = dataManager.dataState(memory,data)
+  val memory:MemoryNode = proc.memory
 
-  def loadStatus:LoadStatus = (this !? QueryLoadStatus).asInstanceOf[LoadStatus]
+  def dataState(data:Data):DataState = dataManager.dataState(data,memory)
 
-  start
+  def loadStatus:LoadStatus = LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))
 
-  def act:Unit = loop { react {
-
-    case QueryLoadStatus => {
-      sender ! LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))
-    }
-
-    case ExecuteTask(task) => {
-      profiler ! TaskAssigned(task,proc)
+  def executeTask(task:Task):Unit = {
+      profiler.taskAssigned(task,proc)
 
       if (currentTask.isDefined) {
         tasks ::= task
       }
       else {
-        executeTask(task)
+        executeTaskInternal(task)
       }
+  }
 
-    }
+  def completedTask(task:Task):Unit = {
+    assert(task == currentTask.get)
+    
+    profiler.taskCompleted(task,proc)
 
-    case TaskComplete(task) => {
-      assert(task == currentTask.get)
-      
-      profiler ! TaskCompleted(task,proc)
+    scheduler.completedTask(task)
 
-      scheduler ! TaskComplete(task)
-
-      /* Execute another task, if any */
-      currentTask = None
-      tasks match {
-        case t :: l => {
-          tasks = l
-          executeTask(t)
-        }
-        case Nil => ()
+    /* Execute another task, if any */
+    currentTask = None
+    tasks match {
+      case t :: l => {
+        tasks = l
+        executeTaskInternal(t)
       }
+      case Nil => ()
     }
-  }}
+  }
 
-  private def executeTask(task:Task):Unit = {
+  def executeTaskInternal(task:Task):Unit = {
     currentTask = Some(task)
 
 
@@ -92,11 +95,11 @@ class Worker(val proc:Processor, scheduler:Scheduler, profiler:Profiler, dataMan
       /* Schedule kernel execution */
       val ev = proc.execute(kernel, task.makeKernelParams(memory))
 
-      profiler ! TaskStart(task,kernel,proc)
+      profiler.taskStart(task,kernel,proc)
 
       /* Schedule notification after kernel execution */
       ev.willTrigger {
-        this ! TaskComplete(task)
+        self.completedTask(task)
 
         dataManager.release(memConf)
       }

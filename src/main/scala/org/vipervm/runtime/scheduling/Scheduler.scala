@@ -13,17 +13,23 @@
 
 package org.vipervm.runtime.scheduling
 
-import scala.actors.Actor
 import org.vipervm.platform.{Event,Platform}
 import org.vipervm.runtime.Task
 import org.vipervm.runtime.scheduling.Messages._
+import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
-abstract class Scheduler extends Actor {
+trait Scheduler {
+  def submitTask(task:Task,deps:Seq[Event]):Event
+  def completedTask(task:Task):Unit
 
-  val platform:Platform
+  def platform:Platform
+}
 
-  def submitTask(task:Task,deps:Seq[Event]):Event = {
-    (this !? SubmitTask(task,deps)).asInstanceOf[Event]
+object Scheduler {
+  
+  protected val factory = TypedActor.get(ActorSystem())
+
+  def apply[A<:Scheduler](scheduler: =>A):Scheduler = {
+    factory.typedActorOf( TypedProps[A](classOf[Scheduler],scheduler))
   }
-
 }

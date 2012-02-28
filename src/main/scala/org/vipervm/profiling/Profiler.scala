@@ -13,15 +13,15 @@
 
 package org.vipervm.profiling
 
-import scala.actors._
+import org.vipervm.platform._
+import org.vipervm.runtime._
 
-abstract class Profiler extends Actor {
-  protected def reactions(e:ProfilingEvent):Unit
+trait Profiler {
 
-  def act = loop { react { 
-    case e:ProfilingEvent => reactions(e)
-    case e => throw new Exception("Invalid profiling event %s".format(e))
-  }}
+  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
+  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
+  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
+  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
+  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
 
-  start
 }

@@ -21,4 +21,6 @@ object Barrier {
       event.fold(k())
     }
   }
+
+  def sequence[A,C](body: => A@cpsParam[A,C]):C = reset { body }
 }

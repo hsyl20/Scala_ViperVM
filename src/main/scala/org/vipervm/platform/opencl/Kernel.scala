@@ -43,19 +43,21 @@ abstract class OpenCLKernel extends Kernel {
 
   /** Source program */
   val program: OpenCLProgram
-  /** Kernel name in the program */
-  val name:String
 
   /**
    * Return peer kernel for the given device
    */
-  def get(device:OpenCLProcessor): cl.Kernel = peers.get(device) match {
+  def get(device:OpenCLProcessor,name:String): cl.Kernel = peers.get(device) match {
     case Some(k) => k
     case None => {
       val k = new cl.Kernel(program.get(device), name)
       peers += (device -> k)
       k
     }
+  }
+
+  def compileFor(proc:OpenCLProcessor): Unit = {
+    program.compileFor(proc)
   }
 
   /**
@@ -74,15 +76,3 @@ abstract class OpenCLKernel extends Kernel {
    */
   def configure(device:OpenCLProcessor, params:Seq[Any]): Option[OpenCLKernelConfig]
 }
-
-/**
- * Configuration for a kernel execution
- *
- * @param localWorkSize Local work size is optional. Default behavior is to let the OpenCL
- * implementation decide how to break the global work-items into work-groups
- */
-case class OpenCLKernelConfig(
-  val parameters: IndexedSeq[OpenCLKernelParameter],
-  val globalWorkSize: List[Long],
-  val localWorkSize: Option[List[Long]] = None 
-)

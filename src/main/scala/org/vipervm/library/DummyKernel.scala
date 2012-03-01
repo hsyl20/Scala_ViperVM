@@ -18,7 +18,7 @@ import org.vipervm.platform.host._
 import org.vipervm.platform._
 import org.vipervm.bindings.opencl.OpenCLBuildProgramException
 
-class DummyKernel extends OpenCLKernel {
+class DummyOpenCLKernel extends OpenCLKernel {
   val source = """
     __kernel void dummy(__global float * in, __global float * out, int a) {
       int i = get_global_id(0);
@@ -28,7 +28,6 @@ class DummyKernel extends OpenCLKernel {
   """
 
   val program = new OpenCLProgram(source)
-  val name = "dummy"
 
   val in = Parameter[Buffer](
     name = "in",
@@ -56,6 +55,7 @@ class DummyKernel extends OpenCLKernel {
   def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
+      kernelName = "dummy",
       globalWorkSize = List(params(size), 1, 1),
       parameters = IndexedSeq(params(in), params(out), params(factor))
     )

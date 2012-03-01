@@ -52,7 +52,7 @@ class OpenCL extends FixtureFunSuite {
   class Common {
     val n = 100L
     val factor = 10
-    val kernel = new DummyKernel
+    val kernel = new DummyOpenCLKernel
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 

@@ -50,7 +50,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
    * Compile the kernel for this processor
    */
   def compile(kernel:Kernel):Unit = {
-    kernel.get(this)
+    kernel.compileFor(this)
   }
 
   /**
@@ -65,7 +65,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
     }
 
     /* Get compiled kernel for this device */
-    val k = kernel.get(this)
+    val k = kernel.get(this,config.kernelName)
 
     /* We need to synchronize as OpenCL kernels are not thread safe */
     val e = k.synchronized {

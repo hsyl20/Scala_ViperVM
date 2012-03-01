@@ -55,11 +55,11 @@ object FloatMatrixMultiplicationOpenCL extends OpenCLKernel with FloatMatrixMult
   """
 
   val program = new OpenCLProgram(source)
-  val name = "matrixMul"
 
   def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
+      kernelName = "matrixMul",
       globalWorkSize = List(params(n), params(n), 1),
       localWorkSize = Some(List(32, 32/2, 1)),
       parameters = IndexedSeq(params(n),params(a), params(b), params(c))

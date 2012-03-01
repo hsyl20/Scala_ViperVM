@@ -35,11 +35,11 @@ object FloatMatrixAdditionOpenCL extends OpenCLKernel with FloatMatrixAdditionPr
   """
 
   val program = new OpenCLProgram(source)
-  val name = "matrixAdd"
 
   def configure(device:OpenCLProcessor, params:Seq[Any]) = {
 
     val config = OpenCLKernelConfig(
+      kernelName = "matrixAdd",
       globalWorkSize = List(params(width), params(height), 1),
       localWorkSize = None,
       parameters = IndexedSeq(params(width),params(height), params(a), params(b), params(c))

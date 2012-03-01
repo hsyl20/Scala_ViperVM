@@ -16,7 +16,7 @@ package org.vipervm.apps
 import org.vipervm.profiling.SVGProfiler
 import scala.swing._
 
-class ProfilerFrame(root:Component) extends MainFrame {
+private class ProfilerFrame(root:Component) extends MainFrame {
   title = "ViperVM Profiler"
   contents = root
 }

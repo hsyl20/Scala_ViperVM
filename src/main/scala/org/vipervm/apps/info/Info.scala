@@ -14,6 +14,7 @@
 package org.vipervm.apps
 
 import org.vipervm.platform.Platform
+import org.vipervm.platform.jvm.JVMDriver
 import org.vipervm.platform.opencl.OpenCLDriver
 import org.vipervm.platform.host.DefaultHostDriver
 
@@ -23,9 +24,12 @@ import org.vipervm.platform.host.DefaultHostDriver
 object Info {
 
   def main(args:Array[String]): Unit = {
-    val p = Platform(DefaultHostDriver, new OpenCLDriver)
+    val host = DefaultHostDriver
+    val platform = Platform(host, new OpenCLDriver, new JVMDriver(host))
 
     println("Processors:")
-    p.processors.foreach(a => println(" - %s".format(a)))
+    platform.processors.foreach(a => println(" - %s".format(a)))
+
+    platform.shutdown
   }
 }

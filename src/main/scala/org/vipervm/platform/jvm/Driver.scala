@@ -23,12 +23,17 @@ import akka.actor.ActorSystem
 class JVMDriver(hostDriver:HostDriver) extends Driver {
 
   val procCount = Runtime.getRuntime.availableProcessors
-  val dispatcher = ActorSystem().dispatcher
 
-  val processors = (0 to procCount).map(x => new JVMProcessor(hostDriver,dispatcher))
+  val system = ActorSystem("JVMDriver")
+  val dispatcher = system.dispatcher
+
+  val processors = (1 to procCount).map(x => new JVMProcessor(hostDriver,dispatcher))
 
   val networks:Seq[Network] = Seq.empty
 
   val memories:Seq[MemoryNode] = Seq.empty
 
+  def shutdown:Unit = {
+    system.shutdown
+  }
 }

@@ -24,4 +24,6 @@ object DefaultHostDriver extends HostDriver {
   def networks:Seq[Network] = Nil
 
   def memories:Seq[HostMemoryNode] = Seq(mem)
+
+  def shutdown:Unit = {}
 }

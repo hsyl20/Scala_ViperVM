@@ -27,4 +27,6 @@ abstract class Driver {
 
   /** Processors */
   def processors:Seq[Processor]
+
+  def shutdown:Unit
 }

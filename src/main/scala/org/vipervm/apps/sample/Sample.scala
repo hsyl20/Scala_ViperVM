@@ -79,6 +79,8 @@ private class SampleApp(size:Long = 32) {
   }
 
   profiler.save("profile.svg")
+
+  platform.shutdown
 }
 
 

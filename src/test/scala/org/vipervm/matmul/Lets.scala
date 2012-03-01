@@ -114,6 +114,8 @@ class MatMulLets extends FunSuite {
     val r = result.data.asInstanceOf[Matrix2D[Float]]
     
     println(r.print(dataManager)())
+
+    platform.shutdown
   }
 
 }

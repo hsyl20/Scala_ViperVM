@@ -64,6 +64,8 @@ class TestPolicies extends FunSuite {
     val result = interp.evaluate(program)
 
     result.syncWait
+
+    platform.shutdown
   }
 
 }

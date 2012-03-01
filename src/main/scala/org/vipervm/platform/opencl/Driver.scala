@@ -46,4 +46,5 @@ class OpenCLDriver(
 
   val memories:Seq[OpenCLMemoryNode] = processors.map(new OpenCLMemoryNode(_))
 
+  def shutdown:Unit = {}
 }

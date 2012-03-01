@@ -84,6 +84,9 @@ class Platform(val drivers:Driver*) {
    */
   def linkBetween(source:BufferView,target:BufferView):Option[Link] = 
     linksBetween(source.buffer,target.buffer).headOption
+
+  /** Shutdown drivers */
+  def shutdown:Unit = drivers.foreach(_.shutdown)
 }
 
 object Platform {

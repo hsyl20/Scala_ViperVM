@@ -15,7 +15,6 @@ package org.vipervm.runtime.scheduling
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
-import org.vipervm.runtime.scheduling.Messages._
 import org.vipervm.runtime.mm.DataManager
 import org.vipervm.profiling.{Profiler,DummyProfiler}
 

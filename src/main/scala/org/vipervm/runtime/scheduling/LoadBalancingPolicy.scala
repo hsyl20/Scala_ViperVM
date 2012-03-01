@@ -14,7 +14,6 @@
 package org.vipervm.runtime.scheduling
 
 import org.vipervm.runtime._
-import org.vipervm.runtime.scheduling.Messages.LoadStatus
 
 trait LoadBalancingPolicy extends RankingPolicy {
 

@@ -15,7 +15,6 @@ package org.vipervm.runtime.scheduling
 
 import org.vipervm.platform.{Event,Platform}
 import org.vipervm.runtime.Task
-import org.vipervm.runtime.scheduling.Messages._
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait Scheduler {

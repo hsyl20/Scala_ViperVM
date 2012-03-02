@@ -18,7 +18,7 @@ import org.vipervm.platform._
 /**
  * A data that can be used in the JVM
  */
-abstract class Value[A] extends Data {
+abstract class Value[A] extends MetaView {
 
   /** Return the value. It needs to be stored in host memory */
   def value:A

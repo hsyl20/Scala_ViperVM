@@ -18,9 +18,9 @@ import org.vipervm.runtime.mm.DataManager
 
 
 /**
- * Data that can be used on host
+ * MetaView that can be used on host
  */
-trait HostableData extends Data {
+trait HostableMetaView extends MetaView {
   
   def onHost[A](dataManager:DataManager)(body: (ViewType,HostBuffer) => A):FutureEvent[A] = {
     val platform = dataManager.platform

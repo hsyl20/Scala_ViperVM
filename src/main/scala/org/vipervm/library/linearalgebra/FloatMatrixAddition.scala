@@ -42,7 +42,7 @@ object FloatMatrixAdditionMetaKernel extends KernelSet {
 
   val prototype = Prototype(a,b,c)
 
-  def makeKernelParams(params:Seq[Data],memory:MemoryNode):Seq[Any] = {
+  def makeKernelParams(params:Seq[MetaView],memory:MemoryNode):Seq[Any] = {
     val w = params(a).width.toInt
     val h = params(a).height.toInt
     val b1 = params(a).viewIn(memory).get.buffer

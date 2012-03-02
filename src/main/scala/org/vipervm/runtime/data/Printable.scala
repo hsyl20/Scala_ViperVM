@@ -19,7 +19,7 @@ import org.vipervm.runtime.mm.DataManager
 /**
  * Data that can be printed
  */
-trait PrintableData extends HostableData {
+trait PrintableMetaView extends HostableMetaView {
   
   protected def hostPrint(view:ViewType,buffer:HostBuffer):String
 

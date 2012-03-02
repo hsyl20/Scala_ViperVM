@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime.scheduling
 
-import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,Data,MemoryNode}
+import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,MetaView,MemoryNode}
 import org.vipervm.runtime._
 import org.vipervm.runtime.mm._
 import org.vipervm.profiling._
@@ -27,7 +27,7 @@ trait Worker {
   val self = TypedActor.self[Worker]
 
   def loadStatus:LoadStatus
-  def dataState(data:Data):DataState
+  def dataState(data:MetaView):DataState
   def executeTask(task:Task):Unit
   def completedTask(task:Task):Unit
   def canExecute(task:Task):Boolean
@@ -45,7 +45,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
 
   val memory:MemoryNode = proc.memory
 
-  def dataState(data:Data):DataState = dataManager.dataState(data,memory)
+  def dataState(data:MetaView):DataState = dataManager.dataState(data,memory)
 
   def loadStatus:LoadStatus = LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))
 

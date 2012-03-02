@@ -28,11 +28,11 @@ trait MetaKernel extends Prototyped {
    */
   def getKernelsFor(proc:Processor): Seq[Kernel]
 
-  def makeKernelParams(params:Seq[Data],memory:MemoryNode):Seq[Any]
+  def makeKernelParams(params:Seq[MetaView],memory:MemoryNode):Seq[Any]
 
   def canExecuteOn(proc:Processor) = !getKernelsFor(proc).isEmpty
 
-  def memoryConfig(params:Seq[Data],memory:MemoryNode,hostMemory:MemoryNode):Seq[(Data,MemoryNode)] = {
+  def memoryConfig(params:Seq[MetaView],memory:MemoryNode,hostMemory:MemoryNode):Seq[(MetaView,MemoryNode)] = {
     if (params.length != prototype.length) throw new Exception("Invalid parameters")
     params zip prototype.map(_.storage match {
       case HostStorage => hostMemory

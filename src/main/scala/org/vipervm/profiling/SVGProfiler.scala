@@ -129,11 +129,11 @@ private class SVGProfilerImpl(platform:Platform) extends SVGProfiler {
   private def position(time:Long) = ((time - first(time)) * scale + margin).toInt
   private def time(position:Int) = ((position - margin).toDouble / scale) + first(0L)
     
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+  def transferStart(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {
     transfers += (dataTransfer -> timestamp)
   }
 
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+  def transferEnd(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {
     val color = new Color(0.0f, 0.0f, 1.0f, 0.5f)
     g.setPaint(color)
     val stroke = new BasicStroke(2.0f)

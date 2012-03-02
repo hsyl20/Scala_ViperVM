@@ -13,6 +13,6 @@
 
 package org.vipervm.platform
 
-class FutureData(val data:Data, event:Event) extends FutureEvent(data,event) {
-  def this(data:Data) = this(data,DummyEvent)
+class FutureData(val data:MetaView, event:Event) extends FutureEvent(data,event) {
+  def this(data:MetaView) = this(data,DummyEvent)
 }

@@ -16,7 +16,7 @@ package org.vipervm.platform
 import scala.collection.mutable.HashMap
 import scala.collection.breakOut
 
-abstract class Data {
+abstract class MetaView {
   type ViewType <: BufferView
 
   protected var fviews: HashMap[MemoryNode,ViewType] = HashMap.empty

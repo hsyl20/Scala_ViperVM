@@ -20,7 +20,7 @@ import org.vipervm.runtime.mm.DataManager
 /**
  * 2D matrix
  */
-class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) extends Data with PrintableData {
+class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) extends MetaView with PrintableMetaView {
   type ViewType = BufferView2D
 
   def allocate(memory:MemoryNode):BufferView2D = {

@@ -18,7 +18,7 @@ import org.vipervm.platform._
 /**
  * Contiguous raw data
  */
-class RawData(size:Long) extends Data {
+class RawData(size:Long) extends MetaView {
   type ViewType = BufferView1D
 
   def allocate(memory:MemoryNode):BufferView1D = {

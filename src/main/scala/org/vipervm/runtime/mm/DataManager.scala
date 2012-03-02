@@ -13,13 +13,13 @@
 
 package org.vipervm.runtime.mm
 
-import org.vipervm.platform.{Platform,MemoryNode,Event,Data,FutureEvent}
+import org.vipervm.platform.{Platform,MemoryNode,Event,MetaView,FutureEvent}
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait DataManager {
   
-  type DataConfig = Seq[(Data,MemoryNode)]
+  type DataConfig = Seq[(MetaView,MemoryNode)]
 
   def platform:Platform
 
@@ -30,8 +30,8 @@ trait DataManager {
   def release(config:DataConfig):Unit
 
   /** Return the state of a data in a memory */
-  def dataState(data:Data,memory:MemoryNode):DataState
-  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit
+  def dataState(data:MetaView,memory:MemoryNode):DataState
+  def updateDataState(data:MetaView,memory:MemoryNode,state:DataState):Unit
 
   /** Indicate to the data manager that an event occured */
   def wakeUp:Unit

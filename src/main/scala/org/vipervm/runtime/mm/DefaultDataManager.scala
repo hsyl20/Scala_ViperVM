@@ -22,23 +22,23 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
 
   private val self = TypedActor.self[DataManager]
 
-  protected var dataStates:Map[(MemoryNode,Data),DataState] = Map.empty
+  protected var dataStates:Map[(MemoryNode,MetaView),DataState] = Map.empty
   
   protected var configs:Map[DataConfig,(Int,Event)] = Map.empty
 
-  def dataState(data:Data,memory:MemoryNode):DataState = {
+  def dataState(data:MetaView,memory:MemoryNode):DataState = {
     dataStateInternal(data,memory)
   }
 
-  protected def dataStateInternal(data:Data,memory:MemoryNode):DataState = {
+  protected def dataStateInternal(data:MetaView,memory:MemoryNode):DataState = {
     dataStates.getOrElse(memory -> data, DataState())
   }
 
-  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit = {
+  def updateDataState(data:MetaView,memory:MemoryNode,state:DataState):Unit = {
     updateDataStateInternal(data,memory,state)
   }
 
-  protected def updateDataStateInternal(data:Data,memory:MemoryNode,state:DataState):Unit = {
+  protected def updateDataStateInternal(data:MetaView,memory:MemoryNode,state:DataState):Unit = {
     dataStates += (memory -> data) -> state
     self.wakeUp
   }
@@ -80,7 +80,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
       event.complete
     }
 
-    val metaConf = (Set.empty[(Data,MemoryNode)] /: uncompleted.map(_.toSet))(_++_)
+    val metaConf = (Set.empty[(MetaView,MemoryNode)] /: uncompleted.map(_.toSet))(_++_)
 
     /* Skip data available or being transferred */
     val metaConf2 = metaConf.filterNot { case (data,mem) => {
@@ -131,13 +131,13 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     }.reduceLeft(_&&_)
   }
 
-  def isDirect(data:Data,memory:MemoryNode):Boolean = data.views.exists(
+  def isDirect(data:MetaView,memory:MemoryNode):Boolean = data.views.exists(
     view => platform.linkBetween(view.buffer.memory,memory).isDefined
   )
 
-  def isValid(data:Data):Boolean = data.isDefined
+  def isValid(data:MetaView):Boolean = data.isDefined
 
-  protected def transfer(data:Data,source:BufferView,target:BufferView,link:Link):DataTransfer = {
+  protected def transfer(data:MetaView,source:BufferView,target:BufferView,link:Link):DataTransfer = {
     val mem = target.buffer.memory
     val tr = link.copy(source,target)
     profiler.transferStart(data,tr)
@@ -155,7 +155,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     tr
   }
 
-  def selectDirectSource(data:Data, target:BufferView):(BufferView,Link) = {
+  def selectDirectSource(data:MetaView, target:BufferView):(BufferView,Link) = {
     val directSources = data.views.filter(src => platform.linkBetween(src,target).isDefined)
     val src = directSources.head
     val link = platform.linkBetween(src,target).get

@@ -89,6 +89,8 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
 
     val event = dataManager.prepare(memConf)
 
+    val me = self
+
     event.willTrigger {
 
       /* Schedule kernel execution */
@@ -98,7 +100,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
 
       /* Schedule notification after kernel execution */
       ev.willTrigger {
-        self.completedTask(task)
+        me.completedTask(task)
 
         dataManager.release(memConf)
       }

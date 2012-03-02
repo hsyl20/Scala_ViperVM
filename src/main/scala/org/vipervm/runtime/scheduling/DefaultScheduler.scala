@@ -24,7 +24,8 @@ class DefaultScheduler(val dataManager:DataManager, val profiler:Profiler = Dumm
 
   val platform = dataManager.platform
 
-  protected val factory = TypedActor.get(ActorSystem())
+  protected val system = ActorSystem("workers")
+  protected val factory = TypedActor.get(system)
 
   /* Create a worker per processor */
   private val workers = platform.processors.map(x => {

@@ -42,11 +42,13 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   val prototype = Prototype(a,b,c)
 
   def makeKernelParams(params:Seq[MetaView],memory:MemoryNode):Seq[Any] = {
-    val n = params(a).width.toInt
+    val wA = params(a).width
+    val hA = params(a).height
+    val wB = params(b).width
     val b1 = params(a).viewIn(memory).get.buffer
     val b2 = params(b).viewIn(memory).get.buffer
     val b3 = params(c).viewIn(memory).get.buffer
-    Seq(n,b1,b2,b3)
+    Seq(b1,b2,b3,wA,hA,wB)
   }
 }
 

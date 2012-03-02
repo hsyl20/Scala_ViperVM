@@ -52,7 +52,11 @@ class OpenCLProgram(val source:String) {
       compatibleDevices += (device -> true)
       p
     } catch {
-      case e => compatibleDevices += (device -> false) ; throw e
+      case e@OpenCLBuildProgramException(err,prog,devs) => {
+        println(e.buildInfo(device.peer).log)
+        compatibleDevices += (device -> false)
+        throw e
+      }
     }
   }
 

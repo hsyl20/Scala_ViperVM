@@ -34,6 +34,7 @@ private class SampleApp(size:Long = 32) {
 
   val host = DefaultHostDriver
   //val platform = Platform(host, new OpenCLDriver, new JVMDriver(host))
+  //val platform = Platform(host, new JVMDriver(host))
   val platform = Platform(host, new OpenCLDriver)
   val profiler = SVGProfiler(platform)
   val dataManager = DefaultDataManager(platform,profiler)
@@ -48,17 +49,17 @@ private class SampleApp(size:Long = 32) {
 
   import org.vipervm.dsl._
   val a = Matrix2D[Float](size,size)
-  val b = Matrix2D[Float](size,size)
-  val c = Matrix2D[Float](size,size)
+  val b = Matrix2D[Float](32L,size)
+  val c = Matrix2D[Float](32L,size)
   val x = Matrix2D[Float](size,size)
   val y = Matrix2D[Float](size,size)
 
   def makeTree(init:Matrix2D[Float], height:Int):Matrix2D[Float] = {
     (init /: (0 to height))((init,_) => init + init)
   }
-  val program = makeTree(a*b+a*c, 3)
+//  val program = makeTree(a*b+a*c, 3)
 //  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
-//  val program = a*b + a*c
+  val program = a*b + a*c
 
   a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
   b.peer.get.initialize(dataManager, (x,y) => 2.0f )

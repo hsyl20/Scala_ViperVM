@@ -19,20 +19,20 @@ import org.vipervm.platform.jvm._
 object FloatMatrixMultiplicationJVM extends JVMKernel with FloatMatrixMultiplicationPrototype {
 
   def fun(params:Seq[Any]): Unit = {
-    val w = params(n)
+    val (wA,hA,wB) = (params(widthA), params(heightA), params(widthB))
     val (m1,m2,m3) = (params(a).peer,params(b).peer,params(c).peer)
 
     var i = 0L
-    while (i < w) {
+    while (i < hA) {
       var j = 0L
-      while (j < w) {
+      while (j < wB) {
         var k = 0L
         var sum = 0.0f
-        while (k < w) {
-          sum += m1.getFloat((i*w+k)*4) * m2.getFloat((k*w+j)*4)
+        while (k < wA) {
+          sum += m1.getFloat((i*wA+k)*4) * m2.getFloat((k*wB+j)*4)
           k += 1
         }
-        m3.setFloat((i*w+j)*4, sum)
+        m3.setFloat((i*wB+j)*4, sum)
         j += 1
       }
       i += 1

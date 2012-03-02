@@ -18,39 +18,54 @@ import org.vipervm.library.linearalgebra.kernels.prototypes._
 import org.vipervm.platform.opencl._
 
 object FloatMatrixMultiplicationOpenCL extends OpenCLKernel with FloatMatrixMultiplicationPrototype {
+
+  val blockSize = 16
+
   val source = """
-    #define BS 32
-    __kernel void matrixMul(
-       const int N,
-       __global float* A,
-       __global float* B, 
-       __global float* C) {
-        __local float atile[BS+1][BS+1];
-        __local float btile[BS+1][BS+1];
-        int bx = get_group_id(0); 
-        int by = get_group_id(1); 
-        int gx = get_global_id(0);
-        int gy = get_global_id(1);
+    #define BLOCK_SIZE """ + blockSize + """
+      
+    __kernel void
+    matrixMul(__global float* A, 
+              __global float* B, 
+              __global float* C, long wA, long wB)
+    {
+        int bx = get_group_id(0) * BLOCK_SIZE;
+        int by = get_group_id(1) * BLOCK_SIZE;
+     
         int tx = get_local_id(0);
         int ty = get_local_id(1);
+     
+        long aBegin = wA * by;
+        long aEnd   = aBegin + wA;
+        long aStep  = BLOCK_SIZE;
+     
+        long bBegin = bx;
+        long bStep  = BLOCK_SIZE * wB;
 
-        float sum = 0.0;
-        const int UT = N / BS;
-        int k,t,i;
+        float Csub = 0.0f;
+     
+        for (long a = aBegin, b = bBegin;
+                 a < aEnd;
+                 a += aStep, b += bStep) 
+        {
 
-        for (t=0; t<UT; t++) {
-          btile[tx][ty] = B[gx + BS*N*t + N*ty];
-          btile[tx][ty+BS/2] = B[gx + BS*N*t + (BS/2)*N + N*ty];
-          atile[ty][tx] = A[N*gy+t*BS+tx];
-          barrier(CLK_LOCAL_MEM_FENCE);
+            __local float As[BLOCK_SIZE][BLOCK_SIZE];
+            __local float Bs[BLOCK_SIZE][BLOCK_SIZE];
 
-          for (k=0; k<BS; k++) {		
-           sum += atile[ty][k] * btile[tx][k];
-          }	   
-
-        }	    
-
-        C[gy*N+gx] = sum;
+            As[ty][tx] = A[a + wA * ty + tx];
+            Bs[ty][tx] = B[b + wB * ty + tx];
+     
+            barrier(CLK_LOCAL_MEM_FENCE);
+     
+            for (long k = 0; k < BLOCK_SIZE; ++k)
+                Csub += As[ty][k] * Bs[k][tx];
+     
+            barrier(CLK_LOCAL_MEM_FENCE);
+     
+        }
+     
+        long c = wB * by + bx;
+        C[c + wB * ty + tx] = Csub;
     }
   """
 
@@ -60,9 +75,9 @@ object FloatMatrixMultiplicationOpenCL extends OpenCLKernel with FloatMatrixMult
 
     val config = OpenCLKernelConfig(
       kernelName = "matrixMul",
-      globalWorkSize = List(params(n), params(n), 1),
-      localWorkSize = Some(List(32, 32/2, 1)),
-      parameters = IndexedSeq(params(n),params(a), params(b), params(c))
+      globalWorkSize = List(params(widthB), params(heightA), 1),
+      localWorkSize = Some(List(blockSize, blockSize, 1)),
+      parameters = IndexedSeq(params(a), params(b), params(c), params(widthA), params(widthB))
     )
 
     Some(config)

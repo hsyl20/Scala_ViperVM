@@ -16,11 +16,23 @@ package org.vipervm.library.linearalgebra.kernels.prototypes
 import org.vipervm.platform._
 
 trait FloatMatrixMultiplicationPrototype {
-  val n = Parameter[Int](
-    name = "n",
+  val widthA = Parameter[Long](
+    name = "widthA",
     mode = ReadOnly,
     storage = HostStorage,
-    description = "Width and height of matrices"
+    description = "Width of A"
+  )
+  val heightA = Parameter[Long](
+    name = "widthA",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Height of A"
+  )
+  val widthB = Parameter[Long](
+    name = "widthB",
+    mode = ReadOnly,
+    storage = HostStorage,
+    description = "Width of B"
   )
   val a = Parameter[Buffer](
     name = "a",
@@ -38,5 +50,5 @@ trait FloatMatrixMultiplicationPrototype {
     storage = DeviceStorage
   )
 
-  val prototype = Prototype(n,a,b,c)
+  val prototype = Prototype(a,b,c,widthA,heightA,widthB)
 }

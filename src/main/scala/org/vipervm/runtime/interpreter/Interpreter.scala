@@ -16,27 +16,29 @@ package org.vipervm.runtime.interpreter
 import org.vipervm.platform.{Event,FutureEvent,FutureData}
 import org.vipervm.runtime.{Function,Task}
 import org.vipervm.runtime.scheduling.Scheduler
+import org.vipervm.library.Library
 import org.vipervm.utils._
 
-import scala.collection.mutable
 
 /**
  * Interpreter for functional programs
  */
-class Interpreter(scheduler:Scheduler) {
+class Interpreter(scheduler:Scheduler,library:Library) {
 
   def evaluate(program:Program):FutureData = evaluate(program.term,program.symbols)
 
   def evaluate(expr:Term, symbols:SymbolTable):FutureData = expr match {
-    case TmVar(name)   => symbols.values(name)
-    case TmApp(TmKernel(name),args)  => {
-      val k = symbols.functions(name)
+    case TmId(name)   => symbols.values(name)
+    case TmApp(TmId(name),args)  => {
+      val k = library(name).getOrElse {
+        throw new Exception("Unknown operation %s".format(name))
+      }
       val params = args.par.map(x => evaluate(x,symbols)).seq
       submit(k, params, symbols)
     }
     case TmLet(v,e,in) => {
       val data = evaluate(e,symbols)
-      val nsymbols = symbols.copy(values = symbols.values + (v.name -> data))
+      val nsymbols = symbols.copy(values = symbols.values + (v.id -> data))
       evaluate(in,nsymbols)
     }
     case _ => ???

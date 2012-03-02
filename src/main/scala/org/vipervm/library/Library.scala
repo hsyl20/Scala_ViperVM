@@ -11,24 +11,13 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm
+package org.vipervm.library
 
-import org.vipervm.runtime.interpreter._
+import org.vipervm.runtime.Function
 
-package object dsl {
-  def let(bindings:(Program,Program)*) = new {
-    val bs = bindings.map{ case (x,e) => x.term match {
-      case a@TmId(_) => (a,e)
-      case _ => throw new Exception("Invalid data type")
-    }}
+class Library(functions:Map[String,Function]) {
 
-    def in(prog:Program):Program = new Program {
-      
-      val term = (bs :\ prog.term) { case ((v,e),in) => TmLet(v,e.term,in) }
-      val symbols = (prog.symbols /: bindings.map(_._2.symbols)) {
-        (a,b) => a.copy(a.values ++ b.values)
-      }
-    }
-  }
+  def this(fs:(String,Function)*) = this(fs.toMap)
+
+  def apply(name:String):Option[Function] = functions.get(name)
 }
-

@@ -18,22 +18,17 @@ import org.vipervm.runtime.data.Primitives._
 import org.vipervm.runtime.data
 import org.vipervm.runtime.interpreter._
 
-import org.vipervm.library.linearalgebra._
-
 abstract class Matrix2D[A:Primitive] extends Program {
   val term:Term
   val symbols:SymbolTable
   val peer:Option[data.Matrix2D[A]]
 
-  val addFunc = FloatMatrixAddition
-  val mulFunc = FloatMatrixMultiplication
-
   def +(m:Matrix2D[A]):Matrix2D[A] = {
     val myt = term
     val myc = symbols
     new Matrix2D[A] {
-      val term = TmApp(TmKernel("matadd"), Vector(myt, m.term))
-      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.functions ++ m.symbols.functions + ("matadd" -> addFunc))
+      val term = TmApp(TmId("+"), Vector(myt, m.term))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values)
       val peer = None
     }
   }
@@ -42,8 +37,8 @@ abstract class Matrix2D[A:Primitive] extends Program {
     val myt = term
     val myc = symbols
     new Matrix2D[A] {
-      val term = TmApp(TmKernel("matmul"), Vector(myt, m.term))
-      val symbols = SymbolTable(myc.values ++ m.symbols.values, myc.functions ++ m.symbols.functions + ("matmul" -> mulFunc))
+      val term = TmApp(TmId("*"), Vector(myt, m.term))
+      val symbols = SymbolTable(myc.values ++ m.symbols.values)
       val peer = None
     }
   }
@@ -56,9 +51,9 @@ object Matrix2D {
     id += 1
     val name = "m%d".format(id)
     new Matrix2D[A] {
-      val term = TmVar(name)
+      val term = TmId(name)
       val peer = Some(new data.Matrix2D[A](width,height))
-      val symbols = SymbolTable(Map(name -> peer.get), Map.empty)
+      val symbols = SymbolTable(Map(name -> peer.get))
     }
   }
 }

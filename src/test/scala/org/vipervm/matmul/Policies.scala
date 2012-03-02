@@ -59,7 +59,7 @@ class TestPolicies extends FunSuite {
     b.peer.get.initialize(dataManager, (x,y) => 2.0f )
     c.peer.get.initialize(dataManager, (x,y) => 2.0f )
 
-    val interp = new Interpreter(sched)
+    val interp = new Interpreter(sched,DefaultLibrary())
 
     val result = interp.evaluate(program)
 

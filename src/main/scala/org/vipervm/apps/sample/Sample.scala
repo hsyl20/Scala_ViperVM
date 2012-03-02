@@ -64,7 +64,8 @@ private class SampleApp(size:Long = 32) {
   b.peer.get.initialize(dataManager, (x,y) => 2.0f )
   c.peer.get.initialize(dataManager, (x,y) => 2.0f )
 
-  val interp = new Interpreter(sched)
+  val library = DefaultLibrary()
+  val interp = new Interpreter(sched,library)
 
   val result = interp.evaluate(program)
 

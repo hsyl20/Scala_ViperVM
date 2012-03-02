@@ -13,32 +13,26 @@
 
 package org.vipervm.parsers
 
-import scala.util.parsing.combinator.syntactical._
+import scala.util.parsing.combinator.RegexParsers
 
 import org.vipervm.runtime._
 import org.vipervm.runtime.interpreter._
 
-object LispyParser extends StandardTokenParsers {
+object LispyParser extends RegexParsers {
 
-  lexical.delimiters += ("(", ")")
-  lexical.reserved += "let"
-
-  lazy val expr: Parser[Term] = (
-      ("("~>"let"~>"("~>rep("("~>ident~expr<~")")<~")")~expr<~")" ^^ {
+  val expr: Parser[Term] = (
+      ("("~>"let"~>"("~>rep("("~>id~expr<~")")<~")")~expr<~")" ^^ {
         case lets~in => (lets :\ in) { case ((v~e),in) =>
-          TmLet(TmVar(v),e,in)
+          TmLet(v,e,in)
         }
       }
-    | ("("~>ident)~rep(expr)<~")" ^^ {
-        case k~as => TmApp(TmKernel(k), Vector(as:_*))
+    | ("("~>id)~rep(expr)<~")" ^^ {
+        case k~as => TmApp(k, Vector(as:_*))
       }
-    | ident ^^ {
-        case d => TmVar(d)
-      }
+    | id
   )
 
-  def parse(s:String) = {
-    val tokens = new lexical.Scanner(s)
-    phrase(expr)(tokens)
-  } 
+  def id : Parser[TmId] = """[a-zA-Z=*+/<>!\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ {case s => TmId(s)}
+
+  def parse(s:String):ParseResult[Term] = parse(expr,s)
 }

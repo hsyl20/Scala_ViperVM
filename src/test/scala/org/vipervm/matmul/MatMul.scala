@@ -25,7 +25,7 @@ import org.vipervm.runtime.scheduling.DefaultScheduler
 import org.vipervm.runtime.mm._
 import org.vipervm.runtime.interpreter._
 
-import org.vipervm.library.linearalgebra._
+import org.vipervm.library._
 
 import org.vipervm.profiling.SLF4JProfiler
 
@@ -34,19 +34,15 @@ import org.vipervm.parsers.LispyParser
 class MatMul extends FunSuite {
 
   test("R = A*B + A*C using AST") {
-    val src = TmApp(TmKernel("matadd"), Vector(
-      TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("b"))),
-      TmApp(TmKernel("matmul"), Vector(TmVar("a"), TmVar("c")))))
+    val src = TmApp(TmId("+"), Vector(
+      TmApp(TmId("*"), Vector(TmId("a"), TmId("b"))),
+      TmApp(TmId("*"), Vector(TmId("a"), TmId("c")))))
 
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = FloatMatrixMultiplication
-    val matadd = FloatMatrixAddition
 
-    val symbols = SymbolTable(
-      Map("a" -> a, "b" -> b, "c" -> c),
-      Map("matmul" -> matmul, "matadd" -> matadd))
+    val symbols = SymbolTable(Map("a" -> a, "b" -> b, "c" -> c))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
@@ -57,20 +53,16 @@ class MatMul extends FunSuite {
 
   test("R = A*B + A*C using Lispy parser") {
     val src = LispyParser.parse("""
-      (matadd 
-        (matmul a b)
-        (matmul a c))
+      (+
+        (* a b)
+        (* a c))
       """)
 
     val a = new Matrix2D[Float](32,32)
     val b = new Matrix2D[Float](32,32)
     val c = new Matrix2D[Float](32,32)
-    val matmul = FloatMatrixMultiplication
-    val matadd = FloatMatrixAddition
 
-    val symbols = SymbolTable(
-      Map("a" -> a, "b" -> b, "c" -> c),
-      Map("matmul" -> matmul, "matadd" -> matadd))
+    val symbols = SymbolTable(Map("a" -> a, "b" -> b, "c" -> c))
 
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
 
@@ -101,7 +93,7 @@ class MatMul extends FunSuite {
     c.initialize(dataManager, (x,y) => 2.0f )
 
     val sched = new DefaultScheduler(dataManager,profiler)
-    val interp = new Interpreter(sched)
+    val interp = new Interpreter(sched,DefaultLibrary())
 
     val result = interp.evaluate(program)
 

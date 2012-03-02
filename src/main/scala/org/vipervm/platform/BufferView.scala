@@ -30,7 +30,7 @@ sealed abstract class BufferView {
 case class BufferView1D(buffer:Buffer,offset:Long,size:Long) extends BufferView
 
 /** 2D view with row padding */
-case class BufferView2D(buffer:Buffer,offset:Long,width:Long,height:Long,rowPadding:Long) extends BufferView
+case class BufferView2D(buffer:Buffer,offset:Long,width:Long,height:Long,padding:Long) extends BufferView
 
 /** 2D view with row and plane paddings */
 case class BufferView3D(buffer:Buffer,offset:Long,width:Long,height:Long,depth:Long,rowPadding:Long,planePadding:Long) extends BufferView

@@ -35,7 +35,7 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
 
     onHost(dataManager) { (view,buf) => {
       for (y <- 0L until view.height; x <- 0L until (view.width/4)) {
-        val index = x*4 + y * (view.width + view.rowPadding) + view.offset
+        val index = x*4 + y * (view.width + view.padding) + view.offset
         elem.typ match {
           case "float" => buf.peer.setFloat(index, f.asInstanceOf[(Long,Long)=>Float](x,y))
           case "double" => buf.peer.setDouble(index, f.asInstanceOf[(Long,Long)=>Double](x,y))
@@ -52,7 +52,7 @@ class Matrix2D[A](val width:Long, val height:Long)(implicit elem:Primitive[A]) e
 
     for (y <- 0L until view.height) {
       for (x <- 0L until (view.width/4)) {
-        val index = x*4 + y * (view.width + view.rowPadding) + view.offset
+        val index = x*4 + y * (view.width + view.padding) + view.offset
         elem.typ match {
           case "float" => result.append(mem.getFloat(index) + " ")
           case "double" => result.append(mem.getDouble(index) + " ")

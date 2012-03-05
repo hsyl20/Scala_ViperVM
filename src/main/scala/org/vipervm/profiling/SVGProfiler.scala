@@ -54,6 +54,7 @@ private class SVGProfilerImpl(platform:Platform) extends SVGProfiler {
 
   private val g = new SVGGraphics2D(document)
   val canvas = new JSVGCanvas
+  canvas.setDoubleBufferedRendering(true)
   canvas.setSVGDocument(document)
   g.setSVGCanvasSize(initSize)
 

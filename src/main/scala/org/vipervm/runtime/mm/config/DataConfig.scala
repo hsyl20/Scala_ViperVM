@@ -11,26 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.mm
+package org.vipervm.runtime.mm.config
 
-import org.vipervm.platform.MemoryNode
+import org.vipervm.platform._
+import org.vipervm.runtime.mm._
 
-trait Data {
+case class DataConfig(constraints:DataConfigConstraint*)
 
-  type T <: VVMType
-  type M <: MetaData
-  type R <: Repr
-  type I <: DataInstance[R]
+sealed abstract class DataConfigConstraint
 
-  /** Type of the data */
-  def typ:T
-
-  /** Meta data associated to the data type */
-  def metadata:M
-
-  def allocate(memory:MemoryNode,repr:R):Either[AllocationFailure,I]
+case class PresentIn(data:Data,memory:MemoryNode) extends DataConfigConstraint {
+  def withRepr(repr:Repr) = PresentInWithRepr(data,memory,repr)
 }
 
-sealed abstract class AllocationFailure
-case object OutOfMemoryFailure extends AllocationFailure
-case object DataRepresentationNotSupported extends AllocationFailure
+case class PresentInWithRepr(data:Data,memory:MemoryNode,repr:Repr) extends DataConfigConstraint

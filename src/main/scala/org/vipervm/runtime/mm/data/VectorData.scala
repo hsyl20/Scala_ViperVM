@@ -47,8 +47,14 @@ case class CompositeVectorRepr(blocks:Seq[Vector]) extends VectorRepr
 /** Instance of a Vector */
 abstract class VectorInstance(repr:VectorRepr) extends DataInstance[VectorRepr]
 
-case class DenseVectorInstance(repr:DenseVectorRepr,view:BufferView1D) extends VectorInstance(repr)
+case class DenseVectorInstance(repr:DenseVectorRepr,view:BufferView1D) extends VectorInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Right(view.buffer.memory == memory)
+}
 
-case class StridedVectorInstance(repr:StridedVectorRepr,view:BufferView2D) extends VectorInstance(repr)
+case class StridedVectorInstance(repr:StridedVectorRepr,view:BufferView2D) extends VectorInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Right(view.buffer.memory == memory)
+}
 
-case class CompositeVectorInstance(repr:CompositeVectorRepr) extends VectorInstance(repr)
+case class CompositeVectorInstance(repr:CompositeVectorRepr) extends VectorInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Left(repr.blocks)
+}

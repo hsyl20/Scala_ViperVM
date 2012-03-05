@@ -29,7 +29,9 @@ case object PrimitiveMetaData extends MetaData
 
 case class PrimitiveRepr(endianness:ByteOrder) extends Repr
 
-case class PrimitiveInstance(repr:PrimitiveRepr,view:BufferView1D) extends DataInstance[PrimitiveRepr]
+case class PrimitiveInstance(repr:PrimitiveRepr,view:BufferView1D) extends DataInstance[PrimitiveRepr] {
+  def isAvailableIn(memory:MemoryNode) = Right(view.buffer.memory == memory)
+}
 
 object Primitive {
 

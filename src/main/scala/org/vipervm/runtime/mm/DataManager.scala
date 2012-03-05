@@ -26,8 +26,14 @@ trait DataManager {
   /** Register a data in the system */
   def register(data:Data):Unit
 
+  /** Unregister a data */
+  def unregister(data:Data):Unit
+
   /** Associate an instance to a data */
   def associate(instance:DataInstance[Repr],data:Data):Unit
+
+  /** Available instances in a given memory */
+  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance[_]]
 
   /** Prepare the given configuration */
   def prepare(config:DataConfig):Event

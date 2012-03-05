@@ -15,6 +15,7 @@ package org.vipervm.runtime.mm
 
 import org.vipervm.platform._
 import org.vipervm.profiling._
+import org.vipervm.utils._
 
 import scala.collection.immutable.HashMap
 
@@ -34,9 +35,28 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     instances += (data -> Seq.empty)
   }
 
+  def unregister(data:Data):Unit = {
+    instances -= data
+  }
+
   def associate(instance:DataInstance[Repr],data:Data):Unit = {
     val old = instances.getOrElse(data, Seq.empty)
     instances = instances.updated(data, instance +: old)
+  }
+
+  def dataIsAvailableIn(data:Data,memory:MemoryNode):Boolean = {
+    instances(data).exists { _.isAvailableIn(memory) match {
+      case Right(b) => b
+      case Left(datas) => datas.forall(data => dataIsAvailableIn(data,memory))
+    }}
+  }
+
+  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance[_]] = {
+    instances(data).filter { _.isAvailableIn(memory) match {
+      case Right(b) => b
+      case Left(datas) => datas.forall(data => dataIsAvailableIn(data,memory))
+    }}
+
   }
 
   def dataState(data:MetaView,memory:MemoryNode):DataState = {

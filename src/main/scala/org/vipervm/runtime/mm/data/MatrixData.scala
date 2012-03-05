@@ -44,7 +44,7 @@ case class StridedMatrixRepr(elem:PrimitiveRepr,major:Major,padding:Long) extend
 case class DoubleStridedMatrixRepr(elem:PrimitiveRepr,major:Major,cellPadding:Long,rowPadding:Long) extends MatrixRepr
 
 /** A matrix stored in multiple other matrices */
-case class CompositeMatrixRepr(blocks:Array[Array[Matrix]]) extends MatrixRepr
+case class CompositeMatrixRepr(blocks:Seq[Seq[Matrix]]) extends MatrixRepr
 
 
 abstract class SparseMatrixRepr extends MatrixRepr
@@ -55,8 +55,14 @@ case object BlockCompressedRowSparseMatrixRepr extends SparseMatrixRepr
 /** Instance of a Matrix */
 abstract class MatrixInstance(repr:MatrixRepr) extends DataInstance[MatrixRepr]
 
-case class DenseMatrixInstance(repr:DenseMatrixRepr,view:BufferView1D) extends MatrixInstance(repr)
+case class DenseMatrixInstance(repr:DenseMatrixRepr,view:BufferView1D) extends MatrixInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Right(view.buffer.memory == memory)
+}
 
-case class StridedMatrixInstance(repr:StridedMatrixRepr,view:BufferView2D) extends MatrixInstance(repr)
+case class StridedMatrixInstance(repr:StridedMatrixRepr,view:BufferView2D) extends MatrixInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Right(view.buffer.memory == memory)
+}
 
-case class CompositeMatrixInstance(repr:CompositeMatrixRepr) extends MatrixInstance(repr)
+case class CompositeMatrixInstance(repr:CompositeMatrixRepr) extends MatrixInstance(repr) {
+  def isAvailableIn(memory:MemoryNode) = Left(repr.blocks.flatten)
+}

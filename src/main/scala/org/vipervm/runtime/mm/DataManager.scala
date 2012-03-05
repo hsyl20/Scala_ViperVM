@@ -23,6 +23,12 @@ trait DataManager {
 
   def platform:Platform
 
+  /** Register a data in the system */
+  def register(data:Data):Unit
+
+  /** Associate an instance to a data */
+  def associate(instance:DataInstance[Repr],data:Data):Unit
+
   /** Prepare the given configuration */
   def prepare(config:DataConfig):Event
 

@@ -16,6 +16,8 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform._
 import org.vipervm.profiling._
 
+import scala.collection.immutable.HashMap
+
 import akka.actor.TypedActor
 
 private class DefaultDataManager(val platform:Platform, profiler:Profiler) extends DataManager {
@@ -25,6 +27,17 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
   protected var dataStates:Map[(MemoryNode,MetaView),DataState] = Map.empty
   
   protected var configs:Map[DataConfig,(Int,Event)] = Map.empty
+
+  protected var instances:HashMap[Data,Seq[DataInstance[_]]] = HashMap.empty
+
+  def register(data:Data):Unit = {
+    instances += (data -> Seq.empty)
+  }
+
+  def associate(instance:DataInstance[Repr],data:Data):Unit = {
+    val old = instances.getOrElse(data, Seq.empty)
+    instances = instances.updated(data, instance +: old)
+  }
 
   def dataState(data:MetaView,memory:MemoryNode):DataState = {
     dataStateInternal(data,memory)

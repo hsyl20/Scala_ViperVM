@@ -37,9 +37,9 @@ object MyProject extends Build {
     scalacOptions += "-P:continuations:enable",
 
     /* Tasks */
-    fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Test, "org.vipervm.apps.Profiler"),
-    fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Test, "org.vipervm.apps.Info"),
-    fullRunTask(TaskKey[Unit]("run-sample", "Sample application"), Test, "org.vipervm.apps.Sample"),
+    fullRunTask(TaskKey[Unit]("run-profiler", "Profiler GUI"), Compile, "org.vipervm.apps.Profiler"),
+    fullRunTask(TaskKey[Unit]("run-platform-info", "Platform information"), Compile, "org.vipervm.apps.Info"),
+    fullRunTask(TaskKey[Unit]("run-sample", "Sample application"), Compile, "org.vipervm.apps.Sample"),
     fullRunTask(replTaskKey, Test, "org.vipervm.fp.REPL"),
     fork in replTaskKey := true,
     outputStrategy in replTaskKey := Some(StdoutOutput),

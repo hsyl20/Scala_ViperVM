@@ -14,8 +14,22 @@
 package org.vipervm
 
 import org.vipervm.runtime.interpreter._
+import org.vipervm.runtime.mm.Matrix
 
 package object dsl {
+
+  var id = -1
+
+  implicit def matrixWrapper(m:Matrix) = {
+    id += 1
+    val name = "m%d".format(id)
+    new MatrixDSL {
+      val term = TmId(name)
+      val peer = Some(m)
+      val symbols = SymbolTable(Map(name -> m))
+    }
+  }
+
   def let(bindings:(Program,Program)*) = new {
     val bs = bindings.map{ case (x,e) => x.term match {
       case a@TmId(_) => (a,e)

@@ -16,9 +16,10 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform.MemoryNode
 
 /** Instance of a data */
-trait DataInstance[+R<:Repr] {
+trait DataInstance {
+
   /** Selected way to represent the data */
-  def repr:R
+  val repr:Repr
 
   /**
    * Indicate whether a data is available in a memory
@@ -28,4 +29,3 @@ trait DataInstance[+R<:Repr] {
    */
   def isAvailableIn(memory:MemoryNode):Either[Seq[Data],Boolean]
 }
-

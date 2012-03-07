@@ -11,18 +11,18 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.profiling
+package org.vipervm.runtime
 
-import org.vipervm.platform._
-import org.vipervm.runtime._
-import org.vipervm.runtime.mm.Data
+import org.vipervm.platform.AccessMode
+import org.vipervm.runtime.mm.{Repr,VVMType}
 
-trait Profiler {
-
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-
+object Prototype {
+  def apply(ps:Parameter[_]*):List[Parameter[_]] = ps.toList
 }
+
+case class Parameter[A](mode:AccessMode, repr:Repr, typ:VVMType, storage:Storage = DeviceStorage, name:String = "", description:String = "")
+
+sealed abstract class Storage
+case object HostStorage extends Storage
+case object DeviceStorage extends Storage
+

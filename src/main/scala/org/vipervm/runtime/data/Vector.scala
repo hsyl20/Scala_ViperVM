@@ -20,7 +20,7 @@ import org.vipervm.runtime.mm.DataManager
 /**
  * Vector
  */
-class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends MetaView with PrintableMetaView {
+/*class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends MetaView with PrintableMetaView {
   type ViewType = BufferView1D
 
   def allocate(memory:MemoryNode):BufferView1D = {
@@ -61,4 +61,4 @@ class Vector[A](val size:Long)(implicit elem:Primitive[A]) extends MetaView with
     result.mkString
   }
 }
-
+*/

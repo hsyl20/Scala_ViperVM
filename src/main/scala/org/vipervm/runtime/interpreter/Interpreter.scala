@@ -13,8 +13,8 @@
 
 package org.vipervm.runtime.interpreter
 
-import org.vipervm.platform.{Event,FutureEvent,FutureData}
-import org.vipervm.runtime.{Function,Task}
+import org.vipervm.platform.{Event,FutureEvent}
+import org.vipervm.runtime.{Function,Task,FutureData}
 import org.vipervm.runtime.scheduling.Scheduler
 import org.vipervm.library.Library
 import org.vipervm.utils._
@@ -26,6 +26,11 @@ import org.vipervm.utils._
 class Interpreter(scheduler:Scheduler,library:Library) {
 
   def evaluate(program:Program):FutureData = evaluate(program.term,program.symbols)
+
+  def isValue(e:Term):Boolean = e match {
+    case TmId(_) => true
+    case _ => false
+  }
 
   def evaluate(expr:Term, symbols:SymbolTable):FutureData = expr match {
     case TmId(name)   => symbols.values(name)
@@ -44,7 +49,7 @@ class Interpreter(scheduler:Scheduler,library:Library) {
     case _ => ???
   }
 
-  private def submit(function:Function, params:Vector[FutureData], symbols:SymbolTable):FutureData = {
+  private def submit(function:Function, params:Seq[FutureData], symbols:SymbolTable):FutureData = {
 
     val ftask = function.createTask(params)
     //We explicitly wait for task creation (even if it requires access to param

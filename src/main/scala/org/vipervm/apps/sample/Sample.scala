@@ -19,9 +19,8 @@ import org.vipervm.platform.jvm.JVMDriver
 import org.vipervm.platform.host.DefaultHostDriver
 
 import org.vipervm.runtime._
-import org.vipervm.runtime.data._
+import org.vipervm.runtime.mm._
 import org.vipervm.runtime.scheduling._
-import org.vipervm.runtime.mm.{DefaultDataManager,DataManager}
 import org.vipervm.runtime.interpreter._
 
 import org.vipervm.library._
@@ -48,22 +47,18 @@ private class SampleApp(size:Long = 32) {
   val frame = Profiler.dynamicRendering(profiler)
 
   import org.vipervm.dsl._
-  val a = Matrix2D[Float](size,size)
-  val b = Matrix2D[Float](32L,size)
-  val c = Matrix2D[Float](32L,size)
-  val x = Matrix2D[Float](size,size)
-  val y = Matrix2D[Float](size,size)
+  val a = Matrix.create[Float](dataManager,size,size) {
+    (x,y) => if (x == y) 1.0f else 0.0f
+  }
+  val b = Matrix.create[Float](dataManager,32L,size)((_,_) => 2.0f)
+  val c = Matrix.create[Float](dataManager,32L,size)((_,_) => 2.0f)
 
-  def makeTree(init:Matrix2D[Float], height:Int):Matrix2D[Float] = {
+  def makeTree(init:MatrixDSL, height:Int):MatrixDSL = {
     (init /: (0 to height))((init,_) => init + init)
   }
 //  val program = makeTree(a*b+a*c, 3)
 //  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
   val program = a*b + a*c
-
-  a.peer.get.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
-  b.peer.get.initialize(dataManager, (x,y) => 2.0f )
-  c.peer.get.initialize(dataManager, (x,y) => 2.0f )
 
   val library = DefaultLibrary()
   val interp = new Interpreter(sched,library)
@@ -73,8 +68,8 @@ private class SampleApp(size:Long = 32) {
   result.syncWait
 
   if (size < 64) {
-    val r = result.data.asInstanceOf[data.Matrix2D[Float]]
-    println(r.print(dataManager)())
+/*    val r = result.data.asInstanceOf[data.Matrix2D[Float]]
+    println(r.print(dataManager)())*/
   }
   else {
     println("Printing disabled (size of the matrices too big)")

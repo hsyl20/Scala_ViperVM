@@ -15,9 +15,11 @@ package org.vipervm.library
 
 import org.vipervm.runtime.Function
 
-class Library(functions:Map[String,Function]) {
+class Library(functions:Seq[Function]) {
 
-  def this(fs:(String,Function)*) = this(fs.toMap)
+  lazy val names = functions.groupBy(_.prototype.name)
 
-  def apply(name:String):Option[Function] = functions.get(name)
+  def this(functions:Function*) = this(functions.toList)
+
+  def byName(name:String):Seq[Function] = names.getOrElse(name, Seq.empty)
 }

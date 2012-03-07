@@ -11,18 +11,17 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.profiling
+package org.vipervm.runtime
 
-import org.vipervm.platform._
-import org.vipervm.runtime._
-import org.vipervm.runtime.mm.Data
+import org.vipervm.platform.{Event,MemoryNode,Processor}
+import org.vipervm.runtime.mm.config._
+import org.vipervm.runtime.mm.{Data,DataInstance}
 
-trait Profiler {
+trait KernelPrototype {
 
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
+  /* Compute from parameters the memory configuration required to compute result */
+  def execConf(params:Seq[Data],memory:MemoryNode,proc:Processor): DataConfig
 
 }
+
+

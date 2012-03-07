@@ -11,18 +11,11 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.profiling
+package org.vipervm.runtime
 
-import org.vipervm.platform._
-import org.vipervm.runtime._
+import org.vipervm.platform.{Event,FutureEvent,DummyEvent}
 import org.vipervm.runtime.mm.Data
 
-trait Profiler {
-
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-
+class FutureData(val data:Data, event:Event) extends FutureEvent(data,event) {
+  def this(data:Data) = this(data,DummyEvent)
 }

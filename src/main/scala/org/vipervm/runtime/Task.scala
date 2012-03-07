@@ -13,16 +13,6 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform._
+import org.vipervm.runtime.mm.Data
 
-/**
- * A functional kernel with its parameters
- */
-case class Task(kernel:MetaKernel, params:Seq[MetaView], result:MetaView) {
-
-  def makeKernelParams(memory:MemoryNode):Seq[Any] = kernel.makeKernelParams(params, memory)
-
-  def canExecuteOn(proc:Processor):Boolean = kernel.canExecuteOn(proc)
-
-  override def toString = "%s <- %s(%s)".format(result,kernel,params.mkString(","))
-}
+case class Task(functionName:String, params:Seq[Data], result:Data)

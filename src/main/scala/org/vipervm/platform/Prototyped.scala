@@ -1,11 +1,26 @@
+/*                                                  *\
+** \ \     / _)                   \ \     /   \  |  **
+**  \ \   /   |  __ \    _ \   __| \ \   /   |\/ |  **
+**   \ \ /    |  |   |   __/  |     \ \ /    |   |  **
+**    \_/    _|  .__/  \___| _|      \_/    _|  _|  **
+**              _|                                  **
+**                                                  **
+**       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          **
+**                                                  **
+**            http://www.vipervm.org                **
+**                     GPLv3                        **
+\*                                                  */
+
 package org.vipervm.platform
+
+import org.vipervm.runtime.mm.{Data,DataInstance}
 
 trait Prototyped {
 
   val prototype:List[Parameter[_]]
 
   protected implicit def paramExtractor(params:Seq[Any]) = new {
-    def apply[A:Manifest](param:Parameter[A]) = try {
+    def apply[A : Manifest](param:Parameter[A]) = try {
       params(prototype.indexOf(param)).asInstanceOf[A]
     }
     catch {

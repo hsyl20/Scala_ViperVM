@@ -15,21 +15,16 @@ package org.vipervm.runtime.mm
 
 import org.vipervm.platform.MemoryNode
 
-trait Data {
+class Data(dataManager:DataManager) {
 
-  type T <: VVMType
-  type M <: MetaData
-  type R <: Repr
-  type I <: DataInstance[R]
+  def typ:Option[VVMType] = dataManager.getType(this)
 
-  /** Type of the data */
-  def typ:T
-
-  /** Meta data associated to the data type */
-  def metadata:M
-
-  def allocate(memory:MemoryNode,repr:R):Either[AllocationFailure,I]
+  def meta:Option[MetaData] = dataManager.getMetaData(this)
 }
+
+case class TypedData(data:Data,typ:VVMType)
+case class TypedDataWithMetaData(data:Data,typ:VVMType,meta:MetaData)
+case class DataReprInstance(data:Data,repr:Repr,instance:DataInstance)
 
 sealed abstract class AllocationFailure
 case object OutOfMemoryFailure extends AllocationFailure

@@ -15,13 +15,14 @@ package org.vipervm.profiling
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.mm.Data
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 private class DummyProfiler extends Profiler {
 
-  def transferStart(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {}
-  def transferEnd(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {}
+  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {}
+  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {}
   def taskAssigned(task:Task,proc:Processor,timestamp:Long):Unit = {}
   def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long):Unit = {}
   def taskCompleted(task:Task,proc:Processor,timestamp:Long):Unit = {}

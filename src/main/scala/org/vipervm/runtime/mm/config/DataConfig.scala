@@ -16,12 +16,19 @@ package org.vipervm.runtime.mm.config
 import org.vipervm.platform._
 import org.vipervm.runtime.mm._
 
-case class DataConfig(constraints:DataConfigConstraint*)
-
-sealed abstract class DataConfigConstraint
-
-case class PresentIn(data:Data,memory:MemoryNode) extends DataConfigConstraint {
-  def withRepr(repr:Repr) = PresentInWithRepr(data,memory,repr)
+sealed abstract class DataConfig {
+  def || (that:DataConfig) = Or(this,that)
+  def && (that:DataConfig) = And(this,that)
 }
 
-case class PresentInWithRepr(data:Data,memory:MemoryNode,repr:Repr) extends DataConfigConstraint
+case class Or(left:DataConfig,right:DataConfig) extends DataConfig
+case class And(left:DataConfig,right:DataConfig) extends DataConfig
+
+case class RequiredMetaData(data:Data) extends DataConfig
+case class RequireInHostMemory(data:Data) extends DataConfig
+
+case class RequiredIn(data:Data,memory:MemoryNode) extends DataConfig {
+  def withRepr(repr:Repr) = RequiredInWithRepr(data,memory,repr)
+}
+
+case class RequiredInWithRepr(data:Data,memory:MemoryNode,repr:Repr) extends DataConfig

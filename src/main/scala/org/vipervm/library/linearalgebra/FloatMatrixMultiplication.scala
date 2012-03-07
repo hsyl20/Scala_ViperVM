@@ -15,53 +15,49 @@ package org.vipervm.library.linearalgebra
 
 import org.vipervm.library.linearalgebra.kernels.jvm.FloatMatrixMultiplicationJVM
 import org.vipervm.library.linearalgebra.kernels.opencl.FloatMatrixMultiplicationOpenCL
-import org.vipervm.platform._
-import org.vipervm.runtime._
-import org.vipervm.runtime.data.Matrix2D
 import org.vipervm.library.linearalgebra.kernels._
+
+import org.vipervm.platform.{ReadOnly,WriteOnly}
+import org.vipervm.runtime._
+import org.vipervm.runtime.mm._
 
 object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   val kernels = Seq(FloatMatrixMultiplicationOpenCL,FloatMatrixMultiplicationJVM)
   
-  val a = Parameter[Matrix2D[Float]](
+  val a = Parameter[DenseMatrixInstance](
+    typ = MatrixType(FloatType),
+    repr = DenseMatrixRepr(RowMajor),
     name = "a",
     mode = ReadOnly,
     storage = DeviceStorage
+
   )
-  val b = Parameter[Matrix2D[Float]](
+  val b = Parameter[DenseMatrixInstance](
+    typ = MatrixType(FloatType),
+    repr = DenseMatrixRepr(RowMajor),
     name = "b",
     mode = ReadOnly,
     storage = DeviceStorage
+
   )
-  val c = Parameter[Matrix2D[Float]](
+  val c = Parameter[DenseMatrixInstance](
+    typ = MatrixType(FloatType),
+    repr = DenseMatrixRepr(RowMajor),
     name = "c",
-    mode = ReadWrite,
+    mode = WriteOnly,
     storage = DeviceStorage
+
   )
 
   val prototype = Prototype(a,b,c)
 
-  def makeKernelParams(params:Seq[MetaView],memory:MemoryNode):Seq[Any] = {
-    val wA = params(a).width
-    val hA = params(a).height
-    val wB = params(b).width
-    val b1 = params(a).viewIn(memory).get.buffer
-    val b2 = params(b).viewIn(memory).get.buffer
-    val b3 = params(c).viewIn(memory).get.buffer
+  def makeKernelParams(params:Seq[DataInstance]):Seq[Any] = {
+    val wA = params(a).meta.width
+    val hA = params(a).meta.height
+    val wB = params(b).meta.width
+    val b1 = params(a).view.buffer
+    val b2 = params(b).view.buffer
+    val b3 = params(c).view.buffer
     Seq(b1,b2,b3,wA,hA,wB)
-  }
-}
-
-
-object FloatMatrixMultiplication extends Function {
-  val peer = FloatMatrixMultiplicationMetaKernel
-
-  def createTask(args:Seq[FutureData]):FutureEvent[Task] = args.map(_.data) match {
-    case Seq(a:Matrix2D[_], b:Matrix2D[_]) => {
-      val c = new Matrix2D[Float](b.width, a.height)
-      val task = Task(peer, List(a,b,c), c)
-      FutureEvent(task)
-    }
-    case _ => throw new Exception("Invalid parameters: "+args)
   }
 }

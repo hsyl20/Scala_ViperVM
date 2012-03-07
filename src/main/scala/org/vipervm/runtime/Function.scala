@@ -13,12 +13,8 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{FutureEvent,FutureData}
-
-trait Function {
-
-  val peer:MetaKernel
-
-  def createTask(args:Seq[FutureData]): FutureEvent[Task]
-
+sealed abstract class Function {
+  val prototype:FunctionPrototype
 }
+
+case class KernelFunction(kernel:MetaKernel,prototype:FunctionPrototype) extends Function

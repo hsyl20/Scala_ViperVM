@@ -15,6 +15,8 @@ package org.vipervm.runtime
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.mm.config._
+import org.vipervm.runtime.mm.{Data,DataInstance}
 
 /**
  * A kernel that can be executed on different architectures
@@ -28,16 +30,18 @@ trait MetaKernel extends Prototyped {
    */
   def getKernelsFor(proc:Processor): Seq[Kernel]
 
-  def makeKernelParams(params:Seq[MetaView],memory:MemoryNode):Seq[Any]
+  def makeKernelParams(params:Seq[DataInstance]):Seq[Any]
 
   def canExecuteOn(proc:Processor) = !getKernelsFor(proc).isEmpty
 
-  def memoryConfig(params:Seq[MetaView],memory:MemoryNode,hostMemory:MemoryNode):Seq[(MetaView,MemoryNode)] = {
+  def memoryConfig(params:Seq[Data],memory:MemoryNode,hostMemory:MemoryNode):DataConfig = {
     if (params.length != prototype.length) throw new Exception("Invalid parameters")
-    params zip prototype.map(_.storage match {
+    val paramMem = params zip prototype.map(_.storage match {
       case HostStorage => hostMemory
       case DeviceStorage => memory
     })
+    val constraints = paramMem map { case (p,m) => p requiredIn m }
+    constraints.reduceLeft[DataConfig](_&&_)
   }
 
 }

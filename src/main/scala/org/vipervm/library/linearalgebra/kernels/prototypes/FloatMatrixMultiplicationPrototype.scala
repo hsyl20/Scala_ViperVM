@@ -46,7 +46,7 @@ trait FloatMatrixMultiplicationPrototype {
   )
   val c = Parameter[Buffer](
     name = "c",
-    mode = ReadWrite,
+    mode = WriteOnly,
     storage = DeviceStorage
   )
 

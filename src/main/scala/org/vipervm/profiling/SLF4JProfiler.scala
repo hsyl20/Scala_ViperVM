@@ -15,6 +15,7 @@ package org.vipervm.profiling
 
 import org.vipervm.platform._
 import org.vipervm.runtime._
+import org.vipervm.runtime.mm.Data
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
@@ -22,13 +23,13 @@ import grizzled.slf4j.Logging
 
 private class SLF4JProfiler extends Profiler with Logging {
 
-  def transferStart(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
     info("Starting transfer of %s from memory %s to memory %s using link %s".format(
       data,dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
     )
   }
 
-  def transferEnd(data:MetaView,dataTransfer:DataTransfer,timestamp:Long):Unit = {
+  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
     info("Transfer of %s from memory %s to memory %s using link %s completed".format(
       data,dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
     )

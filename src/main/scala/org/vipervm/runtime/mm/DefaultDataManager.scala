@@ -14,6 +14,7 @@
 package org.vipervm.runtime.mm
 
 import org.vipervm.platform._
+import org.vipervm.runtime.mm.config._
 import org.vipervm.profiling._
 import org.vipervm.utils._
 
@@ -25,11 +26,11 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
 
   private val self = TypedActor.self[DataManager]
 
-  protected var dataStates:Map[(MemoryNode,MetaView),DataState] = Map.empty
+  protected var dataStates:Map[(MemoryNode,Data),DataState] = Map.empty
   
   protected var configs:Map[DataConfig,(Int,Event)] = Map.empty
 
-  protected var instances:HashMap[Data,Seq[DataInstance[_]]] = HashMap.empty
+  protected var instances:HashMap[Data,Seq[DataInstance]] = HashMap.empty
 
   def register(data:Data):Unit = {
     instances += (data -> Seq.empty)
@@ -39,7 +40,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     instances -= data
   }
 
-  def associate(instance:DataInstance[Repr],data:Data):Unit = {
+  def associate(instance:DataInstance,data:Data):Unit = {
     val old = instances.getOrElse(data, Seq.empty)
     instances = instances.updated(data, instance +: old)
   }
@@ -51,7 +52,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     }}
   }
 
-  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance[_]] = {
+  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
     instances(data).filter { _.isAvailableIn(memory) match {
       case Right(b) => b
       case Left(datas) => datas.forall(data => dataIsAvailableIn(data,memory))
@@ -59,24 +60,14 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
 
   }
 
-  def dataState(data:MetaView,memory:MemoryNode):DataState = {
-    dataStateInternal(data,memory)
-  }
-
-  protected def dataStateInternal(data:MetaView,memory:MemoryNode):DataState = {
-    dataStates.getOrElse(memory -> data, DataState())
-  }
-
-  def updateDataState(data:MetaView,memory:MemoryNode,state:DataState):Unit = {
-    updateDataStateInternal(data,memory,state)
-  }
-
-  protected def updateDataStateInternal(data:MetaView,memory:MemoryNode,state:DataState):Unit = {
-    dataStates += (memory -> data) -> state
+  def scheduleConfig(config:DataConfig):Event = {
+    val (count,event) = configs.getOrElse(config, (0,new UserEvent))
+    configs += config -> (count+1 -> event)
     self.wakeUp
+    event
   }
 
-  def release(config:DataConfig):Unit = {
+  def releaseConfig(config:DataConfig):Unit = {
     //TODO: check config state and release data...
 
     val (count,event) = configs(config)
@@ -86,24 +77,35 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     self.wakeUp
   }
 
-  def prepare(config:DataConfig):Event = {
-    val (count,event) = configs.getOrElse(config, (0,new UserEvent))
-    configs += config -> (count+1 -> event)
-    self.wakeUp
-    event
-  }
-
   def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
-    prepare(config) willTrigger {
+    scheduleConfig(config) willTrigger {
       val result = body
-      self.release(config)
+      self.releaseConfig(config)
       result
     }
   }
 
+  def dataState(data:Data,memory:MemoryNode):DataState = {
+    dataStateInternal(data,memory)
+  }
+
+  protected def dataStateInternal(data:Data,memory:MemoryNode):DataState = {
+    dataStates.getOrElse(memory -> data, DataState())
+  }
+
+  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit = {
+    updateDataStateInternal(data,memory,state)
+  }
+
+  protected def updateDataStateInternal(data:Data,memory:MemoryNode,state:DataState):Unit = {
+    dataStates += (memory -> data) -> state
+    self.wakeUp
+  }
+
+
   def wakeUp:Unit = {
     /* Skip already complete configs */
-    val confs = configs.collect { case (conf,(_,ev)) if !ev.test => conf }
+/*    val confs = configs.collect { case (conf,(_,ev)) if !ev.test => conf }
 
     val (completed,uncompleted) = confs.partition(isComplete)
 
@@ -155,23 +157,24 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
       val target = data.allocate(platform.hostMemory)
       val (source,link) = selectDirectSource(data,target)
       transfer(data,source,target,link)
-    }}
+    }}*/
   }
 
   def isComplete(config:DataConfig):Boolean = {
-    config.map {
+    /*config.map {
       case (data,mem) => dataStateInternal(data,mem).available
-    }.reduceLeft(_&&_)
+    }.reduceLeft(_&&_)*/
+    ???
   }
 
-  def isDirect(data:MetaView,memory:MemoryNode):Boolean = data.views.exists(
+  def isDirect(data:Data,memory:MemoryNode):Boolean = ???/*data.views.exists(
     view => platform.linkBetween(view.buffer.memory,memory).isDefined
-  )
+  )*/
 
-  def isValid(data:MetaView):Boolean = data.isDefined
+  def isValid(data:Data):Boolean = ???//data.isDefined
 
-  protected def transfer(data:MetaView,source:BufferView,target:BufferView,link:Link):DataTransfer = {
-    val mem = target.buffer.memory
+  protected def transfer(data:Data,source:BufferView,target:BufferView,link:Link):DataTransfer = {
+/*    val mem = target.buffer.memory
     val tr = link.copy(source,target)
     profiler.transferStart(data,tr)
 
@@ -185,7 +188,8 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
       updateDataState(data, mem, state.copy(uploading = false, available = true))
     }
 
-    tr
+    tr*/
+    ???
   }
 
   def selectDirectSource(data:MetaView, target:BufferView):(BufferView,Link) = {

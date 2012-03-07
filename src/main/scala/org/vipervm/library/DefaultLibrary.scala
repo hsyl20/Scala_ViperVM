@@ -13,11 +13,12 @@
 
 package org.vipervm.library
 
+import org.vipervm.runtime._
 import org.vipervm.library.linearalgebra._
 
 object DefaultLibrary {
   def apply():Library = new Library(
-    "+" -> FloatMatrixAddition,
-    "*" -> FloatMatrixMultiplication
+    KernelFunction(FloatMatrixAdditionMetaKernel, MatrixAdditionProto),
+    KernelFunction(FloatMatrixMultiplicationMetaKernel, MatrixMultiplicationProto)
   )
 }

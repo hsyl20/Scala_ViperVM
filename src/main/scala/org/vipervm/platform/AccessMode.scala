@@ -15,5 +15,6 @@ package org.vipervm.platform
 
 sealed abstract class AccessMode
 case object ReadOnly extends AccessMode
-case object ReadWrite extends AccessMode
+//case object ReadWrite extends AccessMode
+case object WriteOnly extends AccessMode
 

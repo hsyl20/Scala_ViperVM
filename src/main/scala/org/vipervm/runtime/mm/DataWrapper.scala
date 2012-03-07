@@ -11,18 +11,8 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.profiling
+package org.vipervm.runtime.mm
 
-import org.vipervm.platform._
-import org.vipervm.runtime._
-import org.vipervm.runtime.mm.Data
-
-trait Profiler {
-
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-
+trait DataWrapper {
+  val data:Data
 }

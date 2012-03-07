@@ -13,6 +13,6 @@
 
 package org.vipervm.runtime.interpreter
 
-import org.vipervm.platform.FutureData
+import org.vipervm.runtime.FutureData
 
 case class SymbolTable(values:Map[String,FutureData])

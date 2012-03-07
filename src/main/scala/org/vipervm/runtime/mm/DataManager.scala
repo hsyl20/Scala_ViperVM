@@ -14,36 +14,38 @@
 package org.vipervm.runtime.mm
 
 import org.vipervm.platform.{Platform,MemoryNode,Event,MetaView,FutureEvent}
+import org.vipervm.runtime.mm.config._
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait DataManager {
   
-  type DataConfig = Seq[(MetaView,MemoryNode)]
-
   def platform:Platform
 
-  /** Register a data in the system */
-  def register(data:Data):Unit
+  def create:Data
+  def release(data:Data):Unit
 
-  /** Unregister a data */
-  def unregister(data:Data):Unit
+  def setType(data:Data,typ:VVMType):Unit
+  def getType(data:Data):Option[VVMType]
+
+  def setMetaData(data:Data,meta:MetaData):Unit
+  def getMetaData(data:Data):Option[MetaData]
 
   /** Associate an instance to a data */
-  def associate(instance:DataInstance[Repr],data:Data):Unit
+  def associate(data:Data,repr:Repr,instance:DataInstance):Unit
 
   /** Available instances in a given memory */
-  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance[_]]
+  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance]
 
   /** Prepare the given configuration */
-  def prepare(config:DataConfig):Event
+  def scheduleConfig(config:DataConfig):Event
 
   /** Release the given configuration */
-  def release(config:DataConfig):Unit
+  def releaseConfig(config:DataConfig):Unit
 
   /** Return the state of a data in a memory */
-  def dataState(data:MetaView,memory:MemoryNode):DataState
-  def updateDataState(data:MetaView,memory:MemoryNode,state:DataState):Unit
+  def dataState(data:Data,memory:MemoryNode):DataState
+  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit
 
   /** Indicate to the data manager that an event occured */
   def wakeUp:Unit

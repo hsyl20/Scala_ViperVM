@@ -11,18 +11,21 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.profiling
+package org.vipervm.runtime
 
-import org.vipervm.platform._
-import org.vipervm.runtime._
-import org.vipervm.runtime.mm.Data
+import org.vipervm.runtime.mm.config._
+import org.vipervm.runtime.mm.{Data,MetaData,VVMType}
 
-trait Profiler {
+trait FunctionPrototype {
+  /* Identifier of the function */
+  val name:String
 
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
-  def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
+  /* Compute result type if parameters are valid */
+  def typ(params:Seq[VVMType]):Option[VVMType]
 
+  /* Compute from parameters the memory configuration required to compute result meta data */
+  def metaConf(params:Seq[Data]): DataConfig
+
+  /* Compute result meta data from parameters (with the configuration returned by metaConf) */
+  def meta(params:Seq[Data]): MetaData
 }

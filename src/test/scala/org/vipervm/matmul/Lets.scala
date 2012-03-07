@@ -34,14 +34,14 @@ import org.vipervm.parsers.LispyParser
 class MatMulLets extends FunSuite {
 
   test("let x = a*b in x + a*c using AST") {
-    val src = TmLet(TmId("x"),TmApp(TmId("*"), Vector(TmId("a"), TmId("b"))),
-      TmApp(TmId("+"), Vector(
+    val src = TmLet(TmId("x"),TmApp(TmId("*"), Seq(TmId("a"), TmId("b"))),
+      TmApp(TmId("+"), Seq(
         TmId("x"),
-        TmApp(TmId("*"), Vector(TmId("a"), TmId("c"))))))
+        TmApp(TmId("*"), Seq(TmId("a"), TmId("c"))))))
 
-    val a = new Matrix2D[Float](32,32)
-    val b = new Matrix2D[Float](32,32)
-    val c = new Matrix2D[Float](32,32)
+    val a = Matrix.create[Float](32,32)
+    val b = Matrix.create[Float](32,32)
+    val c = Matrix.create[Float](32,32)
 
     val symbols = SymbolTable(Map("a" -> a, "b" -> b, "c" -> c))
 
@@ -60,9 +60,9 @@ class MatMulLets extends FunSuite {
           (* a c)))
       """)
 
-    val a = new Matrix2D[Float](32,32)
-    val b = new Matrix2D[Float](32,32)
-    val c = new Matrix2D[Float](32,32)
+    val a = Matrix.create[Float](32,32)
+    val b = Matrix.create[Float](32,32)
+    val c = Matrix.create[Float](32,32)
 
     val symbols = SymbolTable( Map("a" -> a, "b" -> b, "c" -> c))
 
@@ -75,10 +75,10 @@ class MatMulLets extends FunSuite {
 
   test("let x = a*b in x + a*c using DSL") {
     import org.vipervm.dsl._
-    val a = Matrix2D[Float](32,32)
-    val b = Matrix2D[Float](32,32)
-    val c = Matrix2D[Float](32,32)
-    val x = Matrix2D[Float](32,32)
+    val x = Matrix.create[Float](32,32)
+    val a = Matrix.create[Float](32,32)
+    val b = Matrix.create[Float](32,32)
+    val c = Matrix.create[Float](32,32)
 
     val program = let (x -> a*b) in x + a*c
 

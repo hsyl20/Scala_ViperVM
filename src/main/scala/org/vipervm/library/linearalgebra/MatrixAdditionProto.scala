@@ -19,8 +19,9 @@ import org.vipervm.runtime.mm.{Data,MatrixType,MetaData,VVMType}
 
 object MatrixAdditionProto extends FunctionPrototype {
   val name = "+"
+  val arity = 2
     
-  def typ(params:Seq[VVMType]):Option[VVMType] = params match {
+  def resultType(params:Seq[VVMType]):Option[VVMType] = params match {
     case Seq(MatrixType(a),MatrixType(b)) if a == b => Some(MatrixType(a))
     case _ => None
   }

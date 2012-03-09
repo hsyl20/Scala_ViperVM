@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime.scheduling
 
-import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,MetaView,MemoryNode}
+import org.vipervm.platform.{Processor,UserEvent,FutureEvent,EventGroup,MetaView,MemoryNode,Kernel}
 import org.vipervm.runtime._
 import org.vipervm.runtime.mm._
 import org.vipervm.profiling._
@@ -67,7 +67,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
   }
 
   def executeTaskInternal(task:Task):Unit = {
-    currentTask = Some(task)
+/*    currentTask = Some(task)
 
 
     /* Select kernel */
@@ -82,8 +82,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
     event.willTrigger {
 
       /* Schedule kernel execution */
-      //val ev = proc.execute(kernel, task.makeKernelParams(memory))
-      val ev = ??? : UserEvent
+      val ev = proc.execute(kernel, task.makeKernelParams(memory))
 
       profiler.taskStart(task,kernel,proc)
 
@@ -93,10 +92,9 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
 
         dataManager.releaseConfig(memConf)
       }
-    }
+    }*/
   }
 
-  def canExecute(task:Task):Boolean = task.canExecuteOn(proc)
 }
 
 

@@ -13,6 +13,19 @@
 
 package org.vipervm.runtime.interpreter
 
-import org.vipervm.runtime.FutureData
+case class Context(bindings:List[(String,Binding)]) {
+  def length = bindings.length
 
-case class SymbolTable(values:Map[String,FutureData])
+  def pickFreshName(name:String, hint:Int=0):(Context,String) = {
+    val x = if (hint == 0) name else name+hint
+    if (bindings.map(_._1).exists(_ == x)) pickFreshName(name,hint+1) else {
+      val ctx = Context((x -> NameBind) :: bindings)
+      (ctx,x)
+    }
+  }
+
+  def indexToName(index:Int):String = bindings(index)._1
+}
+
+sealed abstract class Binding
+case object NameBind extends Binding

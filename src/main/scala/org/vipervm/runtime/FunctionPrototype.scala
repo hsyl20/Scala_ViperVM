@@ -17,13 +17,16 @@ import org.vipervm.runtime.mm.config._
 import org.vipervm.runtime.mm.{Data,MetaData,VVMType}
 
 trait FunctionPrototype {
-  /* Identifier of the function */
+  /** Identifier of the function */
   val name:String
 
-  /* Compute result type if parameters are valid */
-  def typ(params:Seq[VVMType]):Option[VVMType]
+  /** Number of parameters */
+  val arity:Int
 
-  /* Compute from parameters the memory configuration required to compute result meta data */
+  /** Compute result type if parameters are valid */
+  def resultType(params:Seq[VVMType]):Option[VVMType]
+
+  /** Compute from parameters the memory configuration required to compute result meta data */
   def metaConf(params:Seq[Data]): DataConfig
 
   /* Compute result meta data from parameters (with the configuration returned by metaConf) */

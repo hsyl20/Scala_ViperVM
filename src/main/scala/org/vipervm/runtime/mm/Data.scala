@@ -19,7 +19,11 @@ class Data(dataManager:DataManager) {
 
   def typ:Option[VVMType] = dataManager.getType(this)
 
+  def typ_=(typ:VVMType):Unit = dataManager.setType(this,typ)
+
   def meta:Option[MetaData] = dataManager.getMetaData(this)
+
+  def meta_=(meta:MetaData):Unit = dataManager.setMetaData(this,meta)
 }
 
 case class TypedData(data:Data,typ:VVMType)

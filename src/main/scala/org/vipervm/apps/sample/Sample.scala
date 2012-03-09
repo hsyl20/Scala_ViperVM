@@ -61,11 +61,9 @@ private class SampleApp(size:Long = 32) {
   val program = a*b + a*c
 
   val library = DefaultLibrary()
-  val interp = new Interpreter(sched,library)
+  val interp = new Interpreter(sched,library,dataManager)
 
   val result = interp.evaluate(program)
-
-  result.syncWait
 
   if (size < 64) {
 /*    val r = result.data.asInstanceOf[data.Matrix2D[Float]]

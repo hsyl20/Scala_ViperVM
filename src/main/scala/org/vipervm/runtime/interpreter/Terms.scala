@@ -13,7 +13,12 @@
 
 package org.vipervm.runtime.interpreter
 
+import org.vipervm.runtime.mm.Data
+
 sealed abstract class Term
+case class TmVar(index:Int,contextLength:Int) extends Term
+case class TmAbs(varName:String,term:Term) extends Term
+case class TmApp(t1:Term,args:Seq[Term]) extends Term
+
 case class TmId(id:String) extends Term
-case class TmApp(f:TmId, args:Seq[Term]) extends Term
-case class TmLet(v:TmId, e:Term, in:Term) extends Term
+case class TmData(data:Data) extends Term

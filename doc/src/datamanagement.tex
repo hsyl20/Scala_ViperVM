@@ -1,0 +1,92 @@
+\chapter{Data Management}
+
+\section{Low-level}
+A platform is composed of a set of \textbf{memories} and a set of
+\textbf{networks}. Given two memories, a network may return a \textbf{link}
+indicating that data transfers between these two memories are possible.
+
+Buffers are regions of contiguous cells that can be allocated in memories. They
+are fully specified with a size (in bytes).
+
+Buffer \textbf{views} are sets of cells that can be discontinuous in a buffer.
+Currently, ViperVM supports three kinds of view: 1D, 2D and 3D. 1D view maps a
+contiguous set of cells; 2D view maps bunches of N contiguous cells each
+separated by P padding cells; 3D view maps 2D views separated by $P'$ padding
+cells.
+
+Links are able to transfer memory between views of the same kind. Some hardware
+may provide support for strided transfers while others don't. ViperVM correctly
+handles both cases and falls back to contiguous data transfers if strided
+tranfers isn't supported.
+
+\section{Data Representation}
+In the first version of ViperVM, data were just sets of views of the same kind.
+For instance, a vector was a set of 1D views; a two-dimensional matrix was a set
+of 2D views; etc. To execute a kernel on a specific device, the runtime system
+just had to check whether there was a view for each required data in an
+appropriate memory. If some of them were missing, it had to allocate a buffer,
+then to map a fresh view of the right kind on it and finally to transfer valid data
+from an existing view to the new one. Finally the data was updated to reference
+this new view as containing valid data.
+
+ViperVM has now adopted a new scheme to represent data. Before presenting it, we
+describe some limitations of the old scheme that have conducted us to choose a
+new one.
+
+The main goal of ViperVM is to allow efficient execution of programs on
+heterogeneous architectures using only a high-level functional representation of
+the input programs. In some cases, a high level operations should be split into
+several simpler operations to be executed efficiently on an heterogeneous
+architecture. For instance, to compute $a+b$ where a and b are huge matrices, a
+and b should be split into several parts.
+
+It implies that while $a$ and $b$ are data of type Matrix, they may not always
+be stored in a set of 2D views. We needed another \textbf{representation} layer
+so that the hierarchy becomes:
+
+\[\text{Data} \leftarrow \text{Set[Representation]} \leftarrow \text{Set[View]}
+\leftarrow \text{Buffer} \leftarrow \text{Memory}\]
+
+Another problem solved by this new layer is to handle different kinds of storage
+for a given data type even within the same kind of views. For instance, matrices
+can be stored in row-major or column-major way, while both representations use
+2D views.
+
+\section{Impact on functions}
+This new layer has an impact on function representation as well. Before, it was
+easy to tell if a function was supporting a data type or not. Now, a given
+function may use different kernels for different data representations. For
+instance, $a+b$ when $a$ and $b$ are represented by 2D views (dense
+representations) with the same major is computed using a different kernel than
+when $a$ and $b$ don't have the same major. The same goes for split matrices.
+
+Functions must now indicate which data representations are supported by their
+implementations. If a set of parameters with given representations is not
+supported, the runtime system would have to convert data into compatible
+representations before executing it. 
+
+Some functions only consist in changing the representation of a data. For
+instance, a matrix transposition is a switch between a row-major and a
+column-major representation. The real physical conversion will only occur if no
+kernel is able to execute using the current data representation.
+
+\section{Data Configurations}
+Before executing a task in ViperVM, data must be in a task-specific state in
+memories. We call this state a \textbf{data configuration}.
+
+In previous versions of ViperVM, kernel's prototypes indicated where each data
+was to be stored for the kernel to be executed: either in host memory or in
+device memory. Using the new scheme, kernels have to indicate which
+representation of the data is required too.
+
+For instance, while there was only one single matrix multiplication kernel per architecture,
+there are now several ones dedicated to different data representations.
+
+Data configurations are now more complex, because several configurations may be
+valid for a given function on a given architecture. Configurations are now
+a set of valid configurations, that are themselves a set of tuples
+(Data,Representation,HostOrDevice) where HostOrDevice indicates in which memory
+(host or device) the data is to be stored.
+
+The scheduler now has to choose which configuration can be more efficiently set
+up (considering data transfer or representation conversions).

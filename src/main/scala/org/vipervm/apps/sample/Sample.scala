@@ -37,12 +37,9 @@ private class SampleApp(size:Long = 32) {
   val platform = Platform(host, new OpenCLDriver)
   val profiler = SVGProfiler(platform)
   val dataManager = DefaultDataManager(platform,profiler)
-  val sched = Scheduler {
-    new DefaultScheduler(dataManager,profiler) with DataAffinityPolicy with LoadBalancingPolicy {
-      override val loadBalancingCoef = 5.0f
-    }
-  }
-  //val sched = DefaultScheduler(dataManager,profiler)
+  val library = DefaultLibrary()
+  val runtime = DefaultRuntime(library,dataManager,profiler)
+  val interp = new DefaultInterpreter(runtime)
 
   val frame = Profiler.dynamicRendering(profiler)
 
@@ -60,8 +57,6 @@ private class SampleApp(size:Long = 32) {
 //  val program = let (x -> a*b, y -> a*c) in (x+y) * (x+y)
   val program = a*b + a*c
 
-  val library = DefaultLibrary()
-  val interp = new Interpreter(sched,library,dataManager)
 
   val result = interp.evaluate(program)
 

@@ -59,7 +59,7 @@ object Primitives {
     p.set(view.buffer.asInstanceOf[HostBuffer], 0, value)
 
     /* Associate instance to the data */
-    dataManager.associate(data,repr,instance)
+    dataManager.associate(data,instance)
 
     /* Return the data */
     new Primitive(data,dataManager)

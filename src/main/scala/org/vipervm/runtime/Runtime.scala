@@ -11,17 +11,31 @@
 **                     GPLv3                        **
 \*                                                  */
 
-package org.vipervm.runtime.mm
+package org.vipervm.runtime
 
-import org.vipervm.platform.MemoryNode
+import org.vipervm.runtime.interpreter.Term
+import org.vipervm.runtime.Task
 
-class Data(dataManager:DataManager) {
+import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
-  def typ:Option[VVMType] = dataManager.getType(this)
+trait Runtime {
+  val platform:Platform
+  val library:Library
+  val dataManager:DataManager
 
-  def typ_=(typ:VVMType):Unit = dataManager.setType(this,typ)
+  def rewrite(term:Term):Option[Term]
+  def submit(task:Task):Unit
 
-  def meta:Option[MetaData] = dataManager.getMetaData(this)
+  def transferCompleted(transfer:DataTransfer):Unit
+  def kernelCompleted(kernel:KernelEvent):Unit
+}
 
-  def meta_=(meta:MetaData):Unit = dataManager.setMetaData(this,meta)
+
+object Runtime {
+  
+  protected val factory = TypedActor.get(ActorSystem())
+
+  def apply[A<:Runtime](runtime: =>A):Runtime = {
+    factory.typedActorOf( TypedProps[A](classOf[Runtime], runtime))
+  }
 }

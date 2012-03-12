@@ -20,8 +20,7 @@ import org.vipervm.profiling._
 
 import org.vipervm.utils._
 
-import akka.actor.TypedActor
-
+import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait Worker {
   val self = TypedActor.self[Worker]
@@ -30,6 +29,14 @@ trait Worker {
   def dataState(data:Data):DataState
   def executeTask(task:Task):Unit
   def completedTask(task:Task):Unit
-  def canExecute(task:Task):Boolean
+  def canExecute(kernel:MetaKernel):Boolean
 }
 
+object Worker {
+  protected val factory = TypedActor.get(ActorSystem("workers"))
+
+  def apply[A<:Worker](worker: =>A):Worker = {
+    factory.typedActorOf( TypedProps[A](classOf[Worker], worker))
+  }
+
+}

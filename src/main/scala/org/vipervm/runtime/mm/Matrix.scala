@@ -50,7 +50,7 @@ object Matrix {
     }
 
     /* Associate instance to the data */
-    dataManager.associate(data,repr,instance)
+    dataManager.associate(data,instance)
 
     /* Return the data */
     new Matrix(data)

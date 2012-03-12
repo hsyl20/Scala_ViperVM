@@ -18,8 +18,8 @@ import org.vipervm.runtime.Task
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait Scheduler {
-  def submitTask(task:Task,deps:Seq[Event]):Event
-  def completedTask(task:Task):Unit
+  def submit(task:Task):Unit
+  def completed(task:Task):Unit
 
   def platform:Platform
 }

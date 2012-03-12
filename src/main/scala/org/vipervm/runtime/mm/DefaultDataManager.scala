@@ -30,35 +30,63 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
   
   protected var configs:Map[DataConfig,(Int,Event)] = Map.empty
 
-  protected var instances:HashMap[Data,Seq[DataInstance]] = HashMap.empty
+  protected var types:Map[Data,VVMType] = Map.empty
+  protected var metadata:Map[Data,MetaData] = Map.empty
+  protected var instances:Map[Data,Seq[DataInstance]] = Map.empty
+  protected var events:Map[Data,Event] = Map.empty
 
-  def register(data:Data):Unit = {
-    instances += (data -> Seq.empty)
+  def create:Data = {
+    val d = new Data(this)
+    instances += d -> Seq.empty
+    d
   }
 
-  def unregister(data:Data):Unit = {
+  def release(data:Data):Unit = {
+    types -= data
+    metadata -= data
     instances -= data
   }
 
-  def associate(instance:DataInstance,data:Data):Unit = {
-    val old = instances.getOrElse(data, Seq.empty)
-    instances = instances.updated(data, instance +: old)
+  def setType(data:Data,typ:VVMType):Unit = {
+    types += data -> typ
   }
 
-  def dataIsAvailableIn(data:Data,memory:MemoryNode):Boolean = {
-    instances(data).exists { _.isAvailableIn(memory) match {
-      case Right(b) => b
-      case Left(datas) => datas.forall(data => dataIsAvailableIn(data,memory))
-    }}
+  def getType(data:Data):Option[VVMType] = types.get(data)
+
+  def setMetaData(data:Data,meta:MetaData):Unit = {
+    metadata += data -> meta
+  }
+
+  def getMetaData(data:Data):Option[MetaData] = metadata.get(data)
+
+  def associate(data:Data,instance:DataInstance):Unit = {
+    val insts = availableInstances(data)
+    instances += data -> (insts :+ instance)
+  }
+
+  def availableInstances(data:Data):Seq[DataInstance] = instances.getOrElse(data, Seq.empty)
+
+  def isAvailableIn(data:Data,memory:MemoryNode):Boolean = {
+    !availableInstancesIn(data,memory).isEmpty
   }
 
   def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
-    instances(data).filter { _.isAvailableIn(memory) match {
+    val instances = availableInstances(data).filter(_.isAvailableIn(memory) match {
+      case Left(ds) => ds.map(d => isAvailableIn(d,memory)).reduce(_&&_)
       case Right(b) => b
-      case Left(datas) => datas.forall(data => dataIsAvailableIn(data,memory))
-    }}
-
+    })
+    instances
   }
+
+  def getEvent(data:Data):Event = {
+    events.getOrElse(data, {
+      val e = new UserEvent
+      events += data -> e
+      if (!availableInstances(data).isEmpty) e.complete
+      e
+    })
+  }
+
 
   def scheduleConfig(config:DataConfig):Event = {
     val (count,event) = configs.getOrElse(config, (0,new UserEvent))

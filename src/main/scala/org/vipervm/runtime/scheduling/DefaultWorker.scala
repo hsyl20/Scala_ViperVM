@@ -21,12 +21,11 @@ import org.vipervm.profiling._
 import org.vipervm.utils._
 
 import akka.actor.TypedActor
+
 /**
  * Defaut worker (typed actor)
  */
-class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataManager:DataManager) extends Worker with Serializable {
-
-  import TypedActor.dispatcher
+class DefaultWorker(proc:Processor,runtime:Runtime,profiler:Profiler,dataManager:DataManager) extends Worker with Serializable {
 
   var tasks:List[Task] = Nil
   var currentTask:Option[Task] = None
@@ -36,6 +35,8 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
   def dataState(data:Data):DataState = dataManager.dataState(data,memory)
 
   def loadStatus:LoadStatus = LoadStatus(tasks.length + (if (currentTask.isDefined) 1 else 0))
+
+  def canExecute(kernel:MetaKernel):Boolean = kernel.canExecuteOn(proc)
 
   def executeTask(task:Task):Unit = {
       profiler.taskAssigned(task,proc)
@@ -53,7 +54,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
     
     profiler.taskCompleted(task,proc)
 
-    scheduler.completedTask(task)
+    runtime.kernelCompleted(task.kernel)
 
     /* Execute another task, if any */
     currentTask = None
@@ -73,7 +74,7 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
     /* Select kernel */
     val kernel = task.kernel.getKernelsFor(proc).head
 
-    val memConf = task.kernel.memoryConfig(task.params,memory,scheduler.platform.hostMemory)
+    val memConf = task.kernel.memoryConfig(task.params,memory,runtime.platform.hostMemory)
 
     val event = dataManager.scheduleConfig(memConf)
 
@@ -97,4 +98,10 @@ class DefaultWorker(proc:Processor,scheduler:Scheduler,profiler:Profiler,dataMan
 
 }
 
-
+object DefaultWorker {
+  def apply(proc:Processor,runtile:Runtime,profiler:Profiler,dataManager:DataManager): Worker = {
+    Worker {
+      new DefaultWorker(proc,runtime,profiler,dataManager)
+    }
+  }
+}

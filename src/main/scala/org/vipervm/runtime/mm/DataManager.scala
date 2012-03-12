@@ -32,7 +32,7 @@ trait DataManager {
   def getMetaData(data:Data):Option[MetaData]
 
   /** Associate an instance to a data */
-  def associate(data:Data,repr:Repr,instance:DataInstance):Unit
+  def associate(data:Data,instance:DataInstance):Unit
 
   /** Available instances in a given memory */
   def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance]
@@ -42,10 +42,6 @@ trait DataManager {
 
   /** Release the given configuration */
   def releaseConfig(config:DataConfig):Unit
-
-  /** Return the state of a data in a memory */
-  def dataState(data:Data,memory:MemoryNode):DataState
-  def updateDataState(data:Data,memory:MemoryNode,state:DataState):Unit
 
   /** Indicate to the data manager that an event occured */
   def wakeUp:Unit

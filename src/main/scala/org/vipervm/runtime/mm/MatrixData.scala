@@ -38,11 +38,6 @@ case class DoubleStridedMatrixRepr(major:Major) extends MatrixRepr
 case object CompositeMatrixRepr extends MatrixRepr
 
 
-abstract class SparseMatrixRepr extends MatrixRepr
-case object CompressedRowSparseMatrixRepr extends SparseMatrixRepr
-case object CompressedColumnSparseMatrixRepr extends SparseMatrixRepr
-case object BlockCompressedRowSparseMatrixRepr extends SparseMatrixRepr
-
 /** Instance of a Matrix */
 abstract class MatrixInstance extends DataInstance {
   val typ:MatrixType

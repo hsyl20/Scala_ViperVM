@@ -16,13 +16,13 @@ package org.vipervm.runtime.scheduling
 import org.vipervm.platform._
 import org.vipervm.runtime._
 
-trait RankingPolicy extends DefaultScheduler {
+trait RankingPolicy extends Runtime {
 
-  def rankWorker(task:Task,worker:Worker,current:Float):Float = current
+  def rankProcessor(task:Task,proc:Processor,current:Float):Float = current
 
-  override def selectWorker(workers:Seq[Worker],task:Task):Worker = {
-    val rankedWorker = (workers zip workers.map(w => rankWorker(task,w,1.0f))).sortBy(_._2).reverse
-    rankedWorker.head._1
+  override def selectProcessor(procs:Seq[Processor],task:Task):Processor = {
+    val rankedProcs = (procs zip procs.map(w => rankProcessor(task,w,1.0f))).sortBy(_._2).reverse
+    rankedProcs.head._1
   }
 
 }

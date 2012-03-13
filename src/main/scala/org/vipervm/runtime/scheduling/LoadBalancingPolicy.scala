@@ -13,19 +13,16 @@
 
 package org.vipervm.runtime.scheduling
 
+import org.vipervm.platform.Processor
 import org.vipervm.runtime._
 
 trait LoadBalancingPolicy extends RankingPolicy {
 
   val loadBalancingCoef = 4.0f
 
-  private def rankStatus(status:LoadStatus):Float = {
-    1.0f / (status.taskCount.toFloat + 1.0f)
-  }
-
-  override def rankWorker(task:Task,worker:Worker,current:Float):Float = {
-    val r = rankStatus(worker.loadStatus)
-    super.rankWorker(task, worker, current + r * loadBalancingCoef)
+  override def rankProcessor(task:Task,proc:Processor,current:Float):Float = {
+    val r = 1.0f / (queues(proc).size.toFloat + 1.0f)
+    super.rankProcessor(task, proc, current + r * loadBalancingCoef)
   }
 
 }

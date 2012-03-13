@@ -13,8 +13,4 @@
 
 package org.vipervm.runtime
 
-sealed abstract class Function {
-  val prototype:FunctionPrototype
-}
-
-case class KernelFunction(kernel:MetaKernel,prototype:FunctionPrototype) extends Function
+case class Function(kernel:MetaKernel,prototype:FunctionPrototype)

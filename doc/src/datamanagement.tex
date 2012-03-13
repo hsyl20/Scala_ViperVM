@@ -89,4 +89,32 @@ a set of valid configurations, that are themselves a set of tuples
 (host or device) the data is to be stored.
 
 The scheduler now has to choose which configuration can be more efficiently set
-up (considering data transfer or representation conversions).
+up (considering data transfers and/or representation conversions).
+
+\section{Split Data}
+Using this new data representation scheme, we can more easily integrate data
+splitting. To do that, we use special function implementations that replace
+their expression by another one in the input program.
+
+For instance, for the matrix addition function, we know that we can replace
+$a+b$ with the following expression when $a$ and $b$ are represented as
+row-major matrices:
+
+\[
+\text{flatten} (\text{zipWith} (+) (\text{horizontalHalfSplit} a) (\text{horizontalHalfSplit} b))
+\]
+
+horizontalHalfSplit creates a matrix (1,2) of matrices from its parameter as its
+name implies.  zipWith applies an operator to each corresponding cell of the two split
+matrices. Finally, flatten creates a matrix by flattening its parameter that
+must be a matrix of matrices.
+
+Types are as follows:
+\begin{itemize}
+  \item horizontalHalfSplit : Matrix[A] => Matrix[Matrix[A]]
+  \item zipWith : ((A,B) => C) => Matrix[A] => Matrix[B] => Matrix[C]
+  \item flatten : Matrix[Matrix[A]] => Matrix[A]
+\end{itemize}
+
+In this expression, only one application will imply computing: $\text{zipWith}
+(+)$. The other ones are only virtual.

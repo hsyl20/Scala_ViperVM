@@ -17,14 +17,13 @@ import org.vipervm.platform._
 import org.vipervm.runtime.mm.config._
 import org.vipervm.profiling._
 import org.vipervm.utils._
+import org.vipervm.runtime.Runtime
 
 import scala.collection.immutable.HashMap
 
 import akka.actor.TypedActor
 
-private class DefaultDataManager(val platform:Platform, profiler:Profiler) extends DataManager {
-
-  private val self = TypedActor.self[DataManager]
+trait DefaultDataManager extends Runtime {
 
   protected var dataStates:Map[(MemoryNode,Data),DataState] = Map.empty
   
@@ -35,31 +34,31 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
   protected var instances:Map[Data,Seq[DataInstance]] = Map.empty
   protected var events:Map[Data,Event] = Map.empty
 
-  def create:Data = {
+  def createData:Data = {
     val d = new Data(this)
     instances += d -> Seq.empty
     d
   }
 
-  def release(data:Data):Unit = {
+  def releaseData(data:Data):Unit = {
     types -= data
     metadata -= data
     instances -= data
   }
 
-  def setType(data:Data,typ:VVMType):Unit = {
+  def setDataType(data:Data,typ:VVMType):Unit = {
     types += data -> typ
   }
 
-  def getType(data:Data):Option[VVMType] = types.get(data)
+  def getDataType(data:Data):Option[VVMType] = types.get(data)
 
-  def setMetaData(data:Data,meta:MetaData):Unit = {
+  def setDataData(data:Data,meta:MetaData):Unit = {
     metadata += data -> meta
   }
 
-  def getMetaData(data:Data):Option[MetaData] = metadata.get(data)
+  def getDataData(data:Data):Option[MetaData] = metadata.get(data)
 
-  def associate(data:Data,instance:DataInstance):Unit = {
+  def associateDataInstance(data:Data,instance:DataInstance):Unit = {
     val insts = availableInstances(data)
     instances += data -> (insts :+ instance)
   }
@@ -71,11 +70,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
   }
 
   def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
-    val instances = availableInstances(data).filter(_.isAvailableIn(memory) match {
-      case Left(ds) => ds.map(d => isAvailableIn(d,memory)).reduce(_&&_)
-      case Right(b) => b
-    })
-    instances
+    availableInstances(data).filter(_.isAvailableIn(memory))
   }
 
   def getEvent(data:Data):Event = {
@@ -91,7 +86,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
   def scheduleConfig(config:DataConfig):Event = {
     val (count,event) = configs.getOrElse(config, (0,new UserEvent))
     configs += config -> (count+1 -> event)
-    self.wakeUp
+    wakeUp
     event
   }
 
@@ -102,13 +97,13 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     if (count == 1) configs -= config
     else configs += config -> (count-1 -> event)
 
-    self.wakeUp
+    wakeUp
   }
 
   def withConfig[A](config:DataConfig)(body: => A):FutureEvent[A] = {
     scheduleConfig(config) willTrigger {
       val result = body
-      self.releaseConfig(config)
+      releaseConfig(config)
       result
     }
   }
@@ -127,7 +122,7 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
 
   protected def updateDataStateInternal(data:Data,memory:MemoryNode,state:DataState):Unit = {
     dataStates += (memory -> data) -> state
-    self.wakeUp
+    wakeUp
   }
 
 
@@ -195,9 +190,11 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     ???
   }
 
-  def isDirect(data:Data,memory:MemoryNode):Boolean = ???/*data.views.exists(
-    view => platform.linkBetween(view.buffer.memory,memory).isDefined
-  )*/
+  def isDirect(data:Data,memory:MemoryNode):Boolean = {
+    availableInstances(data).exists(_.storage.views.forall(
+      view => platform.linkBetween(view.buffer.memory,memory).isDefined
+    ))
+  }
 
   def isValid(data:Data):Boolean = ???//data.isDefined
 
@@ -225,16 +222,6 @@ private class DefaultDataManager(val platform:Platform, profiler:Profiler) exten
     val src = directSources.head
     val link = platform.linkBetween(src,target).get
     (src,link)
-  }
-
-}
-
-object DefaultDataManager {
-
-  def apply(platform:Platform,profiler:Profiler = DummyProfiler()):DataManager = {
-    DataManager {
-      new DefaultDataManager(platform,profiler)
-    }
   }
 
 }

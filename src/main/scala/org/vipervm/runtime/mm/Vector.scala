@@ -15,6 +15,7 @@ package org.vipervm.runtime.mm
 
 import java.nio.ByteOrder
 import org.vipervm.platform._
+import org.vipervm.runtime.Runtime
 
 case class VectorType(elem:PrimitiveType) extends VVMType
 case class VectorMetaData(width:Long) extends MetaData
@@ -42,18 +43,18 @@ case class Vector(val data:Data) extends DataWrapper {
 }
 
 object Vector {
-  def create[A](width:Long,f:(Long)=>A)(implicit dataManager:DataManager,prim:PrimType[A]): Vector = {
+  def create[A](width:Long,f:(Long)=>A)(implicit runtime:Runtime,prim:PrimType[A]): Vector = {
     
     /* Create data */
-    val data = dataManager.create
+    val data = runtime.createData
 
     /* Set type and meta data */
     val typ = VectorType(prim.typ)
     val meta = VectorMetaData(width)
-    dataManager.setType(data, typ)
-    dataManager.setMetaData(data, meta)
+    data.typ = typ
+    data.meta = meta
 
-    val mem = dataManager.platform.hostMemory
+    val mem = runtime.platform.hostMemory
     val instance = allocateDenseVector(typ,meta,mem)
 
     /* Initialize instance */
@@ -65,7 +66,7 @@ object Vector {
     }
 
     /* Associate instance to the data */
-    dataManager.associate(data,instance)
+    data.associate(instance)
 
     /* Return the data */
     new Vector(data)

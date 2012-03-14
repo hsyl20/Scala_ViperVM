@@ -17,16 +17,14 @@ import org.vipervm.platform.{Platform,DataTransfer,Processor,MemoryNode}
 import org.vipervm.runtime.interpreter.{DefaultInterpreter,Term}
 import org.vipervm.library.Library
 import org.vipervm.profiling._
-import org.vipervm.runtime.mm.{DataManager,Data}
+import org.vipervm.runtime.mm._
 import org.vipervm.runtime.scheduling._
 
 import akka.actor.TypedActor
 
-class DefaultRuntime(library:Library,dataManager:DataManager,profiler:Profiler = DummyProfiler()) extends Runtime {
+class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Profiler = DummyProfiler()) extends Runtime with DefaultDataManager {
 
   private val self = TypedActor.self[Runtime]
-
-  val platform = dataManager.platform
 
   protected var toBeComputed:Set[Data] = Set.empty
   protected var pendingTasks:Map[Task,Set[Data]] = Map.empty
@@ -50,6 +48,9 @@ class DefaultRuntime(library:Library,dataManager:DataManager,profiler:Profiler =
     }
   }
 
+  /** Duplicate or transfer a data instance */
+  protected def copy(data:DataInstance,memory:MemoryNode):FutureEvent[DataInstance] = {
+  }
 
   /** 
    * Select the worker that will execute the task amongst valid workers (i.e. for which
@@ -108,9 +109,9 @@ class DefaultRuntime(library:Library,dataManager:DataManager,profiler:Profiler =
 
 object DefaultRuntime {
 
-  def apply(library:Library,dataManager:DataManager,profiler:Profiler=DummyProfiler()):Runtime = {
+  def apply(platform:Platform,library:Library,profiler:Profiler=DummyProfiler()):Runtime = {
     Runtime {
-      new DefaultRuntime(library,dataManager,profiler)
+      new DefaultRuntime(platform,library,profiler)
     }
   }
 

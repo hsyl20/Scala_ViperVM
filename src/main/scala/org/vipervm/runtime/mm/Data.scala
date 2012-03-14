@@ -13,15 +13,18 @@
 
 package org.vipervm.runtime.mm
 
+import org.vipervm.runtime.Runtime
 import org.vipervm.platform.MemoryNode
 
-class Data(dataManager:DataManager) {
+class Data(runtime:Runtime) {
 
-  def typ:Option[VVMType] = dataManager.getType(this)
+  def typ:Option[VVMType] = runtime.getDataType(this)
 
-  def typ_=(typ:VVMType):Unit = dataManager.setType(this,typ)
+  def typ_=(typ:VVMType):Unit = runtime.setDataType(this,typ)
 
-  def meta:Option[MetaData] = dataManager.getMetaData(this)
+  def meta:Option[MetaData] = runtime.getDataMeta(this)
 
-  def meta_=(meta:MetaData):Unit = dataManager.setMetaData(this,meta)
+  def meta_=(meta:MetaData):Unit = runtime.setDataMeta(this,meta)
+
+  def associate(instance:DataInstance):Unit = runtime.associateDataInstance(data,instance)
 }

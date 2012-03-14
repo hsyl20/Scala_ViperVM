@@ -15,6 +15,7 @@ package org.vipervm.runtime.mm
 
 import java.nio.ByteOrder
 import org.vipervm.platform._
+import org.vipervm.runtime.Runtime
 
 case class MatrixType(elem:PrimitiveType) extends VVMType
 case class MatrixMetaData(width:Long, height:Long) extends MetaData
@@ -52,18 +53,18 @@ case class Matrix(val data:Data) extends DataWrapper {
 }
 
 object Matrix {
-  def create[A](dataManager:DataManager,width:Long,height:Long,major:Major = RowMajor)(f:(Long,Long)=>A)(implicit prim:PrimType[A]): Matrix = {
+  def create[A](width:Long,height:Long,major:Major = RowMajor)(f:(Long,Long)=>A)(implicit runtime:Runtime,prim:PrimType[A]): Matrix = {
     
     /* Create data */
-    val data = dataManager.create
+    val data = runtime.createData
 
     /* Set type and meta data */
     val typ = MatrixType(prim.typ)
     val meta = MatrixMetaData(width,height)
-    dataManager.setType(data, typ)
-    dataManager.setMetaData(data, meta)
+    data.typ = typ
+    data.meta = meta
 
-    val mem = dataManager.platform.hostMemory
+    val mem = runtime.platform.hostMemory
     val instance = allocateDenseMatrix(typ,meta,mem,major)
 
     /* Initialize instance */
@@ -81,7 +82,7 @@ object Matrix {
     }
 
     /* Associate instance to the data */
-    dataManager.associate(data,instance)
+    data.associate(instance)
 
     /* Return the data */
     new Matrix(data)

@@ -26,7 +26,7 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   
   val a = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "a",
     mode = ReadOnly,
     storage = DeviceStorage
@@ -34,7 +34,7 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   )
   val b = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "b",
     mode = ReadOnly,
     storage = DeviceStorage
@@ -42,7 +42,7 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   )
   val c = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "c",
     mode = WriteOnly,
     storage = DeviceStorage
@@ -55,9 +55,9 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
     val wA = params(a).meta.width
     val hA = params(a).meta.height
     val wB = params(b).meta.width
-    val b1 = params(a).view.buffer
-    val b2 = params(b).view.buffer
-    val b3 = params(c).view.buffer
+    val b1 = params(a).storage.view.buffer
+    val b2 = params(b).storage.view.buffer
+    val b3 = params(c).storage.view.buffer
     Seq(b1,b2,b3,wA,hA,wB)
   }
 }

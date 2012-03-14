@@ -27,21 +27,21 @@ object FloatMatrixAdditionMetaKernel extends KernelSet {
 
   val a = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "a",
     mode = ReadOnly,
     storage = DeviceStorage
   )
   val b = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "b",
     mode = ReadOnly,
     storage = DeviceStorage
   )
   val c = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
-    repr = DenseMatrixRepr(RowMajor),
+    repr = DenseMatrixRepr,
     name = "c",
     mode = WriteOnly,
     storage = DeviceStorage
@@ -52,9 +52,9 @@ object FloatMatrixAdditionMetaKernel extends KernelSet {
   def makeKernelParams(params:Seq[DataInstance]):Seq[Any] = {
     val w = params(a).meta.width
     val h = params(a).meta.height
-    val b1 = params(a).view.buffer
-    val b2 = params(b).view.buffer
-    val b3 = params(c).view.buffer
+    val b1 = params(a).storage.view.buffer
+    val b2 = params(b).storage.view.buffer
+    val b3 = params(c).storage.view.buffer
     Seq(w,h,b1,b2,b3)
   }
 }

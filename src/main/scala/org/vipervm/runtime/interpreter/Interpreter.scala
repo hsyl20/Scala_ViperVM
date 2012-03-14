@@ -14,7 +14,7 @@
 package org.vipervm.runtime.interpreter
 
 import org.vipervm.runtime.{Function,Task,Runtime}
-import org.vipervm.runtime.mm.{Data,DataManager}
+import org.vipervm.runtime.mm.Data
 import org.vipervm.library.Library
 
 
@@ -23,7 +23,6 @@ import org.vipervm.library.Library
  */
 class DefaultInterpreter(runtime:Runtime) {
   protected val library = runtime.library
-  protected val dataManager = runtime.dataManager
 
   /**
    * Evaluate a term and return a resulting data.
@@ -66,7 +65,7 @@ class DefaultInterpreter(runtime:Runtime) {
 
           /* Create result data */
           val resType = fn1.head.prototype.resultType(paramTypes).get
-          val result = dataManager.create
+          val result = runtime.createData
           result.typ = resType
 
           /* Schedule task execution */

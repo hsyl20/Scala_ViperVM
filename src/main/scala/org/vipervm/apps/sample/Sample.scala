@@ -36,19 +36,18 @@ private class SampleApp(size:Long = 32) {
   //val platform = Platform(host, new JVMDriver(host))
   val platform = Platform(host, new OpenCLDriver)
   val profiler = SVGProfiler(platform)
-  val dataManager = DefaultDataManager(platform,profiler)
   val library = DefaultLibrary()
-  val runtime = DefaultRuntime(library,dataManager,profiler)
+  implicit val runtime = DefaultRuntime(platform,library,profiler)
   val interp = new DefaultInterpreter(runtime)
 
   val frame = Profiler.dynamicRendering(profiler)
 
   import org.vipervm.dsl._
-  val a = Matrix.create[Float](dataManager,size,size) {
+  val a = Matrix.create[Float](size,size) {
     (x,y) => if (x == y) 1.0f else 0.0f
   }
-  val b = Matrix.create[Float](dataManager,32L,size)((_,_) => 2.0f)
-  val c = Matrix.create[Float](dataManager,32L,size)((_,_) => 2.0f)
+  val b = Matrix.create[Float](32L,size)((_,_) => 2.0f)
+  val c = Matrix.create[Float](32L,size)((_,_) => 2.0f)
 
   def makeTree(init:MatrixDSL, height:Int):MatrixDSL = {
     (init /: (0 to height))((init,_) => init + init)

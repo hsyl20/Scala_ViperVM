@@ -15,6 +15,7 @@ package org.vipervm.runtime.mm
 
 import java.nio.ByteOrder
 import org.vipervm.platform._
+import org.vipervm.runtime.Runtime
 
 abstract class PrimitiveType(val size:Int) extends VVMType
 case object FloatType extends PrimitiveType(4)
@@ -29,7 +30,7 @@ case class PrimitiveStorage(view:BufferView1D) extends Storage(view)
 case class PrimitiveInstance(typ:PrimitiveType,properties:PrimitiveProperties,storage:PrimitiveStorage) extends DataInstance(typ,PrimitiveMetaData,PrimitiveRepr,properties,storage)
 
 
-class Primitive[A](val data:Data,dataManager:DataManager) extends DataWrapper {
+class Primitive[A](val data:Data,runtime:Runtime) extends DataWrapper {
 }
 
 abstract class PrimType[A](val typ:PrimitiveType) {
@@ -40,18 +41,18 @@ abstract class PrimType[A](val typ:PrimitiveType) {
 
 object Primitives {
 
-  def create[A](value:A)(implicit dataManager:DataManager,p:PrimType[A]): Primitive[A] = {
+  def create[A](value:A)(implicit runtime:Runtime,p:PrimType[A]): Primitive[A] = {
 
     /* Create data */
-    val data = dataManager.create
+    val data = runtime.createData
 
     /* Set type and meta data */
     val typ = p.typ
     val meta = PrimitiveMetaData
-    dataManager.setType(data, typ)
-    dataManager.setMetaData(data, meta)
+    data.typ = typ
+    data.meta = meta
 
-    val mem = dataManager.platform.hostMemory
+    val mem = runtime.platform.hostMemory
     val instance = allocate(p.typ,mem)
 
     /* Initialize instance */
@@ -59,10 +60,10 @@ object Primitives {
     p.set(buffer, 0, value)
 
     /* Associate instance to the data */
-    dataManager.associate(data,instance)
+    data.associate(instance)
 
     /* Return the data */
-    new Primitive(data,dataManager)
+    new Primitive(data,runtime)
   }
 
   def allocate[A](memory:MemoryNode)(implicit p:PrimType[A]):PrimitiveInstance = {

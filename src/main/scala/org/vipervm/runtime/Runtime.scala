@@ -15,7 +15,7 @@ package org.vipervm.runtime
 
 import org.vipervm.platform.{Platform,DataTransfer,KernelEvent,Processor}
 import org.vipervm.runtime.interpreter.Term
-import org.vipervm.runtime.mm.{DataManager,Data}
+import org.vipervm.runtime.mm._
 import org.vipervm.library.Library
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
@@ -23,7 +23,6 @@ import akka.actor.{TypedActor,ActorSystem,TypedProps}
 trait Runtime {
   val platform:Platform
   val library:Library
-  val dataManager:DataManager
 
   protected val queues:Map[Processor,Set[Task]]
 
@@ -32,6 +31,18 @@ trait Runtime {
 
   protected def transferCompleted(transfer:DataTransfer):Unit
   protected def kernelCompleted(kernel:KernelEvent):Unit
+  protected def wakeUp:Unit
+
+
+  def createData:Data
+
+  def setDataType(data:Data,typ:VVMType):Unit
+  def getDataType(data:Data):Option[VVMType]
+
+  def setDataMeta(data:Data,meta:MetaData):Unit
+  def getDataMeta(data:Data):Option[MetaData]
+
+  def associateDataInstance(data:Data,instance:DataInstance):Unit
 }
 
 

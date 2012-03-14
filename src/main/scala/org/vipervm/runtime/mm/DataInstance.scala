@@ -16,7 +16,7 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform.MemoryNode
 
 /** Instance of a data */
-class DataInstance(typ:VVMType, meta:MetaData, repr:Repr, properties:ReprProperties, storage:Storage) {
+class DataInstance(val typ:VVMType, val meta:MetaData, val repr:Repr, val properties:ReprProperties, val storage:Storage) {
 
   /**
    * Indicate whether a data is available in a memory

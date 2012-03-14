@@ -25,6 +25,8 @@ class OpenCLMemoryNode(val device:OpenCLProcessor) extends MemoryNode {
 
   implicit def buffer2buffer(b:Buffer): OpenCLBuffer = b.asInstanceOf[OpenCLBuffer]
 
+  val endianness = device.peer.endianness
+
   def availableMemory: Long = device.peer.globalMemSize - buffers.map(_.size).sum
 
   /**

@@ -14,6 +14,7 @@
 package org.vipervm.platform
 
 import scala.collection.immutable.{NumericRange,HashSet}
+import java.nio.ByteOrder
 
 /**
  * A memory node
@@ -23,6 +24,8 @@ abstract class MemoryNode {
   type BufferType <: Buffer
 
   protected var buffers:HashSet[Buffer] = HashSet.empty
+
+  val endianness:ByteOrder
 
   /** 
    * Estimated available memory

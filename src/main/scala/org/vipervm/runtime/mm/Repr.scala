@@ -14,3 +14,5 @@
 package org.vipervm.runtime.mm
 
 trait Repr
+
+trait ReprProperties

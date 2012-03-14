@@ -14,8 +14,34 @@
 package org.vipervm.runtime.mm
 
 import java.nio.ByteOrder
-
 import org.vipervm.platform._
+
+case class MatrixType(elem:PrimitiveType) extends VVMType
+case class MatrixMetaData(width:Long, height:Long) extends MetaData
+abstract class MatrixRepr extends Repr
+
+sealed abstract class Major
+case object ColumnMajor extends Major
+case object RowMajor extends Major
+
+/** A vector stored in contiguous memory */
+case object DenseMatrixRepr extends MatrixRepr
+case class DenseMatrixProperties(major:Major,endianness:ByteOrder) extends ReprProperties
+case class DenseMatrixStorage(view:BufferView1D) extends Storage(view)
+case class DenseMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DenseMatrixProperties,storage:DenseMatrixStorage) extends DataInstance(typ,meta,DenseMatrixRepr,properties,storage)
+
+/** A matrix stored using padding between rows */
+case object StridedMatrixRepr extends MatrixRepr
+case class StridedMatrixProperties(major:Major,endianness:ByteOrder,rowPadding:Long) extends ReprProperties
+case class StridedMatrixStorage(view:BufferView2D) extends Storage(view)
+case class StridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:StridedMatrixProperties,storage:StridedMatrixStorage) extends DataInstance(typ,meta,StridedMatrixRepr,properties,storage)
+
+/** A matrix stored using padding between rows and between elements */
+case object DoubleStridedMatrixRepr extends MatrixRepr
+case class DoubleStridedMatrixProperties(major:Major,endianness:ByteOrder,rowPadding:Long,cellPadding:Long) extends ReprProperties
+case class DoubleStridedMatrixStorage(view:BufferView3D) extends Storage(view)
+case class DoubleStridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DoubleStridedMatrixProperties,storage:DoubleStridedMatrixStorage) extends DataInstance(typ,meta,DoubleStridedMatrixRepr,properties,storage)
+
 
 case class Matrix(val data:Data) extends DataWrapper {
   def typOption:Option[MatrixType] = data.typ.map(_.asInstanceOf[MatrixType])
@@ -37,16 +63,21 @@ object Matrix {
     dataManager.setType(data, typ)
     dataManager.setMetaData(data, meta)
 
-    /* Create data instance */
-    val repr = DenseMatrixRepr(major)
     val mem = dataManager.platform.hostMemory
-    val instance = allocateDenseMatrix(typ,meta,repr,mem)
+    val instance = allocateDenseMatrix(typ,meta,mem,major)
 
     /* Initialize instance */
-    val view = instance.view
-    for (y <- 0L until height; x <- 0L until width) {
-      val index = x*4 + y * width * 4 + view.offset
-      prim.set(view.buffer.asInstanceOf[HostBuffer], index, f(x,y))
+    val view = instance.storage.view
+    val buffer = view.buffer.asInstanceOf[HostBuffer]
+    major match {
+      case RowMajor => for (y <- 0L until height; x <- 0L until width) {
+        val index = x * prim.size + y * width * prim.size + view.offset
+        prim.set(buffer, index, f(x,y))
+      }
+      case ColumnMajor => for (x <- 0L until width; y <- 0L until height) {
+        val index = y * prim.size + x * height * prim.size + view.offset
+        prim.set(buffer, index, f(x,y))
+      }
     }
 
     /* Associate instance to the data */
@@ -56,27 +87,24 @@ object Matrix {
     new Matrix(data)
   }
 
-  def allocate(typ:MatrixType,meta:MatrixMetaData,repr:MatrixRepr,memory:MemoryNode):MatrixInstance = repr match {
-    case r@DenseMatrixRepr(_) => allocateDenseMatrix(typ,meta,r,memory)
-    case r@StridedMatrixRepr(_) => allocateStridedMatrix(typ,meta,r,memory)
-    case _ => throw new Exception("Representation not allocatable")
-  }
-
-  def allocateDenseMatrix(typ:MatrixType,meta:MatrixMetaData,repr:DenseMatrixRepr,memory:MemoryNode):DenseMatrixInstance = {
-    val elemSize = Primitive.sizeOf(typ.elem)
+  def allocateDenseMatrix(typ:MatrixType,meta:MatrixMetaData,memory:MemoryNode,major:Major=RowMajor):DenseMatrixInstance = {
+    val prop = DenseMatrixProperties(major,memory.endianness)
+    val elemSize = typ.elem.size
     val size = meta.width * meta.height * elemSize
     val buffer = memory.allocate(size)
     val view = new BufferView1D(buffer, 0, size)
-    val instance = DenseMatrixInstance(typ,meta,repr,view)
-    instance
+    val storage = DenseMatrixStorage(view)
+    DenseMatrixInstance(typ,meta,prop,storage)
   }
 
-  def allocateStridedMatrix(typ:MatrixType,meta:MatrixMetaData,repr:StridedMatrixRepr,memory:MemoryNode,padding:Long=0L):StridedMatrixInstance = {
-    val elemSize = Primitive.sizeOf(typ.elem)
-    val size = (meta.width * elemSize + padding) * meta.height
+  def allocateStridedMatrix(typ:MatrixType,meta:MatrixMetaData,memory:MemoryNode,major:Major=RowMajor,rowPadding:Long=0L):StridedMatrixInstance = {
+    val prop = StridedMatrixProperties(major,memory.endianness,rowPadding)
+    val elemSize = typ.elem.size
+    val size = (meta.width * elemSize + rowPadding) * meta.height
     val buffer = memory.allocate(size)
-    val view = new BufferView2D(buffer, 0, meta.width * elemSize, meta.height, padding)
-    val instance = StridedMatrixInstance(typ,meta,repr,view,padding)
+    val view = new BufferView2D(buffer, 0, meta.width * elemSize, meta.height, rowPadding)
+    val storage = StridedMatrixStorage(view)
+    val instance = StridedMatrixInstance(typ,meta,prop,storage)
     instance
   }
 

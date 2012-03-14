@@ -13,6 +13,8 @@
 
 package org.vipervm.platform
 
+import java.nio.ByteOrder
+
 /**
  * Host memory node
  *
@@ -20,4 +22,6 @@ package org.vipervm.platform
  */
 abstract class HostMemoryNode extends MemoryNode {
   type BufferType <: HostBuffer
+
+  val endianness = ByteOrder.nativeOrder
 }

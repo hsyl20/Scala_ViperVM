@@ -16,29 +16,31 @@ package org.vipervm.runtime.mm
 import java.nio.ByteOrder
 import org.vipervm.platform._
 
+abstract class PrimitiveType(val size:Int) extends VVMType
+case object FloatType extends PrimitiveType(4)
+case object DoubleType extends PrimitiveType(8)
+case object Int32Type extends PrimitiveType(4)
+case object Int64Type extends PrimitiveType(8)
+
+case object PrimitiveMetaData extends MetaData
+case object PrimitiveRepr extends Repr
+case class PrimitiveProperties(endianness:ByteOrder) extends ReprProperties
+case class PrimitiveStorage(view:BufferView1D) extends Storage(view)
+case class PrimitiveInstance(typ:PrimitiveType,properties:PrimitiveProperties,storage:PrimitiveStorage) extends DataInstance(typ,PrimitiveMetaData,PrimitiveRepr,properties,storage)
+
+
 class Primitive[A](val data:Data,dataManager:DataManager) extends DataWrapper {
 }
 
-object Primitive {
-
-  /** Return the size in bytes of a primitive */
-  def sizeOf(typ:PrimitiveType):Long = typ match {
-    case FloatType => 4
-    case DoubleType => 8
-    case Int32Type => 4
-    case Int64Type => 8
-  }
-}
-
 abstract class PrimType[A](val typ:PrimitiveType) {
-  val size:Long
+  val size = typ.size
   def set(hostBuffer:HostBuffer,offset:Long,value:A):Unit
   def get(hostBuffer:HostBuffer,offset:Long):A
 }
 
 object Primitives {
 
-  def create[A](dataManager:DataManager)(value:A)(implicit p:PrimType[A]): Primitive[A] = {
+  def create[A](value:A)(implicit dataManager:DataManager,p:PrimType[A]): Primitive[A] = {
 
     /* Create data */
     val data = dataManager.create
@@ -49,14 +51,12 @@ object Primitives {
     dataManager.setType(data, typ)
     dataManager.setMetaData(data, meta)
 
-    /* Create data instance */
-    val repr = PrimitiveRepr
     val mem = dataManager.platform.hostMemory
-    val instance = allocate[A](mem)
+    val instance = allocate(p.typ,mem)
 
     /* Initialize instance */
-    val view = instance.view
-    p.set(view.buffer.asInstanceOf[HostBuffer], 0, value)
+    val buffer = instance.storage.view.buffer.asInstanceOf[HostBuffer]
+    p.set(buffer, 0, value)
 
     /* Associate instance to the data */
     dataManager.associate(data,instance)
@@ -65,13 +65,16 @@ object Primitives {
     new Primitive(data,dataManager)
   }
 
-
-  def allocate[A](memory:MemoryNode,order:ByteOrder = ByteOrder.nativeOrder)(implicit p:PrimType[A]):PrimitiveInstance = {
-    val size = p.size
-    val typ = p.typ
-    val buffer = memory.allocate(size)
-    val view = new BufferView1D(buffer, 0, size)
-    val instance = PrimitiveInstance(typ,view, order)
-    instance
+  def allocate[A](memory:MemoryNode)(implicit p:PrimType[A]):PrimitiveInstance = {
+    allocate(p.typ,memory)
   }
+
+  def allocate(typ:PrimitiveType,memory:MemoryNode):PrimitiveInstance = {
+    val prop = PrimitiveProperties(memory.endianness)
+    val buffer = memory.allocate(typ.size)
+    val view = BufferView1D(buffer, 0, typ.size)
+    val storage = PrimitiveStorage(view)
+    PrimitiveInstance(typ,prop,storage)
+  }
+
 }

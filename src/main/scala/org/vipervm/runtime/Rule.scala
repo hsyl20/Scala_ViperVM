@@ -13,7 +13,10 @@
 
 package org.vipervm.runtime
 
-trait Function {
-  val kernel:MetaKernel
+import org.vipervm.runtime.interpreter.Term
+
+trait Rule {
   val prototype:FunctionPrototype
+
+  def rewrite(term:Term): Option[Term]
 }

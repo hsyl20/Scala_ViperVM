@@ -18,7 +18,9 @@ import org.vipervm.library.linearalgebra._
 
 object DefaultLibrary {
   def apply():Library = new Library(
-    Function(FloatMatrixAdditionMetaKernel, MatrixAdditionProto),
-    Function(FloatMatrixMultiplicationMetaKernel, MatrixMultiplicationProto)
+    FloatMatrixAdditionFunction,
+    FloatMatrixMultiplicationFunction
+  )(
+    MatrixAdditionSplitRule
   )
 }

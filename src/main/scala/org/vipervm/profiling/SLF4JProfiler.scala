@@ -23,15 +23,15 @@ import grizzled.slf4j.Logging
 
 private class SLF4JProfiler extends Profiler with Logging {
 
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
-    info("Starting transfer of %s from memory %s to memory %s using link %s".format(
-      data,dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
+  def transferStart(dataTransfer:DataTransfer,timestamp:Long):Unit = {
+    info("Starting transfer from memory %s to memory %s using link %s".format(
+      dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
     )
   }
 
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long):Unit = {
-    info("Transfer of %s from memory %s to memory %s using link %s completed".format(
-      data,dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
+  def transferEnd(dataTransfer:DataTransfer,timestamp:Long):Unit = {
+    info("Transfer from memory %s to memory %s using link %s completed".format(
+      dataTransfer.source.buffer.memory,dataTransfer.target.buffer.memory,dataTransfer.link)
     )
   }
 

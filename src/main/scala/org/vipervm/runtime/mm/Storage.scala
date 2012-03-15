@@ -16,4 +16,6 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform.BufferView
 
 /** View used to store a data instance */
-class Storage(val views:BufferView*)
+abstract class Storage(val views:BufferView*) {
+  def duplicate(vs:Seq[BufferView]):Storage
+}

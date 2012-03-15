@@ -13,13 +13,16 @@
 
 package org.vipervm.library
 
-import org.vipervm.runtime.Function
+import org.vipervm.runtime.{Function,Rule}
 
-class Library(functions:Seq[Function]) {
+class Library(functions:Seq[Function],rules:Seq[Rule]) {
 
-  lazy val names = functions.groupBy(_.prototype.name)
+  lazy val functionNames = functions.groupBy(_.prototype.name)
+  lazy val ruleNames = rules.groupBy(_.prototype.name)
 
-  def this(functions:Function*) = this(functions.toList)
+  def this(functions:Function*)(rules:Rule*) = this(functions.toList,rules.toList)
 
-  def byName(name:String):Seq[Function] = names.getOrElse(name, Seq.empty)
+  def byName(name:String):Seq[Function] = functionNames.getOrElse(name, Seq.empty)
+
+  def rulesByName(name:String):Seq[Rule] = ruleNames.getOrElse(name, Seq.empty)
 }

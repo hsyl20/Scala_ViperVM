@@ -26,5 +26,5 @@ class Data(runtime:Runtime) {
 
   def meta_=(meta:MetaData):Unit = runtime.setDataMeta(this,meta)
 
-  def associate(instance:DataInstance):Unit = runtime.associateDataInstance(data,instance)
+  def associate(instance:DataInstance):Unit = runtime.associateDataInstance(this,instance)
 }

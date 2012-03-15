@@ -47,21 +47,23 @@ class DefaultInterpreter(runtime:Runtime) {
 
     case TmApp(TmId(name),vs) if vs.forall(isValue(context,_)) => {
 
-      /* Term Rewriting? */
-      runtime.rewrite(term) match {
-        case Some(t) => t
+      val params = vs.asInstanceOf[Seq[TmData]].map(_.data)
+
+      /* Select functions and rules with valid name */
+      val fn0 = library.byName(name)
+      val rules0 = library.rulesByName(name)
+      if (fn0.isEmpty) throw new Exception("Unknown operation %s".format(name))
+
+      /* Filter functions and rules with valid types */
+      val paramTypes = params.map(_.typ.get)
+      val fn1 = fn0.filter(_.prototype.resultType(paramTypes).isDefined)
+      val rules1 = rules0.filter(_.prototype.resultType(paramTypes).isDefined)
+      if (fn1.isEmpty) throw new Exception("Not function %s found with valid parameter types".format(name))
+
+      /* Rewriting? */
+      runtime.rewrite(term,rules1) match {
+        case Some(t) => eval(context,t)
         case None => {
-          val params = vs.asInstanceOf[Seq[TmData]].map(_.data)
-
-          /* Select functions with valid name */
-          val fn0 = library.byName(name)
-          if (fn0.isEmpty) throw new Exception("Unknown operation %s".format(name))
-
-          /* Filter functions with valid types */
-          val paramTypes = params.map(_.typ.get)
-          val fn1 = fn0.filter(_.prototype.resultType(paramTypes).isDefined)
-          if (fn1.isEmpty) throw new Exception("Not function %s found with valid parameter types".format(name))
-
 
           /* Create result data */
           val resType = fn1.head.prototype.resultType(paramTypes).get

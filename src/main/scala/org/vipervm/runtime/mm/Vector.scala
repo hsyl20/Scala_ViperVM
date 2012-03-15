@@ -24,13 +24,23 @@ abstract class VectorRepr extends Repr
 /** A vector stored in contiguous memory */
 case object DenseVectorRepr extends VectorRepr
 case class DenseVectorProperties(endianness:ByteOrder) extends ReprProperties
-case class DenseVectorStorage(view:BufferView1D) extends Storage(view)
+case class DenseVectorStorage(view:BufferView1D) extends Storage(view){
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView1D) => DenseVectorStorage(x)
+  }
+}
+
 case class DenseVectorInstance(typ:VectorType,meta:VectorMetaData,properties:DenseVectorProperties,storage:DenseVectorStorage) extends DataInstance(typ,meta,DenseVectorRepr,properties,storage)
 
 /** A vector stored using padding between elements */
 case object StridedVectorRepr extends VectorRepr
 case class StridedVectorProperties(endianness:ByteOrder,padding:Long) extends ReprProperties
-case class StridedVectorStorage(view:BufferView2D) extends Storage(view)
+case class StridedVectorStorage(view:BufferView2D) extends Storage(view){
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView2D) => StridedVectorStorage(x)
+  }
+}
+
 case class StridedVectorInstance(typ:VectorType,meta:VectorMetaData,properties:StridedVectorProperties,storage:StridedVectorStorage) extends DataInstance(typ,meta,StridedVectorRepr,properties,storage)
 
 

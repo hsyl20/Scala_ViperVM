@@ -24,23 +24,22 @@ import akka.actor.TypedActor
 
 class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Profiler = DummyProfiler()) extends Runtime with DefaultDataManager {
 
-  private val self = TypedActor.self[Runtime]
-
   protected var toBeComputed:Set[Data] = Set.empty
   protected var pendingTasks:Map[Task,Set[Data]] = Map.empty
   protected var queues:Map[Processor,Set[Task]] = Map.empty
 
-  protected def rewrite(term:Term):Option[Term] = {
-    None
+  def rewrite(term:Term,rules:Seq[Rule]):Option[Term] = {
+    val alternatives = rules.flatMap(_.rewrite(term))
+    alternatives.headOption
   }
 
-  protected def submit(task:Task):Unit = {
+  def submit(task:Task):Unit = {
     val invalidData = task.params.filter(d => toBeComputed.contains(d)).toSet
     pendingTasks += task -> invalidData
     wakeUp
   }
 
-  protected def wakeUp:Unit = {
+  def wakeUp:Unit = {
     if (!pendingTasks.isEmpty) {
       
       val w = selectProcessor(platform.processors.filter(_.canExecute(task)), task)
@@ -48,21 +47,11 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
     }
   }
 
-  /** Duplicate or transfer a data instance */
-  protected def copy(data:DataInstance,memory:MemoryNode):FutureEvent[DataInstance] = {
-  }
-
   /** 
    * Select the worker that will execute the task amongst valid workers (i.e. for which
    * there is at least one compatible kernel).
    */
   def selectProcessor(processors:Seq[Processor],task:Task):Processor = processors.head
-
-  def idleProcessor(proc:Processor):Unit = {
-  }
-
-  def allocate(memory:MemoryNode,data:Data,repr:Repr):DataInstance = {
-  }
 
   def computedData(data:Data):Unit = {
     toBeComputed -= data
@@ -77,8 +66,6 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
 
     val tasks = queues(proc)
     queues += proc -> (tasks - task)
-
-    idleProcessor(proc)
   }
 
   def selectFunction(task:Task):Function = {
@@ -90,7 +77,7 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
   def executeTask(task:Task,proc:Processor):Unit = {
 
     val func = selectFunction(task)
-    val kernel = func.Kernel.getKernelsFor(proc).head
+    val kernel = func.kernel.getKernelsFor(proc).head
 
     /* Schedule kernel execution */
     val ev = proc.execute(kernel, task.makeKernelParams(memory))

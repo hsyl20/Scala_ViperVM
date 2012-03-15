@@ -28,19 +28,31 @@ case object RowMajor extends Major
 /** A vector stored in contiguous memory */
 case object DenseMatrixRepr extends MatrixRepr
 case class DenseMatrixProperties(major:Major,endianness:ByteOrder) extends ReprProperties
-case class DenseMatrixStorage(view:BufferView1D) extends Storage(view)
+case class DenseMatrixStorage(view:BufferView1D) extends Storage(view) {
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView1D) => DenseMatrixStorage(x)
+  }
+}
 case class DenseMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DenseMatrixProperties,storage:DenseMatrixStorage) extends DataInstance(typ,meta,DenseMatrixRepr,properties,storage)
 
 /** A matrix stored using padding between rows */
 case object StridedMatrixRepr extends MatrixRepr
 case class StridedMatrixProperties(major:Major,endianness:ByteOrder,rowPadding:Long) extends ReprProperties
-case class StridedMatrixStorage(view:BufferView2D) extends Storage(view)
+case class StridedMatrixStorage(view:BufferView2D) extends Storage(view) {
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView2D) => StridedMatrixStorage(x)
+  }
+}
 case class StridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:StridedMatrixProperties,storage:StridedMatrixStorage) extends DataInstance(typ,meta,StridedMatrixRepr,properties,storage)
 
 /** A matrix stored using padding between rows and between elements */
 case object DoubleStridedMatrixRepr extends MatrixRepr
 case class DoubleStridedMatrixProperties(major:Major,endianness:ByteOrder,rowPadding:Long,cellPadding:Long) extends ReprProperties
-case class DoubleStridedMatrixStorage(view:BufferView3D) extends Storage(view)
+case class DoubleStridedMatrixStorage(view:BufferView3D) extends Storage(view) {
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView3D) => DoubleStridedMatrixStorage(x)
+  }
+}
 case class DoubleStridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DoubleStridedMatrixProperties,storage:DoubleStridedMatrixStorage) extends DataInstance(typ,meta,DoubleStridedMatrixRepr,properties,storage)
 
 

@@ -58,3 +58,8 @@ object FloatMatrixAdditionMetaKernel extends KernelSet {
     Seq(w,h,b1,b2,b3)
   }
 }
+
+object FloatMatrixAdditionFunction extends Function {
+  val prototype = MatrixAdditionProto
+  val kernel = FloatMatrixAdditionMetaKernel
+}

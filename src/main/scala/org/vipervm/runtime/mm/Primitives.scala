@@ -26,7 +26,12 @@ case object Int64Type extends PrimitiveType(8)
 case object PrimitiveMetaData extends MetaData
 case object PrimitiveRepr extends Repr
 case class PrimitiveProperties(endianness:ByteOrder) extends ReprProperties
-case class PrimitiveStorage(view:BufferView1D) extends Storage(view)
+case class PrimitiveStorage(view:BufferView1D) extends Storage(view){
+  def duplicate(views:Seq[BufferView]):Storage = views match {
+    case Seq(x:BufferView1D) => PrimitiveStorage(x)
+  }
+}
+
 case class PrimitiveInstance(typ:PrimitiveType,properties:PrimitiveProperties,storage:PrimitiveStorage) extends DataInstance(typ,PrimitiveMetaData,PrimitiveRepr,properties,storage)
 
 

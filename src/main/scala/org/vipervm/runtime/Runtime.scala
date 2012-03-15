@@ -17,24 +17,29 @@ import org.vipervm.platform.{Platform,DataTransfer,KernelEvent,Processor}
 import org.vipervm.runtime.interpreter.Term
 import org.vipervm.runtime.mm._
 import org.vipervm.library.Library
+import org.vipervm.profiling.Profiler
 
 import akka.actor.{TypedActor,ActorSystem,TypedProps}
 
 trait Runtime {
   val platform:Platform
   val library:Library
+  val profiler:Profiler
+
+  protected val self = TypedActor.self[Runtime]
 
   protected val queues:Map[Processor,Set[Task]]
 
-  def rewrite(term:Term):Option[Term]
+  def rewrite(term:Term,rules:Seq[Rule]):Option[Term]
   def submit(task:Task):Unit
 
-  protected def transferCompleted(transfer:DataTransfer):Unit
-  protected def kernelCompleted(kernel:KernelEvent):Unit
-  protected def wakeUp:Unit
+  def transferCompleted(transfer:DataTransfer):Unit
+  def kernelCompleted(kernel:KernelEvent):Unit
+  def wakeUp:Unit
 
 
   def createData:Data
+  def releaseData(data:Data):Unit
 
   def setDataType(data:Data,typ:VVMType):Unit
   def getDataType(data:Data):Option[VVMType]

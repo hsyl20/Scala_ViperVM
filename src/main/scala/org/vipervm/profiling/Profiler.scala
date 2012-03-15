@@ -19,8 +19,8 @@ import org.vipervm.runtime.mm.Data
 
 trait Profiler {
 
-  def transferStart(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
-  def transferEnd(data:Data,dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
+  def transferStart(dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
+  def transferEnd(dataTransfer:DataTransfer,timestamp:Long = System.nanoTime):Unit
   def taskAssigned(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit
   def taskStart(task:Task,kernel:Kernel,proc:Processor,timestamp:Long = System.nanoTime):Unit
   def taskCompleted(task:Task,proc:Processor,timestamp:Long = System.nanoTime):Unit

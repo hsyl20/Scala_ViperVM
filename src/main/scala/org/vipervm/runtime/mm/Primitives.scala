@@ -32,7 +32,10 @@ case class PrimitiveStorage(view:BufferView1D) extends Storage(view){
   }
 }
 
-case class PrimitiveInstance(typ:PrimitiveType,properties:PrimitiveProperties,storage:PrimitiveStorage) extends DataInstance(typ,PrimitiveMetaData,PrimitiveRepr,properties,storage)
+case class PrimitiveInstance(typ:PrimitiveType,properties:PrimitiveProperties,storage:PrimitiveStorage) extends DataInstance {
+  val repr = PrimitiveRepr
+  val meta = PrimitiveMetaData
+}
 
 
 class Primitive[A](val data:Data,runtime:Runtime) extends DataWrapper {

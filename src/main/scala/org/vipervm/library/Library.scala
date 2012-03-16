@@ -13,16 +13,28 @@
 
 package org.vipervm.library
 
-import org.vipervm.runtime.{Function,Rule}
+import org.vipervm.runtime.{Function,Rule,FunctionPrototype}
+import org.vipervm.runtime.mm.VVMType
 
-class Library(functions:Seq[Function],rules:Seq[Rule]) {
+class Library(functions:Map[FunctionPrototype,Seq[Function]],rules:Map[FunctionPrototype,Seq[Rule]]) {
 
-  lazy val functionNames = functions.groupBy(_.prototype.name)
-  lazy val ruleNames = rules.groupBy(_.prototype.name)
+  def proto(name:String,paramTypes:Seq[VVMType]):FunctionPrototype = {
+    protoOption(name,paramTypes).getOrElse {
+      throw new Exception("Prototype not found: %s(%s)".format(name,paramTypes.mkString(",")))
+    }
+  }
 
-  def this(functions:Function*)(rules:Rule*) = this(functions.toList,rules.toList)
+  def protoOption(name:String,paramTypes:Seq[VVMType]):Option[FunctionPrototype] = {
+    val ps = functions.keys.filter(f => f.name == name && f.resultType(paramTypes).isDefined)
+    ps.headOption
+  }
 
-  def byName(name:String):Seq[Function] = functionNames.getOrElse(name, Seq.empty)
+  def functionsByProto(proto:FunctionPrototype):Seq[Function] = functions(proto)
+  def rulesByProto(proto:FunctionPrototype):Seq[Rule] = rules(proto)
+}
 
-  def rulesByName(name:String):Seq[Rule] = ruleNames.getOrElse(name, Seq.empty)
+object Library {
+  def apply(functions:Function*)(rules:Rule*) = {
+    new Library(functions.groupBy(_.prototype),rules.groupBy(_.prototype))
+  }
 }

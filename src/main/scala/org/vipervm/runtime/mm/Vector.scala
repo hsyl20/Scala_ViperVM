@@ -30,7 +30,9 @@ case class DenseVectorStorage(view:BufferView1D) extends Storage(view){
   }
 }
 
-case class DenseVectorInstance(typ:VectorType,meta:VectorMetaData,properties:DenseVectorProperties,storage:DenseVectorStorage) extends DataInstance(typ,meta,DenseVectorRepr,properties,storage)
+case class DenseVectorInstance(typ:VectorType,meta:VectorMetaData,properties:DenseVectorProperties,storage:DenseVectorStorage) extends DataInstance {
+  val repr = DenseVectorRepr
+}
 
 /** A vector stored using padding between elements */
 case object StridedVectorRepr extends VectorRepr
@@ -41,7 +43,9 @@ case class StridedVectorStorage(view:BufferView2D) extends Storage(view){
   }
 }
 
-case class StridedVectorInstance(typ:VectorType,meta:VectorMetaData,properties:StridedVectorProperties,storage:StridedVectorStorage) extends DataInstance(typ,meta,StridedVectorRepr,properties,storage)
+case class StridedVectorInstance(typ:VectorType,meta:VectorMetaData,properties:StridedVectorProperties,storage:StridedVectorStorage) extends DataInstance {
+  val repr = StridedVectorRepr
+}
 
 
 case class Vector(val data:Data) extends DataWrapper {

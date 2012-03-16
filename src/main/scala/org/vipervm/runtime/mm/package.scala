@@ -19,8 +19,6 @@ package object mm {
 
   implicit object FloatPrim extends PrimType[Float](FloatType) {
 
-    val size = 4L
-
     def set(hostBuffer:HostBuffer,offset:Long,value:Float):Unit = {
       hostBuffer.peer.setFloat(offset, value)
     }
@@ -31,8 +29,6 @@ package object mm {
   }
 
   implicit object DoublePrim extends PrimType[Double](DoubleType) {
-
-    val size = 8L
 
     def set(hostBuffer:HostBuffer,offset:Long,value:Double):Unit = {
       hostBuffer.peer.setDouble(offset, value)

@@ -16,6 +16,7 @@ package org.vipervm.runtime.mm
 import java.nio.ByteOrder
 import org.vipervm.platform._
 import org.vipervm.runtime.Runtime
+import org.vipervm.runtime.interpreter._
 
 case class MatrixType(elem:PrimitiveType) extends VVMType
 case class MatrixMetaData(width:Long, height:Long) extends MetaData
@@ -33,7 +34,9 @@ case class DenseMatrixStorage(view:BufferView1D) extends Storage(view) {
     case Seq(x:BufferView1D) => DenseMatrixStorage(x)
   }
 }
-case class DenseMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DenseMatrixProperties,storage:DenseMatrixStorage) extends DataInstance(typ,meta,DenseMatrixRepr,properties,storage)
+case class DenseMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DenseMatrixProperties,storage:DenseMatrixStorage) extends DataInstance {
+  val repr = DenseMatrixRepr
+}
 
 /** A matrix stored using padding between rows */
 case object StridedMatrixRepr extends MatrixRepr
@@ -43,7 +46,9 @@ case class StridedMatrixStorage(view:BufferView2D) extends Storage(view) {
     case Seq(x:BufferView2D) => StridedMatrixStorage(x)
   }
 }
-case class StridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:StridedMatrixProperties,storage:StridedMatrixStorage) extends DataInstance(typ,meta,StridedMatrixRepr,properties,storage)
+case class StridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:StridedMatrixProperties,storage:StridedMatrixStorage) extends DataInstance {
+  val repr = StridedMatrixRepr
+}
 
 /** A matrix stored using padding between rows and between elements */
 case object DoubleStridedMatrixRepr extends MatrixRepr
@@ -53,7 +58,9 @@ case class DoubleStridedMatrixStorage(view:BufferView3D) extends Storage(view) {
     case Seq(x:BufferView3D) => DoubleStridedMatrixStorage(x)
   }
 }
-case class DoubleStridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DoubleStridedMatrixProperties,storage:DoubleStridedMatrixStorage) extends DataInstance(typ,meta,DoubleStridedMatrixRepr,properties,storage)
+case class DoubleStridedMatrixInstance(typ:MatrixType,meta:MatrixMetaData,properties:DoubleStridedMatrixProperties,storage:DoubleStridedMatrixStorage) extends DataInstance {
+  val repr = DoubleStridedMatrixRepr
+}
 
 
 case class Matrix(val data:Data) extends DataWrapper {

@@ -23,7 +23,7 @@ class DefaultHostProcessor(mem:DefaultHostMemoryNode) extends HostProcessor {
 
   def compile(kernel:Kernel):Unit = {}
 
-  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
+  def execute(kernel:Kernel, args:Seq[Any]): KernelExecution = {
     throw new Exception("Unable to execute kernels (not implemented)")
   }
 

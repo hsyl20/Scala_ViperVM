@@ -56,7 +56,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
   /**
    * Execute the kernel with the specified parameters
    */
-  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
+  def execute(kernel:Kernel, args:Seq[Any]): KernelExecution = {
 
     /* Check params */
     val config = kernel.configure(this, args) match {
@@ -87,7 +87,7 @@ class OpenCLProcessor(val peer:cl.Device) extends Processor {
     val ev = new OpenCLEvent(e)
     AsyncGC.add(ev, config.parameters)
 
-    new KernelEvent(kernel, args, this, ev)
+    new KernelExecution(kernel, args, this, ev)
   }
 
   override def toString = "OpenCL: %s - %s".format(peer.vendor, peer.name)

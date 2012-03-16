@@ -17,8 +17,11 @@ import scala.util.parsing.combinator.RegexParsers
 
 import org.vipervm.runtime._
 import org.vipervm.runtime.interpreter._
+import org.vipervm.runtime.mm.Data
 
-object LispyParser extends RegexParsers {
+class LispyParser(symbols:Map[String,Data]) extends RegexParsers {
+  
+  def this(syms:(String,Data)*) = this(syms.toMap)
 
   val expr: Parser[Term] = (
 /*      ("("~>"let"~>"("~>rep("("~>id~expr<~")")<~")")~expr<~")" ^^ {
@@ -32,7 +35,9 @@ object LispyParser extends RegexParsers {
     | id
   )
 
-  def id : Parser[TmId] = """[a-zA-Z=*+/<>!\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ {case s => TmId(s)}
+  def id : Parser[Term] = """[a-zA-Z=*+/<>!\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ {
+    case s => symbols.get(s).map(TmData(_)).getOrElse(TmId(s))
+  }
 
   def parse(s:String):ParseResult[Term] = parse(expr,s)
 }

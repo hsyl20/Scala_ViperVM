@@ -17,7 +17,7 @@ import org.vipervm.platform._
 import org.vipervm.runtime._
 import org.vipervm.runtime.mm._
 
-trait DataAffinityPolicy extends RankingPolicy {
+/*trait DataAffinityPolicy extends RankingPolicy {
 
   val dataAffinityCoef = 1.0f
 
@@ -33,4 +33,4 @@ trait DataAffinityPolicy extends RankingPolicy {
     super.rankProcessor(task, proc, current + r * dataAffinityCoef)
   }
 
-}
+}*/

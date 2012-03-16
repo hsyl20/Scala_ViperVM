@@ -21,7 +21,6 @@ import org.vipervm.platform.host.DefaultHostDriver
 
 import org.vipervm.runtime._
 import org.vipervm.runtime.data._
-import org.vipervm.runtime.scheduling.DefaultScheduler
 import org.vipervm.runtime.mm._
 import org.vipervm.runtime.interpreter._
 
@@ -34,76 +33,80 @@ import org.vipervm.parsers.LispyParser
 class MatMul extends FunSuite {
 
   test("R = A*B + A*C using AST") {
-    val src = TmApp(TmId("+"), Vector(
-      TmApp(TmId("*"), Vector(TmId("a"), TmId("b"))),
-      TmApp(TmId("*"), Vector(TmId("a"), TmId("c")))))
-
-    val a = new Matrix2D[Float](32,32)
-    val b = new Matrix2D[Float](32,32)
-    val c = new Matrix2D[Float](32,32)
-
-    val symbols = SymbolTable(Map("a" -> a, "b" -> b, "c" -> c))
-
     val platform = Platform(DefaultHostDriver, new OpenCLDriver)
+    val library = DefaultLibrary()
+    val profiler = SLF4JProfiler()
 
-    val program = Program(src,symbols)
+    implicit val runtime = new DefaultRuntime(platform,library,profiler)
 
-    testMatMul(platform, program, a, b, c)
+    val a = Matrix.create[Float](32,32)( (x,y) => if (x == y) 1.0f else 0.0f )
+    val b = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+    val c = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+
+    val src = TmApp(TmId("+"), Seq(
+      TmApp(TmId("*"), Seq(TmData(a.data), TmData(b.data))),
+      TmApp(TmId("*"), Seq(TmData(a.data), TmData(c.data)))))
+
+    testMatMul(runtime, src)
   }
 
   test("R = A*B + A*C using Lispy parser") {
-    val src = LispyParser.parse("""
+    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
+    val library = DefaultLibrary()
+    val profiler = SLF4JProfiler()
+
+    implicit val runtime = new DefaultRuntime(platform,library,profiler)
+
+    val a = Matrix.create[Float](32,32)( (x,y) => if (x == y) 1.0f else 0.0f )
+    val b = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+    val c = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+
+    val parser = new LispyParser(
+        "a" -> a.data,
+        "b" -> b.data,
+        "c" -> c.data
+    )
+
+    val src = parser.parse("""
       (+
         (* a b)
         (* a c))
       """)
 
-    val a = new Matrix2D[Float](32,32)
-    val b = new Matrix2D[Float](32,32)
-    val c = new Matrix2D[Float](32,32)
-
-    val symbols = SymbolTable(Map("a" -> a, "b" -> b, "c" -> c))
-
-    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-
-    val program = Program(src.get,symbols)
-
-    testMatMul(platform, program, a, b, c)
+    testMatMul(runtime, src.get)
   }
 
   test("R = A*B + A*C using DSL") {
     import org.vipervm.dsl._
-    val a = Matrix2D[Float](32,32)
-    val b = Matrix2D[Float](32,32)
-    val c = Matrix2D[Float](32,32)
+    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
+    val library = DefaultLibrary()
+    val profiler = SLF4JProfiler()
+
+    implicit val runtime = new DefaultRuntime(platform,library,profiler)
+
+    val a = Matrix.create[Float](32,32)( (x,y) => if (x == y) 1.0f else 0.0f )
+    val b = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+    val c = Matrix.create[Float](32,32)( (_,_) => 2.0f )
+
     val program = a*b + a*c
 
-    val platform = Platform(DefaultHostDriver, new OpenCLDriver)
-
-    testMatMul(platform, program, a.peer.get, b.peer.get, c.peer.get)
+    testMatMul(runtime, program.term)
   }
 
 
-  private def testMatMul(platform:Platform, program:Program, a:Matrix2D[Float], b:Matrix2D[Float], c:Matrix2D[Float]):Unit = {
-    val profiler = SLF4JProfiler()
-    val dataManager = DefaultDataManager(platform,profiler)
+  private def testMatMul(runtime:Runtime, src:Term):Unit = {
 
-    a.initialize(dataManager, (x,y) => if (x == y) 1.0f else 0.0f )
-    b.initialize(dataManager, (x,y) => 2.0f )
-    c.initialize(dataManager, (x,y) => 2.0f )
+    val interp = new DefaultInterpreter(runtime)
+    println(interp.typeCheck(src))
 
-    val sched = new DefaultScheduler(dataManager,profiler)
-    val interp = new Interpreter(sched,DefaultLibrary())
-
-    val result = interp.evaluate(program)
+  /*  val result = interp.evaluate(program)
 
     result.syncWait
 
     val r = result.data.asInstanceOf[Matrix2D[Float]]
     
-    println(r.print(dataManager)())
+    println(r.print(dataManager)())*/
 
-    platform.shutdown
   }
 
 }

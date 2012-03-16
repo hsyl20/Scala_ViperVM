@@ -23,7 +23,7 @@ class JVMProcessor(hostDriver:HostDriver,dispatcher:ExecutionContext) extends Pr
 
   def compile(kernel:Kernel):Unit = {}
 
-  def execute(kernel:Kernel, args:Seq[Any]): KernelEvent = {
+  def execute(kernel:Kernel, args:Seq[Any]): KernelExecution = {
     implicit def ker2ker(k:Kernel):JVMKernel =
       k.asInstanceOf[JVMKernel]
 
@@ -34,7 +34,7 @@ class JVMProcessor(hostDriver:HostDriver,dispatcher:ExecutionContext) extends Pr
       ev.complete
     }(dispatcher)
 
-    new KernelEvent(kernel, args, this, ev)
+    new KernelExecution(kernel, args, this, ev)
   }
 
   override def toString = "JVM: Akka Actors"

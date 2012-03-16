@@ -16,12 +16,29 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform.MemoryNode
 
 /** Instance of a data */
-class DataInstance(val typ:VVMType, val meta:MetaData, val repr:Repr, val properties:ReprProperties, val storage:Storage) {
+abstract class DataInstance {
+  val typ:VVMType
+  val meta:MetaData
+  val repr:Repr
+  val properties:ReprProperties
+  val storage:Storage
 
   /**
    * Indicate whether a data is available in a memory
    */
   def isAvailableIn(memory:MemoryNode):Boolean = {
     storage.views.forall(_.buffer.memory == memory)
+  }
+}
+
+object DataInstance {
+  def apply(t:VVMType, m:MetaData, r:Repr, p:ReprProperties, s:Storage) = {
+    new DataInstance {
+      val typ = t
+      val meta = m
+      val repr = r
+      val properties = p
+      val storage = s
+    }
   }
 }

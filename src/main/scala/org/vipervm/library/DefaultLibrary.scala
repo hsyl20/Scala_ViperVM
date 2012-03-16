@@ -17,7 +17,7 @@ import org.vipervm.runtime._
 import org.vipervm.library.linearalgebra._
 
 object DefaultLibrary {
-  def apply():Library = new Library(
+  def apply():Library = Library(
     FloatMatrixAdditionFunction,
     FloatMatrixMultiplicationFunction
   )(

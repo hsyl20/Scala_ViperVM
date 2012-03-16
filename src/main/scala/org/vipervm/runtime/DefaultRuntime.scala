@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Platform,DataTransfer,Processor,MemoryNode}
+import org.vipervm.platform.{Platform,DataTransfer,Processor,MemoryNode,Kernel,KernelExecution}
 import org.vipervm.runtime.interpreter.{DefaultInterpreter,Term}
 import org.vipervm.library.Library
 import org.vipervm.profiling._
@@ -27,6 +27,8 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
   protected var toBeComputed:Set[Data] = Set.empty
   protected var pendingTasks:Map[Task,Set[Data]] = Map.empty
   protected var queues:Map[Processor,Set[Task]] = Map.empty
+
+  protected var runningKernels:Map[Kernel,Task] = Map.empty
 
   def rewrite(term:Term,rules:Seq[Rule]):Option[Term] = {
     val alternatives = rules.flatMap(_.rewrite(term))
@@ -42,8 +44,8 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
   def wakeUp:Unit = {
     if (!pendingTasks.isEmpty) {
       
-      val w = selectProcessor(platform.processors.filter(_.canExecute(task)), task)
-      w.executeTask(task)
+      //val w = selectProcessor(platform.processors.filter(_.canExecute(task)), task)
+      //w.executeTask(task)
     }
   }
 
@@ -58,29 +60,25 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
     pendingTasks.mapValues(_.filter(_!=data))
   }
 
-  def completedTask(task:Task,proc:Processor):Unit = {
+  def kernelCompleted(kernelEvent:KernelExecution):Unit = {
+    val task = runningKernels(kernelEvent.kernel)
+    val proc = kernelEvent.processor
+    
     profiler.taskCompleted(task,proc)
-
-    kernelCompleted(task.kernel)
     computedData(task.result)
 
     val tasks = queues(proc)
     queues += proc -> (tasks - task)
   }
 
-  def selectFunction(task:Task):Function = {
-  }
-
-  def startTransfer(data:Data,memory:MemoryNode,repr:Repr):Unit = {
-  }
-
   def executeTask(task:Task,proc:Processor):Unit = {
 
-    val func = selectFunction(task)
+    val func = task.functions.filter(_.kernel.canExecuteOn(proc)).head
     val kernel = func.kernel.getKernelsFor(proc).head
+    val memory = proc.memory
 
     /* Schedule kernel execution */
-    val ev = proc.execute(kernel, task.makeKernelParams(memory))
+  /*  val ev = proc.execute(kernel, func.kernel.makeKernelParams(memory))
 
     profiler.taskStart(task,kernel,proc)
 
@@ -89,7 +87,7 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
       self.completedTask(task)
 
       dataManager.releaseConfig(memConf)
-    }
+    }*/
   }
 
 }

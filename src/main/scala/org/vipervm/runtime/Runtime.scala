@@ -13,7 +13,7 @@
 
 package org.vipervm.runtime
 
-import org.vipervm.platform.{Platform,DataTransfer,KernelEvent,Processor}
+import org.vipervm.platform.{Platform,DataTransfer,KernelExecution,Processor}
 import org.vipervm.runtime.interpreter.Term
 import org.vipervm.runtime.mm._
 import org.vipervm.library.Library
@@ -26,15 +26,15 @@ trait Runtime {
   val library:Library
   val profiler:Profiler
 
-  protected val self = TypedActor.self[Runtime]
+  protected lazy val self = TypedActor.self[Runtime]
 
-  protected val queues:Map[Processor,Set[Task]]
+  protected var queues:Map[Processor,Set[Task]]
 
   def rewrite(term:Term,rules:Seq[Rule]):Option[Term]
   def submit(task:Task):Unit
 
   def transferCompleted(transfer:DataTransfer):Unit
-  def kernelCompleted(kernel:KernelEvent):Unit
+  def kernelCompleted(kernelEvent:KernelExecution):Unit
   def wakeUp:Unit
 
 
@@ -48,6 +48,8 @@ trait Runtime {
   def getDataMeta(data:Data):Option[MetaData]
 
   def associateDataInstance(data:Data,instance:DataInstance):Unit
+
+  def selectProcessor(procs:Seq[Processor],task:Task):Processor
 }
 
 

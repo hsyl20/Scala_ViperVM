@@ -13,8 +13,10 @@
 
 package org.vipervm.runtime.interpreter
 
+import org.vipervm.utils._
+import org.vipervm.platform.FutureEvent
 import org.vipervm.runtime.{Function,Task,Runtime}
-import org.vipervm.runtime.mm.Data
+import org.vipervm.runtime.mm.{Data,MetaData}
 import org.vipervm.library.Library
 
 
@@ -23,6 +25,19 @@ import org.vipervm.library.Library
  */
 class DefaultInterpreter(runtime:Runtime) {
   protected val library = runtime.library
+
+
+  def typeCheck(term:Term):TypedTerm = term match {
+    case TmData(d) => TypedTerm(term,d.typ.get)
+    case TmApp(TmId(f),params) => {
+      val tp = params.map(typeCheck)
+      val paramTypes = tp.map(_.typ)
+      val proto = library.proto(f, paramTypes)
+      val retTyp = proto.resultType(paramTypes).get
+      TypedTerm(term, retTyp)
+    }
+    case _ => throw new Exception("Unable to type term %s".format(term))
+  }
 
   /**
    * Evaluate a term and return a resulting data.
@@ -37,14 +52,28 @@ class DefaultInterpreter(runtime:Runtime) {
 
 
   protected def isValue(context:Context,term:Term):Boolean = term match {
-    case TmAbs(_,_)
-    | TmId(_)
+    case TmId(_)
     |TmData(_) => true
     case _ => false
   }
 
-  protected def eval(context:Context,term:Term):Term = term match {
+  /**
+   * Compute meta data for the given application
+   */
+  protected def computeMetaData(func:String, params:Seq[Data]):FutureEvent[MetaData] = {
+    val proto = library.proto(func,params.map(_.typ.get))
+    val conf = proto.metaConf(params)
 
+//    withConfig(conf) { proto.meta(params) }
+    ???
+  }
+
+/*  protected def withConfig[A](config:DataConfig)(body: =>A):FutureEvent[A] = {
+    //TODO
+    ???
+  }*/
+
+  protected def eval(context:Context,term:Term):Term = ???/*term match {
     case TmApp(TmId(name),vs) if vs.forall(isValue(context,_)) => {
 
       val params = vs.asInstanceOf[Seq[TmData]].map(_.data)
@@ -83,7 +112,7 @@ class DefaultInterpreter(runtime:Runtime) {
     case TmApp(t1,t2) => eval(context, TmApp(eval(context,t1), t2))
     case v if isValue(context,v) => v
     case _ => throw new Exception("Interpreter unable to return a value")
-  }
+  }*/
 
 }
 

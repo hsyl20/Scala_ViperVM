@@ -53,11 +53,11 @@ trait DefaultDataManager extends Runtime {
 
   def getDataType(data:Data):Option[VVMType] = types.get(data)
 
-  def setDataData(data:Data,meta:MetaData):Unit = {
+  def setDataMeta(data:Data,meta:MetaData):Unit = {
     metadata += data -> meta
   }
 
-  def getDataData(data:Data):Option[MetaData] = metadata.get(data)
+  def getDataMeta(data:Data):Option[MetaData] = metadata.get(data)
 
   def associateDataInstance(data:Data,instance:DataInstance):Unit = {
     val insts = availableInstances(data)
@@ -81,6 +81,8 @@ trait DefaultDataManager extends Runtime {
 
     tr
   }
+
+  def transferCompleted(transfer:DataTransfer):Unit = {}
 
   /**
    * Allocate a new storage in given memory, compatible with given storage 
@@ -113,88 +115,25 @@ trait DefaultDataManager extends Runtime {
   def directCopy(data:DataInstance,memory:MemoryNode,link:Link):FutureEvent[DataInstance] = {
     val targetStorage = allocateStorage(data.storage,memory)
     val transfers = transferStorage(data.storage,targetStorage,link)
-    val di = new DataInstance(data.typ,data.meta,data.repr,data.properties,targetStorage)
+    val di = DataInstance(data.typ,data.meta,data.repr,data.properties,targetStorage)
     FutureEvent(di, new EventGroup(transfers))
   }
 
 
+  /** Indicate whether an instance of data is present in memory */
   def isAvailableIn(data:Data,memory:MemoryNode):Boolean = {
     !availableInstancesIn(data,memory).isEmpty
   }
 
+  /** Return available instances of data in memory */
   def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
     availableInstances(data).filter(_.isAvailableIn(memory))
-  }
-
-
-  def wakeUp:Unit = {
-   
-/*
-    val metaConf = (Set.empty[(MetaView,MemoryNode)] /: uncompleted.map(_.toSet))(_++_)
-
-    /* Skip data available or being transferred */
-    val metaConf2 = metaConf.filterNot { case (data,mem) => {
-      val state = dataStateInternal(data,mem)
-      state.available || state.uploading
-    }}
-
-    val (validData,scratchData) = metaConf2.partition(x => isValid(x._1))
-
-    /* Allocate scratch data */
-    scratchData.foreach { case (data,mem) => {
-      val view = data.allocate(mem)
-      data.store(view)
-      val state = dataStateInternal(data,mem)
-      updateDataStateInternal(data, mem, state.copy(available = true))
-    }}
-
-    /* Split between those requiring a hop in host memory and the other */
-    val (directs,indirects) = validData.partition {
-     case (data,mem) => isDirect(data,mem)
-    }
-
-    /* Schedule required direct data transfers  */
-    val directTransfers = directs.map { case (data,mem) => {
-      //FIXME: support "not enough space on device" exception
-      val target = data.allocate(mem)
-      val (source,link) = selectDirectSource(data,target)
-      transfer(data,source,target,link)
-    }}
-
-    /* Check that no uploading is taking place to the host for indirect transfers */
-    val findirects = indirects.filterNot { case (data,_) =>
-      dataStateInternal(data, platform.hostMemory).uploading
-    }
-
-    /* Schedule indirect transfers to the host */
-    val indirectTransfers = findirects.map { case (data,mem) => {
-      //FIXME: support "not enough space on device" exception
-      val target = data.allocate(platform.hostMemory)
-      val (source,link) = selectDirectSource(data,target)
-      transfer(data,source,target,link)
-    }}*/
-  }
-
-  def isComplete(config:DataConfig):Boolean = {
-    /*config.map {
-      case (data,mem) => dataStateInternal(data,mem).available
-    }.reduceLeft(_&&_)*/
-    ???
   }
 
   def isDirect(data:Data,memory:MemoryNode):Boolean = {
     availableInstances(data).exists(_.storage.views.forall(
       view => platform.linkBetween(view.buffer.memory,memory).isDefined
     ))
-  }
-
-  def isValid(data:Data):Boolean = ???//data.isDefined
-
-  def selectDirectSource(data:MetaView, target:BufferView):(BufferView,Link) = {
-    val directSources = data.views.filter(src => platform.linkBetween(src,target).isDefined)
-    val src = directSources.head
-    val link = platform.linkBetween(src,target).get
-    (src,link)
   }
 
 }

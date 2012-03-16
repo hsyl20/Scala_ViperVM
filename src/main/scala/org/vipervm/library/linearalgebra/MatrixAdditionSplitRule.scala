@@ -30,20 +30,15 @@ object MatrixAdditionSplitRule extends Rule {
             Seq(splitter, b))))))
   }
 
-  def rewrite(term:Term):Option[Term] = term match {
+  def rewrite(term:Term,typ:VVMType,meta:MetaData):Option[Term] = term match {
     case TmApp(TmId("+"), Seq(TmData(d1), TmData(d2))) => {
-      (d1.typ,d2.typ,d1.meta,d2.meta) match {
-        case (Some(MatrixType(elemTyp1)),
-              Some(MatrixType(elemTyp2)),
-              Some(MatrixMetaData(w1,h1)),
-              Some(MatrixMetaData(w2,h2))) if elemTyp1 == elemTyp2 => {
-                if (w1*h1*elemTyp1.size > 100*1024*1024) {
-                  Some(splitted(TmData(d1),TmData(d2),TmId("s")))
-                }
-                else None
-              }
-        case _ => None
+      val MatrixMetaData(w,h) = meta
+      val MatrixType(elemTyp) = typ
+
+      if (w*h*elemTyp.size > 100*1024*1024) {
+        Some(splitted(TmData(d1),TmData(d2),TmId("s")))
       }
+      else None
     }
     case _ => None
   }

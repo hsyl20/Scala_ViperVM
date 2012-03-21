@@ -73,14 +73,15 @@ object MyProject extends Build {
     "batik" % "batik-swing" % "1.6-1",
     "batik" % "batik-css" % "1.6-1",
     "com.typesafe.akka" % "akka-actor" % "2.0",
+    "com.googlecode.kiama" %% "kiama" % "1.2.0",
     /* Logging configuration :
      * - Simple: Output logs to System.err
      * - NOP: Discard logging 
      * - log4j 
      */
-  "org.slf4j" % "slf4j-simple" % "1.6.2"
-  //  "org.slf4j" % "slf4j-nop" % "1.6.2"
-  //"org.slf4j" % "slf4j-log4j12" % "1.6.2"
+    "org.slf4j" % "slf4j-simple" % "1.6.2"
+    //  "org.slf4j" % "slf4j-nop" % "1.6.2"
+    //"org.slf4j" % "slf4j-log4j12" % "1.6.2"
   )
 
 }

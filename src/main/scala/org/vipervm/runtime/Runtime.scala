@@ -30,7 +30,6 @@ trait Runtime {
 
   protected var queues:Map[Processor,Set[Task]]
 
-  def rewrite(term:Term,rules:Seq[Rule]):Option[Term]
   def submit(task:Task):Unit
 
   def transferCompleted(transfer:DataTransfer):Unit

@@ -30,11 +30,6 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
 
   protected var runningKernels:Map[Kernel,Task] = Map.empty
 
-  def rewrite(term:Term,rules:Seq[Rule]):Option[Term] = {
-    val alternatives = rules.flatMap(_.rewrite(term))
-    alternatives.headOption
-  }
-
   def submit(task:Task):Unit = {
     val invalidData = task.params.filter(d => toBeComputed.contains(d)).toSet
     pendingTasks += task -> invalidData

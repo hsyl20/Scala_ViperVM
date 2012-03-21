@@ -16,8 +16,9 @@ package org.vipervm.runtime.interpreter
 import org.vipervm.utils._
 import org.vipervm.platform.FutureEvent
 import org.vipervm.runtime.{Function,Task,Runtime,FunctionPrototype}
-import org.vipervm.runtime.mm.{Data,MetaData}
+import org.vipervm.runtime.mm.{Data,MetaData,VVMType}
 import org.vipervm.library.Library
+import org.kiama.attribution.Attribution._
 
 
 /**
@@ -26,20 +27,20 @@ import org.vipervm.library.Library
 class DefaultInterpreter(runtime:Runtime) {
   protected val library = runtime.library
 
+  val typ:Term => VVMType = 
+    attr {
+      case TmData(data) => data.typ.get
+      case TmApp(TmId(f),params) => {
+        val paramTypes = params.map(_ -> typ)
+        val proto = library.proto(f, paramTypes)
+        proto.resultType(paramTypes).get
+      }
+    }
+
   /**
    * Return a type checked program
    */
-  def typeCheck(term:Term):TypedTerm = term match {
-    case TmData(d) => TypedTerm(term,d.typ.get)
-    case TmApp(TmId(f),params) => {
-      val tp = params.map(typeCheck)
-      val paramTypes = tp.map(_.typ)
-      val proto = library.proto(f, paramTypes)
-      val retTyp = proto.resultType(paramTypes).get
-      TypedTerm(term, retTyp)
-    }
-    case _ => throw new Exception("Unable to type term %s".format(term))
-  }
+  def typeCheck(term:Term):VVMType = term->typ
 
   /**
    * Evaluate a term and return a resulting data.
@@ -48,16 +49,16 @@ class DefaultInterpreter(runtime:Runtime) {
   def evaluate(term:Term):Data = {
     val tterm = typeCheck(term)
 
-    eval(new Context(Nil), tterm) match {
-      case TypedTerm(TmData(data),_) => data
+    eval(new Context(Nil), term) match {
+      case TmData(data) => data
       case t => throw new Exception("Result isn't a data (%s)".format(t))
     }
   }
 
-  protected def eval(context:Context,tterm:TypedTerm):TypedTerm = {
-    val resultType = tterm.typ
+  protected def eval(context:Context,term:Term):Term = {
+    val resultType = term->typ
 
-    tterm.term match {
+    term match {
       case TmApp(TmId(name),vs) if vs.forall(isValue(context,_)) => {
 
         val params = vs.asInstanceOf[Seq[TmData]].map(_.data)
@@ -69,11 +70,11 @@ class DefaultInterpreter(runtime:Runtime) {
 
         /* Check if any rewrite rule applies */
         val rules = library.rulesByProto(proto)
-        val rewritten = rules.flatMap(_.rewrite(tterm.term, resultType, resultMeta))
+        val rewritten = rules.flatMap(_.rewrite(term, resultType, resultMeta))
 
         /* Select one rewrite rule if any */
         if (!rewritten.isEmpty) {
-          eval(context,typeCheck(rewritten.head))
+          eval(context,rewritten.head)
         }
         else {
           val funcs = library.functionsByProto(proto)
@@ -87,21 +88,21 @@ class DefaultInterpreter(runtime:Runtime) {
           val task = Task(funcs, params, result)
           runtime.submit(task)
 
-          TypedTerm(TmData(result), resultType)
+          TmData(result)
         }
       }
 
       case TmApp(v1,ts) if isValue(context, v1) => {
-        eval(context, TypedTerm(TmApp(v1, ts.map(eval(context,_))),resultType))
+        eval(context, TmApp(v1, ts.map(eval(context,_))))
       }
 
       case TmApp(t1,t2) => {
-        eval(context, TypedTerm(TmApp(eval(context,t1), t2), resultType))
+        eval(context, TmApp(eval(context,t1), t2))
       }
 
-      case v if isValue(context,v) => tterm
+      case v if isValue(context,v) => term
 
-      case _ => throw new Exception("Don't know how to eval %s".format(tterm))
+      case _ => throw new Exception("Don't know how to eval %s".format(term))
     }
   }
 

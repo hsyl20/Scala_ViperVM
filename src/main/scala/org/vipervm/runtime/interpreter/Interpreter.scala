@@ -15,7 +15,7 @@ package org.vipervm.runtime.interpreter
 
 import org.vipervm.utils._
 import org.vipervm.platform.FutureEvent
-import org.vipervm.runtime.{Function,Task,Runtime,FunctionPrototype}
+import org.vipervm.runtime.{MetaKernel,Task,Runtime,FunctionPrototype}
 import org.vipervm.runtime.mm.{Data,MetaData,VVMType}
 import org.vipervm.library.Library
 import org.kiama.attribution.Attribution._
@@ -119,15 +119,9 @@ class DefaultInterpreter(runtime:Runtime) {
   protected def computeMetaData(func:String, params:Seq[Data],proto:FunctionPrototype):FutureEvent[MetaData] = {
     val conf = proto.metaConf(params)
 
-//    withConfig(conf) { proto.meta(params) }
-    ???
+    //FIXME: we suppose that the data conf is already available...
+    proto.meta(params)
   }
-
-/*  protected def withConfig[A](config:DataConfig)(body: =>A):FutureEvent[A] = {
-    //TODO
-    ???
-  }*/
-
 
 
 }

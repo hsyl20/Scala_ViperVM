@@ -13,17 +13,18 @@
 
 package org.vipervm.library.linearalgebra
 
-import org.vipervm.library.linearalgebra.kernels.jvm.FloatMatrixMultiplicationJVM
-import org.vipervm.library.linearalgebra.kernels.opencl.FloatMatrixMultiplicationOpenCL
+import org.vipervm.library.linearalgebra.kernels.jvm.FloatMatrixMultiplicationJVMKernel
+import org.vipervm.library.linearalgebra.kernels.opencl.FloatMatrixMultiplicationOpenCLKernel
 import org.vipervm.library.linearalgebra.kernels._
 
 import org.vipervm.platform.{ReadOnly,WriteOnly}
 import org.vipervm.runtime._
 import org.vipervm.runtime.mm._
 
-object FloatMatrixMultiplicationMetaKernel extends KernelSet {
-  val kernels = Seq(FloatMatrixMultiplicationOpenCL,FloatMatrixMultiplicationJVM)
-  
+trait FloatMatrixMultiplicationMetaKernel extends MetaKernel {
+
+  val prototype = MatrixMultiplicationProto
+
   val a = Parameter[DenseMatrixInstance](
     typ = MatrixType(FloatType),
     repr = DenseMatrixRepr,
@@ -49,7 +50,7 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
 
   )
 
-  val prototype = Prototype(a,b,c)
+  val kernelPrototype = Prototype(a,b,c)
 
   def makeKernelParams(params:Seq[DataInstance]):Seq[Any] = {
     val wA = params(a).meta.width
@@ -62,7 +63,10 @@ object FloatMatrixMultiplicationMetaKernel extends KernelSet {
   }
 }
 
-object FloatMatrixMultiplicationFunction extends Function {
-  val prototype = MatrixMultiplicationProto
-  val kernel = FloatMatrixMultiplicationMetaKernel
+object FloatMatrixMultiplicationOpenCL extends FloatMatrixMultiplicationMetaKernel {
+  val kernel = FloatMatrixMultiplicationOpenCLKernel
+}
+
+object FloatMatrixMultiplicationJVM extends FloatMatrixMultiplicationMetaKernel {
+  val kernel = FloatMatrixMultiplicationJVMKernel
 }

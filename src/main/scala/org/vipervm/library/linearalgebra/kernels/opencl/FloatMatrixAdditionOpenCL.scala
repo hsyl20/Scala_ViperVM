@@ -16,7 +16,7 @@ package org.vipervm.library.linearalgebra.kernels.opencl
 import org.vipervm.library.linearalgebra.kernels.prototypes._
 import org.vipervm.platform.opencl._
 
-object FloatMatrixAdditionOpenCL extends OpenCLKernel with FloatMatrixAdditionPrototype {
+object FloatMatrixAdditionOpenCLKernel extends OpenCLKernel with FloatMatrixAdditionPrototype {
   val source = """
     __kernel void matrixAdd(
        const int width,

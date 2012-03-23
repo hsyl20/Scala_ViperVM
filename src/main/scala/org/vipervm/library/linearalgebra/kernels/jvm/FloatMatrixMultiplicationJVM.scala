@@ -16,7 +16,7 @@ package org.vipervm.library.linearalgebra.kernels.jvm
 import org.vipervm.library.linearalgebra.kernels.prototypes._
 import org.vipervm.platform.jvm._
 
-object FloatMatrixMultiplicationJVM extends JVMKernel with FloatMatrixMultiplicationPrototype {
+object FloatMatrixMultiplicationJVMKernel extends JVMKernel with FloatMatrixMultiplicationPrototype {
 
   def fun(params:Seq[Any]): Unit = {
     val (wA,hA,wB) = (params(widthA), params(heightA), params(widthB))

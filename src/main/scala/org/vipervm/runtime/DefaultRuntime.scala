@@ -25,22 +25,29 @@ import akka.actor.TypedActor
 class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Profiler = DummyProfiler()) extends Runtime with DefaultDataManager {
 
   protected var toBeComputed:Set[Data] = Set.empty
-  protected var pendingTasks:Map[Task,Set[Data]] = Map.empty
+  protected var pendingTasks:Set[Task] = Set.empty
   protected var queues:Map[Processor,Set[Task]] = Map.empty
 
   protected var runningKernels:Map[Kernel,Task] = Map.empty
 
   def submit(task:Task):Unit = {
-    val invalidData = task.params.filter(d => toBeComputed.contains(d)).toSet
-    pendingTasks += task -> invalidData
+    pendingTasks += task
     wakeUp
   }
 
   def wakeUp:Unit = {
-    if (!pendingTasks.isEmpty) {
+    // Tasks with valid parameters
+    val tasks = pendingTasks.filter(_.params.filter(d => toBeComputed.contains(d)).isEmpty)
+
+    if (!tasks.isEmpty) {
+      val task = tasks.head
       
-      //val w = selectProcessor(platform.processors.filter(_.canExecute(task)), task)
-      //w.executeTask(task)
+      val procs = platform.processors.filter( proc =>
+        task.functions.exists( func => func.kernel.canExecuteOn(proc)))
+
+      val proc = selectProcessor(procs,task)
+      val kernel = selectKernel(proc,task)
+      proc.execute(kernel)
     }
   }
 
@@ -50,9 +57,13 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
    */
   def selectProcessor(processors:Seq[Processor],task:Task):Processor = processors.head
 
+  def selectKernel(proc:Processor,task:Task):Kernel = {
+    val kernels = task.functions.map(_.kernel)
+    kernels.head
+  }
+
   def computedData(data:Data):Unit = {
     toBeComputed -= data
-    pendingTasks.mapValues(_.filter(_!=data))
   }
 
   def kernelCompleted(kernelEvent:KernelExecution):Unit = {
@@ -69,7 +80,7 @@ class DefaultRuntime(val platform:Platform, val library:Library, val profiler:Pr
   def executeTask(task:Task,proc:Processor):Unit = {
 
     val func = task.functions.filter(_.kernel.canExecuteOn(proc)).head
-    val kernel = func.kernel.getKernelsFor(proc).head
+    val kernel = func.kernel
     val memory = proc.memory
 
     /* Schedule kernel execution */

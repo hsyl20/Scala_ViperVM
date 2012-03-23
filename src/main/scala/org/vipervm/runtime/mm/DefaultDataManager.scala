@@ -26,7 +26,9 @@ import java.util.IdentityHashMap
 import akka.actor.TypedActor
 
 case class DataInfo(typ:Option[VVMType],meta:Option[MetaData],instances:Seq[DataInstance])
-case class DataCopy(source:DataInstance,target:MemoryNode)
+
+case class DataCopy(data:Data,source:DataInstance,target:MemoryNode,link:Link,event:Event)
+
 
 trait DefaultDataManager extends Runtime {
 
@@ -78,8 +80,6 @@ trait DefaultDataManager extends Runtime {
     views -= view
     if (views.isEmpty)
       bufferViews -= view.buffer
-    else
-      bufferViews += view.buffer -> views
   }
 
   /**
@@ -129,7 +129,7 @@ trait DefaultDataManager extends Runtime {
 
     tr.willTrigger {
       profiler.transferEnd(tr)
-      self.transferCompleted(tr)
+      self.viewTransferCompleted(tr)
     }
 
     tr
@@ -189,23 +189,6 @@ trait DefaultDataManager extends Runtime {
     datas += data -> info.copy(instances = info.instances :+ instance)
   }
 
-  /********************************************************
-   * Transfer management
-   ********************************************************/
-  protected var events:Map[Data,Event] = Map.empty
-
-  def transferCompleted(transfer:DataTransfer):Unit = {}
-
-  /**
-   * Allocate then duplicate or transfer a data instance into the given memory using the given link
-   */
-  def directCopy(data:DataInstance,memory:MemoryNode,link:Link):FutureEvent[DataInstance] = {
-    val targetStorage = allocateStorage(data.storage,memory)
-    val transfers = transferStorage(data.storage,targetStorage,link)
-    val di = DataInstance(data.typ,data.meta,data.repr,data.properties,targetStorage)
-    FutureEvent(di, new EventGroup(transfers))
-  }
-
   /**
    * Indicate whether an instance of data is present in memory
    */
@@ -220,12 +203,53 @@ trait DefaultDataManager extends Runtime {
     datas(data).instances.filter(_.isAvailableIn(memory))
   }
 
-  def isDirect(data:Data,memory:MemoryNode):Boolean = {
+
+  /********************************************************
+   * Transfer management
+   ********************************************************/
+  protected var activeTransfers:Map[Data,IdentityHashSet[DataCopy]] = Map.empty
+
+  /**
+   * Current transfers for the given data
+   */
+  def currentTransfers(data:Data):IdentityHashSet[DataCopy] = activeTransfers.getOrElse(data, IdentityHashSet.empty)
+
+  def viewTransferCompleted(transfer:DataTransfer):Unit = {
+  }
+
+  def transferCompleted(copy:DataCopy):Unit = {
+    val current = currentTransfers(copy.data)
+    current -= copy
+    if (current.isEmpty)
+      activeTransfers -= copy.data
+  }
+
+  /**
+   * Allocate then duplicate or transfer a data instance into the given memory using the given link
+   */
+  def directCopy(data:Data,source:DataInstance,memory:MemoryNode,link:Link):FutureEvent[DataInstance] = {
+    val targetStorage = allocateStorage(source.storage,memory)
+    val transfers = transferStorage(source.storage,targetStorage,link)
+    val instance = source.copy(storage = targetStorage)
+    val copyEvent = new EventGroup(transfers)
+    
+    val dataCopy = DataCopy(data,source,memory,link,copyEvent)
+    val current = currentTransfers(data)
+    current += dataCopy
+    activeTransfers += data -> current
+
+    copyEvent.willTrigger {
+      self.transferCompleted(dataCopy)
+    }
+
+    FutureEvent(instance, copyEvent)
+  }
+
+  protected def isDirect(data:Data,memory:MemoryNode):Boolean = {
     datas(data).instances.exists(_.storage.views.forall(
       view => platform.linkBetween(view.buffer.memory,memory).isDefined
     ))
   }
 
-  protected var activeTransfers:Map[Data,DataCopy] = Map.empty
 
 }

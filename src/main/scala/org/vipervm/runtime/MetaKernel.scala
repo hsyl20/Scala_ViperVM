@@ -19,29 +19,41 @@ import org.vipervm.runtime.mm.config._
 import org.vipervm.runtime.mm.{Data,DataInstance}
 
 /**
- * A kernel that can be executed on different architectures
- *
- * Kernels must all take the same parameters as input (same prototype)
+ * Wrapper that makes a kernel functional
  */
-trait MetaKernel extends Prototyped {
+trait MetaKernel {
 
-  /**
-   * Get kernels for the given processor
-   */
-  def getKernelsFor(proc:Processor): Seq[Kernel]
+  val prototype:FunctionPrototype
 
+  /** Low-level kernel */
+  val kernel:Kernel
+
+  /** Low-level kernel prototype */
+  val kernelPrototype:List[Parameter[_]]
+
+  /** Make low-level kernel parameters from data instances */
   def makeKernelParams(params:Seq[DataInstance]):Seq[Any]
 
-  def canExecuteOn(proc:Processor) = !getKernelsFor(proc).isEmpty
+  /** Indicate if this kernel can be executed on the given processor */
+  def canExecuteOn(proc:Processor):Boolean
 
   def memoryConfig(params:Seq[Data],memory:MemoryNode,hostMemory:MemoryNode):DataConfig = {
-    if (params.length != prototype.length) throw new Exception("Invalid parameters")
-    val paramMem = params zip prototype.map(_.storage match {
+    if (params.length != kernelPrototype.length) throw new Exception("Invalid parameters")
+    val paramMem = params zip kernelPrototype.map(_.storage match {
       case HostStorage => hostMemory
       case DeviceStorage => memory
     })
     val constraints = paramMem map { case (p,m) => p requiredIn m }
     constraints.reduceLeft[DataConfig](_&&_)
+  }
+
+  protected implicit def instanceExtractor(params:Seq[DataInstance]) = new {
+    def apply[A : Manifest](param:Parameter[A]) = try {
+      params(kernelPrototype.indexOf(param)).asInstanceOf[A]
+    }
+    catch {
+      case e => throw new Exception("Invalid parameter for \"%s\" at position %d. You should pass a %s that corresponds to the following description: %s)".format(param.name, kernelPrototype.indexOf(param), manifest[A].toString, param.description))
+    }
   }
 
 }

@@ -16,7 +16,7 @@ package org.vipervm.runtime.mm
 import org.vipervm.platform.MemoryNode
 
 /** Instance of a data */
-abstract class DataInstance {
+abstract class DataInstance { self =>
   val typ:VVMType
   val meta:MetaData
   val repr:Repr
@@ -28,6 +28,17 @@ abstract class DataInstance {
    */
   def isAvailableIn(memory:MemoryNode):Boolean = {
     storage.views.forall(_.buffer.memory == memory)
+  }
+
+  def copy(typ:VVMType = self.typ, meta:MetaData = self.meta, repr:Repr = self.repr, properties:ReprProperties = self.properties, storage:Storage = self.storage):DataInstance = {
+    val (t,m,r,p,s) = (typ,meta,repr,properties,storage)
+    new DataInstance {
+      val typ = t
+      val meta = m
+      val repr = r
+      val properties = p
+      val storage = s
+    }
   }
 }
 

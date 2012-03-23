@@ -15,4 +15,4 @@ package org.vipervm.runtime
 
 import org.vipervm.runtime.mm.Data
 
-case class Task(functions:Seq[Function], params:Seq[Data], result:Data)
+case class Task(functions:Seq[MetaKernel], params:Seq[Data], result:Data)

@@ -13,10 +13,10 @@
 
 package org.vipervm.library
 
-import org.vipervm.runtime.{Function,Rule,FunctionPrototype}
+import org.vipervm.runtime.{MetaKernel,Rule,FunctionPrototype}
 import org.vipervm.runtime.mm.VVMType
 
-class Library(functions:Map[FunctionPrototype,Seq[Function]],rules:Map[FunctionPrototype,Seq[Rule]]) {
+class Library(functions:Map[FunctionPrototype,Seq[MetaKernel]],rules:Map[FunctionPrototype,Seq[Rule]]) {
 
   def proto(name:String,paramTypes:Seq[VVMType]):FunctionPrototype = {
     protoOption(name,paramTypes).getOrElse {
@@ -29,12 +29,12 @@ class Library(functions:Map[FunctionPrototype,Seq[Function]],rules:Map[FunctionP
     ps.headOption
   }
 
-  def functionsByProto(proto:FunctionPrototype):Seq[Function] = functions(proto)
-  def rulesByProto(proto:FunctionPrototype):Seq[Rule] = rules(proto)
+  def functionsByProto(proto:FunctionPrototype):Seq[MetaKernel] = functions.getOrElse(proto, Seq.empty)
+  def rulesByProto(proto:FunctionPrototype):Seq[Rule] = rules.getOrElse(proto, Seq.empty)
 }
 
 object Library {
-  def apply(functions:Function*)(rules:Rule*) = {
+  def apply(functions:MetaKernel*)(rules:Rule*) = {
     new Library(functions.groupBy(_.prototype),rules.groupBy(_.prototype))
   }
 }

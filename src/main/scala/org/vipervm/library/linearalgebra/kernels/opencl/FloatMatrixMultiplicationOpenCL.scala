@@ -17,7 +17,7 @@ import org.vipervm.library.linearalgebra.kernels.prototypes._
 
 import org.vipervm.platform.opencl._
 
-object FloatMatrixMultiplicationOpenCL extends OpenCLKernel with FloatMatrixMultiplicationPrototype {
+object FloatMatrixMultiplicationOpenCLKernel extends OpenCLKernel with FloatMatrixMultiplicationPrototype {
 
   val blockSize = 16
 

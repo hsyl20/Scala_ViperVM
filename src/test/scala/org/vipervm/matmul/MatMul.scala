@@ -99,6 +99,8 @@ class MatMul extends FunSuite {
     val interp = new DefaultInterpreter(runtime)
     println(interp.typeCheck(src))
 
+    val ret = Matrix(interp.evaluate(src))
+
   /*  val result = interp.evaluate(program)
 
     result.syncWait

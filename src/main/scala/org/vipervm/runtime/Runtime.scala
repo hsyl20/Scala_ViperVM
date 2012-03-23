@@ -32,7 +32,8 @@ trait Runtime {
 
   def submit(task:Task):Unit
 
-  def transferCompleted(transfer:DataTransfer):Unit
+  def transferCompleted(transfer:DataCopy):Unit
+  def viewTransferCompleted(transfer:DataTransfer):Unit
   def kernelCompleted(kernelEvent:KernelExecution):Unit
   def wakeUp:Unit
 

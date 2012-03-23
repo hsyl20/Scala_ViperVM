@@ -35,6 +35,7 @@ class DefaultInterpreter(runtime:Runtime) {
         val proto = library.proto(f, paramTypes)
         proto.resultType(paramTypes).get
       }
+      case _ => throw new Exception("Invalid term")
     }
 
   /**

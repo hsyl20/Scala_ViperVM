@@ -20,56 +20,109 @@ import org.vipervm.utils._
 import org.vipervm.runtime.Runtime
 
 import scala.collection.immutable.HashMap
+import scala.collection.JavaConversions._
+import java.util.IdentityHashMap
 
 import akka.actor.TypedActor
 
+case class DataInfo(typ:Option[VVMType],meta:Option[MetaData],instances:Seq[DataInstance])
 case class DataCopy(source:DataInstance,target:MemoryNode)
 
 trait DefaultDataManager extends Runtime {
 
-  protected var types:Map[Data,VVMType] = Map.empty
-  protected var metadata:Map[Data,MetaData] = Map.empty
-  protected var instances:Map[Data,Seq[DataInstance]] = Map.empty
-  protected var events:Map[Data,Event] = Map.empty
+  /********************************************************
+   * Buffer management
+   ********************************************************/
 
-  protected var activeTransfers:Map[Data,DataCopy] = Map.empty
+  /**
+   * Try to allocate a buffer in the given memory
+   */
+  def allocateBuffer(memory:MemoryNode,size:Long):Buffer = {
+    memory.allocate(size)
+  }
+  
+  /**
+   * Release a buffer if it contains no active view
+   */
+  def releaseBuffer(buffer:Buffer):Unit = {
+    //Check for active views
+    if (bufferViews.get(buffer).isDefined)
+      throw new Exception("Cannot release buffer: active views")
 
-
-  def createData:Data = {
-    val d = new Data(this)
-    instances += d -> Seq.empty
-    d
+    val mem = buffer.memory
+    mem.free(mem.get(buffer))
   }
 
-  def releaseData(data:Data):Unit = {
-    types -= data
-    metadata -= data
-    instances -= data
+  /********************************************************
+   * View management
+   ********************************************************/
+
+  private var bufferViews:Map[Buffer,IdentityHashSet[BufferView]] = Map.empty
+
+  /**
+  * Register a view in the system
+  *
+  * Buffer containing registered views can't be released
+  */
+  def registerView(view:BufferView):Unit = {
+    val views = registeredViews(view.buffer)
+    views += view
+    bufferViews += view.buffer -> views
   }
 
-  def setDataType(data:Data,typ:VVMType):Unit = {
-    types += data -> typ
+  /**
+   * Unregister a view
+   */
+  def unregisterView(view:BufferView):Unit = {
+    val views = registeredViews(view.buffer)
+    views -= view
+    if (views.isEmpty)
+      bufferViews -= view.buffer
+    else
+      bufferViews += view.buffer -> views
   }
 
-  def getDataType(data:Data):Option[VVMType] = types.get(data)
+  /**
+   * Return registered views in the given buffer
+   */
+  def registeredViews(buffer:Buffer) = bufferViews.getOrElse(buffer, IdentityHashSet.empty)
 
-  def setDataMeta(data:Data,meta:MetaData):Unit = {
-    metadata += data -> meta
+  
+  /**
+   * Allocate buffer(s) and views compatible with the given views in the given memory
+   */
+  protected def allocateCompatibleViews(views:Seq[BufferView],memory:MemoryNode):Seq[BufferView] = {
+    def compatibleViewSize(view:BufferView,align:Long) = {
+      val size = view match {
+        case BufferView1D(_,_,size) => size
+        case BufferView2D(_,_,width,height,_) => width*height
+        case BufferView3D(_,_,width,height,depth,_,_) => width*height*depth
+      }
+      size + (size % align)
+    }
+
+    def createCompatibleViewAt(buffer:Buffer,view:BufferView,offset:Long):BufferView = view match {
+      case BufferView1D(_,_,size) => BufferView1D(buffer,offset,size)
+      case BufferView2D(_,_,width,height,_) => BufferView2D(buffer,offset,width,height,0)
+      case BufferView3D(_,_,width,height,depth,_,_) => BufferView3D(buffer,offset,width,height,depth,0,0)
+    }
+
+    val align = 8L //TODO: correctly handle padding depending on device
+    val sizes = views.map(v => compatibleViewSize(v,align))
+    val totalSize = sizes.sum
+
+    //TODO: check max allocatable size
+    val buffer = memory.allocate(totalSize)
+
+    val offsets = sizes.scanLeft(0L)(_ + _)
+
+    (views zip offsets) map { case (v,o) => createCompatibleViewAt(buffer,v,o) }
   }
-
-  def getDataMeta(data:Data):Option[MetaData] = metadata.get(data)
-
-  def associateDataInstance(data:Data,instance:DataInstance):Unit = {
-    val insts = availableInstances(data)
-    instances += data -> (insts :+ instance)
-  }
-
-  def availableInstances(data:Data):Seq[DataInstance] = instances.getOrElse(data, Seq.empty)
 
   /**
    * Transfer a view content into another view
    */
-  protected def transfer(source:BufferView,target:BufferView,link:Link):DataTransfer = {
+  protected def transferView(source:BufferView,target:BufferView,link:Link):DataTransfer = {
     val mem = target.buffer.memory
     val tr = link.copy(source,target)
     profiler.transferStart(tr)
@@ -82,32 +135,66 @@ trait DefaultDataManager extends Runtime {
     tr
   }
 
-  def transferCompleted(transfer:DataTransfer):Unit = {}
+
+  /********************************************************
+   * Storage management
+   ********************************************************/
 
   /**
    * Allocate a new storage in given memory, compatible with given storage 
    */
   protected def allocateStorage(storage:Storage,memory:MemoryNode):Storage = {
-    val views = storage.views.map( _ match {
-      case BufferView1D(_,offset,size) => {
-        val buffer = memory.allocate(size)
-        BufferView1D(buffer,0,size)
-      }
-      case BufferView2D(_,offset,width,height,padding) => {
-        val buffer = memory.allocate(width*height)
-        BufferView2D(buffer,0,width,height,0)
-      }
-      case BufferView3D(_,offset,width,height,depth,padding0,padding1) =>{
-        val buffer = memory.allocate(width*height*depth)
-        BufferView3D(buffer,0,width,height,depth,0,0)
-      }
-    })
+    val views = allocateCompatibleViews(storage.views, memory)
+
     storage.duplicate(views)
   }
 
   protected def transferStorage(source:Storage,target:Storage,link:Link):Seq[DataTransfer] = {
-    (source.views zip target.views).map { case (s,d) => transfer(s,d,link) }
+    (source.views zip target.views).map { case (s,d) => transferView(s,d,link) }
   }
+
+
+  /********************************************************
+   * Data management
+   ********************************************************/
+
+  protected var datas:IdentityHashMap[Data,DataInfo] = new IdentityHashMap
+
+  def createData:Data = {
+    val data = new Data(this)
+    datas += data -> DataInfo(None,None,Seq.empty)
+    data
+  }
+
+  def releaseData(data:Data):Unit = {
+    datas -= data
+  }
+
+  def setDataType(data:Data,value:VVMType):Unit = {
+    val info = datas(data)
+    datas += data -> info.copy(typ = Some(value))
+  }
+
+  def getDataType(data:Data):Option[VVMType] = datas(data).typ
+
+  def setDataMeta(data:Data,value:MetaData):Unit = {
+    val info = datas(data)
+    datas += data -> info.copy(meta = Some(value))
+  }
+
+  def getDataMeta(data:Data):Option[MetaData] = datas(data).meta
+
+  def associateDataInstance(data:Data,instance:DataInstance):Unit = {
+    val info = datas(data)
+    datas += data -> info.copy(instances = info.instances :+ instance)
+  }
+
+  /********************************************************
+   * Transfer management
+   ********************************************************/
+  protected var events:Map[Data,Event] = Map.empty
+
+  def transferCompleted(transfer:DataTransfer):Unit = {}
 
   /**
    * Allocate then duplicate or transfer a data instance into the given memory using the given link
@@ -119,21 +206,26 @@ trait DefaultDataManager extends Runtime {
     FutureEvent(di, new EventGroup(transfers))
   }
 
-
-  /** Indicate whether an instance of data is present in memory */
+  /**
+   * Indicate whether an instance of data is present in memory
+   */
   def isAvailableIn(data:Data,memory:MemoryNode):Boolean = {
-    !availableInstancesIn(data,memory).isEmpty
+    !instancesIn(data,memory).isEmpty
   }
 
-  /** Return available instances of data in memory */
-  def availableInstancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
-    availableInstances(data).filter(_.isAvailableIn(memory))
+  /**
+   * Return available instances of data in memory
+   */
+  def instancesIn(data:Data,memory:MemoryNode):Seq[DataInstance] = {
+    datas(data).instances.filter(_.isAvailableIn(memory))
   }
 
   def isDirect(data:Data,memory:MemoryNode):Boolean = {
-    availableInstances(data).exists(_.storage.views.forall(
+    datas(data).instances.exists(_.storage.views.forall(
       view => platform.linkBetween(view.buffer.memory,memory).isDefined
     ))
   }
+
+  protected var activeTransfers:Map[Data,DataCopy] = Map.empty
 
 }

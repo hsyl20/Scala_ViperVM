@@ -7,3 +7,12 @@ project/boot
 *.swo
 *~
 \#*\#
+doc/*.log
+doc/*.fls
+doc/*.d
+doc/*.out*
+doc/*.toc*
+doc/*.bbl
+doc/*.blg
+doc/*.aux*
+doc/*.pdf

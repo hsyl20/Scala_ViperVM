@@ -1,0 +1,23 @@
+\chapter{Scheduling algorithms}
+
+\begin{itemize}
+  \item First phase consists in typing every term. Type is known for each term in the
+program graph.
+  \item Execution by graph rewriting.
+  \item Two levels: meta data and data.
+  \item Meta data are what is usually called "dependent types". For instance, matrix
+  \item Terms: App, Id and Var
+  \item Initial variables have type, meta data and some instances
+dimensions, etc.
+  \item Id and Var terms are values
+  \item Reduction of App
+  \begin{itemize}
+    \item Given the function name, we know which param meta data and data are
+    required to compute result meta data
+    \item Given the function name, we know which param meta data and data are
+    required to check whether some rewriting rules should be used
+    \item Given the function name, we get different function implementations
+    \item Implementations can be filtered by: target processor, param
+    representations
+  \end{itemize}
+\end{itemize}

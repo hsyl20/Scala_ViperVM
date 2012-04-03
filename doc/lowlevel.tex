@@ -1,0 +1,48 @@
+\chapter{Low-Level Programming}
+
+Applications can directly use the low-level architecture model that is exposed
+by ViperVM. In this case, they have to manually manage memories, transfers and
+kernel executions.
+
+Many operations are asynchronous (data transfers, kernel executions\ldots) and
+applications must rely on event objects to query the state of each operation.
+ViperVM provides several utility methods to ease event management. For instance,
+several events can be combined into a single one; a callback can be triggered on
+event status modification\ldots
+
+ViperVM provides a delimited continuation mechanism to write asynchronous codes
+triggered by events in a synchronous looking fashion.
+Figure~\ref{fig:continuations} shows an example of code using delimited
+continuations. Each barrier captures the continuation (delimited by the
+\texttt{sequence} keyword) that will be executed when events given as parameters
+have completed. \texttt{chk} is a future whose value can be queried once the
+whole sequence is complete.
+
+\begin{figure}
+\begin{scalacode}
+val chk = sequence {
+  /* Type of the returned value */
+  type R = Boolean 
+
+  val writeEventA = writeLink.copy(hostaView,aView)
+  val writeEventB = writeLink.copy(hostbView,bView)
+  barrier[R](EventGroup(writeEventA, writeEventB))
+
+  val event = proc.execute(kernel,params)
+  barrier[R](event)
+
+  val readEvent = readLink.copy(cView,hostcView)
+  barrier[R](readEvent)
+
+  val result = check(hostcView)
+
+  FutureEvent(result)
+}
+\end{scalacode}
+  \caption{Delimited continuations example}
+  \label{fig:continuations}
+\end{figure}
+
+This kind of low-level programming is hard, even with facilities provided by our
+unified framework. Next sections present models provided by ViperVM that
+abstract over this low-level model.

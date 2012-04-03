@@ -1,45 +1,78 @@
-\chapter{Platforms}
+\chapter{Architecture Model}
 
 ViperVM is designed to run on any kind of platform. For instance, it can be
 used on single-core, multi-core or many-core architectures, with or without
 additional accelerators (GPU, CELL\ldots). It also manages clusters composed of
 such architectures.
 
-ViperVM models architectures using the following entities:
+The architecture model used internally is basically composed of a \textbf{network of
+memory nodes}. Nodes are connected together through links associated to
+networks. Nodes can exchange data through these links.
 
-\begin{description}
+Examples of network of memory nodes:
+\begin{itemize}
+  \item Heterogeneous platforms: 1 node per NUMA node and 1 node per accelerator
+  (GPU\ldots). Links between NUMA nodes and between them amd each accelerator.
+  There may be links between some accelerators (e.g. NVidia's GPUDirect).
+  \item Clusters: 1 node per NUMA node per cluster node. Links for interconnected
+  cluster nodes (to one or several NUMA node memory).
+  \item Hard-disk: 1 node per hard-disk. 1 link to each NUMA memory node.
+\end{itemize}
 
-  \item[Memory] This is the main part of most architectures. Memories contain
-  data that can be used to perform computations.
+\section{Memory Allocation}
+Buffers are memory regions that have been allocated into some memory nodes. A
+buffer is a contiguous sequence of memory cells.
 
-  \item[Buffer] A buffer is a contiguous space in a memory.
+Examples of buffers:
+\begin{itemize}
+  \item Host memory: buffers are allocated by using malloc
+  \item Accelerator memory: buffers are allocated by using the allocator
+  provided by the accelerator framework (CUDA, OpenCL\ldots).
+  \item Hard-disk: buffers are files
+\end{itemize}
 
-  \item[BufferView] A buffer view is a contiguous or discontiguous memory space
-  in a buffer.
+ViperVM subsumes swapping mechanisms (e.g. between host memory and  hard-disks).
+Thus, these mechanisms aren't used for memory managed by our framework.
 
-  \item[Network] This is a physical network that links together some memories.
+\subsection{Views}
+Views are used to represent a subset of the cells in a buffer. There are
+different kind of views with different characteristics:
+\begin{itemize}
+  \item 1D View: a set of contiguous cells
+  \item 2D View: a set of sets of contiguous cells separated by a given number
+  of padding cells
+  \item 3D View: a set of 2D views where each view is separated by a given
+  number of padding cells
+\end{itemize}
 
-  \item[Link] A link is a directed point-to-point association between two
-  memories using a network. It can be represented as a 3-tuple (Network,
-  SourceMemory, DestinationMemory).
+\subsection{Memory Transfers}
+Memory can be transferred through links between two memory nodes. Transfers are
+performed from one view to another. Destination view must be compatible with the
+source view: there must be the same number of contiguous cells containing
+meaningful data while the number of padding cells may be different.
 
-  \item[Processor] A processor is a compute unit that can execute tasks.
-  Processors have one or more associated memories that can be read or write to
-  by tasks.
+Data transfers are implemented using DMA controllers when available. Some of
+them directly support transfers with strides. Otherwise, the framework falls
+back to other available transfer primitives.
 
-  \item[Kernel] A kernel is a piece of code that can be executed by some kind of
-  processor. Kernels can have parameters of different types: buffers or immediate
-  values (integer, floating point numbers\ldots).
+\section{Processing}
+Several \textbf{processors} may be associated to each memory node. Processor are able to
+transform data in the memory node. Transformation programs that are executed by
+processors are called \textbf{kernels}. Kernels may be compatible only with some
+kind of processors.
 
-\end{description}
+\textbf{Kernel instances} (executions of a given kernel) are configured to work only on
+some given views. The kind of access they have to each view is known (read-only,
+read-write, write-only).
 
-\section{Platform configuration}
+Some processors may execute several kernels at the same time.
+
+\section{Platform Configuration}
 ViperVM provides a Platform class that can be configured to use some backends.
-There are backends for the JVM, for CUDA, for OpenCL, for native C code,
+Backends are available or planned for the JVM, CUDA, OpenCL, native C code,
 etc.\footnote{Currently these backends are not production ready or not even
-available, but they should be the first to be provided} and more of them could
-be provided in the future. Using these backends, Platforms objects are able to
-retrieve information about available memories, processors and networks.
+available, but they should be the first to be provided} and more of them will
+be provided in the future (CELL, SCC, MIC\ldots).
 
-\section{Asynchronous operations}
-
+Enabled backends are used to retrieve available memory nodes, networks and
+processors

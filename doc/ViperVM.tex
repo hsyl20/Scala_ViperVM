@@ -24,6 +24,10 @@
 \usepackage{multirow}
 \usepackage{rotating}
 \usepackage{amsmath, amsthm, amssymb}
+\usepackage{minted}
+
+\newminted{haskell}{fontsize=\footnotesize}
+\newminted{scala}{fontsize=\footnotesize}
 
 \newcommand{\theauthor}{Sylvain Henry}
 \newcommand{\thetitle}{ViperVM Manual}
@@ -129,15 +133,13 @@
 \mainmatter
 
 \input{platform}
+\input{lowlevel}
+\input{runtime_basic}
+\input{runtime_advanced}
 
-\input{layers}
-\input{runtime}
-\input{scheduling}
-\input{choices}
-\input{dsl}
-\input{codegen}
 \input{datamanagement}
 \input{algo}
+%\input{changes}
 
 \bibliographystyle{plain}
 \bibliography{biblio}

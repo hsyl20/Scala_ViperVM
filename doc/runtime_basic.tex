@@ -1,0 +1,27 @@
+\chapter{Basic Runtime Systems}
+
+Memory management and kernel scheduling are hard to do when several memory nodes
+are available as well as different processors of different kinds (heterogeneous
+architectures). Application programmers shouldn't have to manage all of this.
+
+\subsection{Meta Views}
+A first abstraction is what we call \textbf{meta views}. A meta view is
+basically a set of views of the same kind that may be present in different
+memories. Kernel instances are now configured using meta views instead of usual
+views. When a kernel is to be executed by a given processor, the runtime system
+ensures for each meta view used as parameter that a view is available in the
+memory the processor is attached to. It performs any necessary data transfer and
+manages the memory coherency between views of a meta view.
+
+\subsection{Meta Kernels}
+Application programmers have to select processors that will execute kernels. To
+relieve programmers from this tedious task, we use an abstraction similar to
+meta views: \textbf{meta kernels}. Similarly to meta views, meta kernels are
+sets of kernels that can be executed by different processors and perform the
+same operation.
+
+Meta kernels can be used with or without meta views. When usual views are used,
+the runtime system only has to select a kernel in the meta kernel compatible
+with one of the processors attached to memory node containing views. When meta
+views are used with meta kernels, the runtime system has to select a processor,
+a kernel and to prepare views in memory attached to chosen processor.

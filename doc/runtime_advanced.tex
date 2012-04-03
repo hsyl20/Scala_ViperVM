@@ -1,0 +1,8 @@
+\chapter{Advanced Runtime Systems}
+
+Kernels cannot allocate buffers nor views. Applications have to allocate
+them as appropriate before executing kernels. This could be left to the runtime
+to perform.
+
+We can associate a function to each kernel that would take the same parameters
+as the kernel and allocate required buffers and (meta-)views.
